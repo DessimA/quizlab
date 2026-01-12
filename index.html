@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizLab | Plataforma de Simulados</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -113,6 +113,13 @@
         <main class="content">
             <!-- Upload Screen -->
             <div id="uploadScreen" class="fade-in">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button class="btn btn-outline" onclick="showLibrary()" title="Meus Simulados Salvos">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        <span>Meus Simulados</span>
+                    </button>
+                </div>
+
                 <div class="upload-area" id="uploadArea">
                     <div style="margin-bottom: 24px; color: var(--primary-500);">
                          <svg class="icon-svg icon-lg anim-bounce" viewBox="0 0 24 24">
@@ -140,6 +147,24 @@
 
                 <div id="errorMessage" class="feedback-message incorrect hidden"></div>
                 <div id="successMessage" class="feedback-message correct hidden"></div>
+            </div>
+
+            <!-- Library Screen (Meus Simulados) -->
+            <div id="libraryScreen" class="hidden fade-in">
+                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-ghost" onclick="hideLibrary()" title="Voltar">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    </button>
+                    <div id="libraryCounter" class="header-subtitle" style="font-size: 0.9rem;">0/10 SALVOS</div>
+                </div>
+                
+                <h2 class="neon-text" style="text-align: center; margin-bottom: 32px;">Biblioteca Local</h2>
+                
+                <div class="library-stats hidden" id="emptyLibraryMsg">
+                    Nenhum simulado salvo ainda.<br>Os simulados salvos ficam armazenados apenas neste navegador.
+                </div>
+
+                <div id="libraryList" class="library-grid"></div>
             </div>
 
             <!-- Creator Screen -->
@@ -273,6 +298,30 @@
             <div class="modal-footer">
                 <button id="modalBtnCancel" class="btn btn-secondary hidden">CANCELAR</button>
                 <button id="modalBtnConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limit Management Modal (11th Item) -->
+    <div id="limitModal" class="modal-overlay hidden">
+        <div class="modal-card" style="border-top-color: var(--error);">
+            <div class="modal-header">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--error)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span class="modal-title" style="color:var(--error)">LIMITE DE ARMAZENAMENTO</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:12px">Você atingiu o limite de <strong>10 simulados</strong> salvos localmente.</p>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:16px;">Para salvar o novo simulado, é necessário remover o mais antigo:</p>
+                
+                <div class="feature-card" style="padding: 12px; margin-bottom: 20px; border-color: var(--border-glass);">
+                    <div style="font-weight:700; color:var(--text-main); margin-bottom:4px" id="limitOldestTitle">Título do Antigo</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono)" id="limitOldestDate">Adicionado em: ...</div>
+                </div>
+            </div>
+            <div class="modal-footer" style="flex-direction: column; gap: 8px;">
+                <button id="limitBtnExport" class="btn btn-outline" style="width:100%">EXPORTAR ANTIGO E SALVAR NOVO</button>
+                <button id="limitBtnReplace" class="btn btn-primary" style="width:100%; background:var(--error); color:white; box-shadow:none;">APENAS REMOVER E SALVAR NOVO</button>
+                <button id="limitBtnCancel" class="btn btn-ghost" style="width:100%">NÃO SALVAR (APENAS CARREGAR)</button>
             </div>
         </div>
     </div>

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentação | QuizLab</title>
+    <title>Central de Ajuda | QuizLab</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -13,70 +13,117 @@
 <body>
 
     <header class="header">
-        <div class="header-brand" onclick="goHome()" title="Voltar ao início">
+        <div class="header-brand" onclick="location.href='index.html'" style="cursor: pointer;" title="Voltar ao início">
             <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
-            <div class="logo-container">
-                <span class="logo-full">QuizLab</span>
-                <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
-            </div>
+            <span>QuizLab</span>
         </div>
     </header>
 
     <div class="container fade-in">
         <main class="content">
-            <h1 class="neon-text" style="margin-bottom: 40px; text-align: center;">DOCUMENTAÇÃO</h1>
+            <h1 class="neon-text" style="margin-bottom: 40px; text-align: center;">CENTRAL DE AJUDA</h1>
 
             <div class="docs-content">
                 
                 <section class="docs-section">
-                    <h2>Introdução</h2>
-                    <p>O QuizLab é uma plataforma client-side para criação e execução de simulados. Esta documentação destina-se tanto a usuários finais quanto a desenvolvedores.</p>
+                    <h2>Bem-vindo ao QuizLab</h2>
+                    <p>O QuizLab é uma ferramenta profissional para criação, gerenciamento e execução de simulados. Projetado com foco em privacidade e performance, ele funciona <strong>100% no seu navegador</strong>, sem enviar dados para servidores externos.</p>
+                </section>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
+
+                <section class="docs-section">
+                    <h2>📚 Biblioteca & Armazenamento</h2>
+                    <p>O QuizLab possui um sistema de cache inteligente para facilitar seus estudos:</p>
+                    <ul>
+                        <li><strong>Armazenamento Local:</strong> Seus simulados são salvos na memória do navegador (LocalStorage).</li>
+                        <li><strong>Limite de 10 Slots:</strong> Para garantir performance, você pode manter até 10 simulados salvos simultaneamente.</li>
+                        <li><strong>Gestão Automática:</strong> Ao tentar salvar o 11º simulado, o sistema oferecerá a opção de substituir o mais antigo ou exportá-lo antes da remoção.</li>
+                        <li><strong>Persistência:</strong> Seus dados permanecem salvos mesmo se você fechar a aba (desde que não limpe o cache do navegador).</li>
+                    </ul>
                 </section>
 
                 <section class="docs-section">
-                    <h2>Guia do Usuário: Criador Visual</h2>
-                    <p>O assistente de criação funciona em etapas para garantir a integridade dos dados:</p>
+                    <h2>📝 Realizando Simulados</h2>
+                    <p>Entenda como funciona o motor de provas:</p>
+                    <ul>
+                        <li><strong>Modo Foco:</strong> Em computadores, a barra de navegação se oculta automaticamente ao rolar para baixo para evitar distrações.</li>
+                        <li><strong>Navegação Mobile:</strong> Toque duas vezes rapidamente (Double Tap) em qualquer área vazia da tela para ocultar/exibir o menu superior.</li>
+                        <li><strong>Regras de Seleção:</strong>
+                            <ul>
+                                <li><em>Única Escolha:</em> Selecione uma opção e clique em "Confirmar".</li>
+                                <li><em>Múltipla Escolha:</em> Você deve selecionar <strong>exatamente</strong> o número de respostas corretas indicado (ex: "Selecione 2 opções"). O botão de confirmação só aparecerá quando a quantidade estiver correta.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Revisão:</strong> Ao finalizar, você terá acesso a um relatório detalhado de erros e acertos, com opção de reiniciar o teste imediatamente.</li>
+                    </ul>
+                </section>
+
+                <section class="docs-section">
+                    <h2>🛠️ Criador de Simulados (Wizard)</h2>
+                    <p>Crie seus próprios testes sem precisar editar códigos:</p>
                     <ol>
-                        <li><strong>Dados Gerais:</strong> Defina o título. O botão de confirmação libera a edição de questões.</li>
-                        <li><strong>Questões:</strong> Preencha enunciado e alternativas. Marque as corretas usando o checkbox lateral.</li>
-                        <li><strong>Ocultar/Exibir:</strong> Clique no cabeçalho de uma seção para recolhê-la e ganhar espaço.</li>
-                        <li><strong>Exportação:</strong> Use o botão de download para salvar seu arquivo .JSON.</li>
+                        <li><strong>Dados Gerais:</strong> Defina um Título e Descrição. Clique no botão de confirmação para travar esses dados e iniciar a edição das questões.</li>
+                        <li><strong>Adicionando Questões:</strong> O sistema utiliza um formato de "Acordeão". Ao adicionar uma nova questão, a anterior é validada e minimizada automaticamente para organizar a tela.</li>
+                        <li><strong>Validação em Tempo Real:</strong> O botão "Nova Questão" só é habilitado se a questão atual estiver completa (Enunciado + Alternativas + Resposta Correta marcada).</li>
+                        <li><strong>Exportação:</strong> Ao terminar, clique em "Exportar JSON". O arquivo será baixado e também salvo automaticamente na sua Biblioteca Local (se houver espaço).</li>
                     </ol>
                 </section>
 
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
+
                 <section class="docs-section">
-                    <h2>Guia do Desenvolvedor: Estrutura JSON</h2>
-                    <p>Esquema de dados para importação manual:</p>
+                    <h2>💻 Guia para Desenvolvedores (JSON)</h2>
+                    <p>Se preferir criar seus simulados manualmente via editor de código, siga rigorosamente este esquema:</p>
                     
-                    <h3>Esquema Raiz</h3>
+                    <h3>Estrutura do Arquivo</h3>
                     <pre><code>{
-  "nomeSimulado": "String",
-  "descricao": "String (Opcional)",
-  "questoes": [ QuestionObject ]
+  "nomeSimulado": "Título do Simulado (Obrigatório)",
+  "descricao": "Descrição breve (Opcional)",
+  "questoes": [
+    {
+      "id": 1,
+      "enunciado": "Texto da pergunta (Aceita HTML básico)",
+      "tipo": "unica",  // ou "multipla"
+      "alternativas": [
+        { "id": "a", "texto": "Opção A" },
+        { "id": "b", "texto": "Opção B" }
+      ],
+      "respostasCorretas": ["a"] // Array com IDs das corretas
+    }
+  ]
 }</code></pre>
 
-                    <h3>Objeto de Questão</h3>
-                    <pre><code>{
-  "id": Number,
-  "enunciado": "String",
-  "tipo": "unica" | "multipla",
-  "alternativas": [
-    { "id": "a", "texto": "String" }
-  ],
-  "respostasCorretas": ["a"] 
-}</code></pre>
+                    <h3>Regras de Validação de Dados</h3>
+                    <ul>
+                        <li><strong>Tipo "unica":</strong> O array <code>respostasCorretas</code> deve conter exatamente <strong>1 ID</strong>.</li>
+                        <li><strong>Tipo "multipla":</strong> O array <code>respostasCorretas</code> deve conter <strong>2 ou mais IDs</strong>.</li>
+                        <li><strong>IDs:</strong> Os IDs dentro de <code>respostasCorretas</code> devem corresponder exatamente aos IDs definidos nas <code>alternativas</code>.</li>
+                    </ul>
+                </section>
+
+                <section class="docs-section">
+                    <h2>❓ Perguntas Frequentes (FAQ)</h2>
+                    
+                    <p><strong>P: Meus simulados ficam salvos na nuvem?</strong><br>
+                    R: Não. O QuizLab é "Zero Data". Tudo fica gravado apenas no seu navegador atual. Se você limpar o cache ou usar navegação anônima, os dados serão perdidos.</p>
+
+                    <p><strong>P: Posso usar no celular?</strong><br>
+                    R: Sim. A interface é 100% responsiva e possui recursos exclusivos para mobile, como o "Modo Compacto" e controle por gestos.</p>
+
+                    <p><strong>P: O arquivo não carrega. O que fazer?</strong><br>
+                    R: Verifique se o arquivo está no formato <code>.json</code> e se segue a estrutura descrita acima. Erros de vírgula ou aspas no JSON são as causas mais comuns.</p>
                 </section>
 
             </div>
         </main>
 
         <footer class="footer">
-            <p>SISTEMA DE DOCUMENTAÇÃO V.2.0</p>
+            <p>SISTEMA DE DOCUMENTAÇÃO OFICIAL V.2.0</p>
         </footer>
     </div>
 
-    <script src="script.js"></script>
 </body>
 </html>
