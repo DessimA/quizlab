@@ -284,7 +284,16 @@ function finishQuiz() {
     rev.innerHTML = html;
 }
 
-function resetQuiz() { location.reload(); }
+function resetQuiz() {
+    if (!quizData) return location.reload();
+    userAnswers = new Array(quizData.questoes.length).fill(null);
+    questionAnswered = new Array(quizData.questoes.length).fill(false);
+    correctAnswersCount = 0;
+    incorrectAnswersCount = 0;
+    setElementText('correctCount', 0);
+    setElementText('incorrectCount', 0);
+    startQuiz();
+}
 
 function toggleQuizCompact() {
     const bar = document.getElementById('quizInfoBar');
