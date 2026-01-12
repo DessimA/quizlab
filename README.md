@@ -2,8 +2,8 @@
 
 **QuizLab** é uma plataforma de simulados educacionais de alta performance com estética **Cyber Green** e design focado em eficiência. Com uma arquitetura **Tech-Industrial** (formas retangulares e densidade de informação), o projeto prioriza o aproveitamento de tela e a privacidade do usuário, funcionando inteiramente no navegador (client-side).
 
-[![Deploy with Vercel](https://zeit.co/button)](https://quizlab-dessima.vercel.app/)
-*(Link do deploy será atualizado após a finalização)*
+[![Deploy with Vercel](https://zeit.co/button)](https://quizlab-chi.vercel.app/)
+*(Acesse o projeto online)*
 
 ---
 
