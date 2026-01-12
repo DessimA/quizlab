@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação | QuizLab</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-brand" onclick="goHome()" title="Voltar ao início">
+            <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <div class="logo-container">
+                <span class="logo-full">QuizLab</span>
+                <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container fade-in">
+        <main class="content">
+            <h1 class="neon-text" style="margin-bottom: 40px; text-align: center;">DOCUMENTAÇÃO</h1>
+
+            <div class="docs-content">
+                
+                <section class="docs-section">
+                    <h2>Introdução</h2>
+                    <p>O QuizLab é uma plataforma client-side para criação e execução de simulados. Esta documentação destina-se tanto a usuários finais quanto a desenvolvedores.</p>
+                </section>
+
+                <section class="docs-section">
+                    <h2>Guia do Usuário: Criador Visual</h2>
+                    <p>O assistente de criação funciona em etapas para garantir a integridade dos dados:</p>
+                    <ol>
+                        <li><strong>Dados Gerais:</strong> Defina o título. O botão de confirmação libera a edição de questões.</li>
+                        <li><strong>Questões:</strong> Preencha enunciado e alternativas. Marque as corretas usando o checkbox lateral.</li>
+                        <li><strong>Ocultar/Exibir:</strong> Clique no cabeçalho de uma seção para recolhê-la e ganhar espaço.</li>
+                        <li><strong>Exportação:</strong> Use o botão de download para salvar seu arquivo .JSON.</li>
+                    </ol>
+                </section>
+
+                <section class="docs-section">
+                    <h2>Guia do Desenvolvedor: Estrutura JSON</h2>
+                    <p>Esquema de dados para importação manual:</p>
+                    
+                    <h3>Esquema Raiz</h3>
+                    <pre><code>{
+  "nomeSimulado": "String",
+  "descricao": "String (Opcional)",
+  "questoes": [ QuestionObject ]
+}</code></pre>
+
+                    <h3>Objeto de Questão</h3>
+                    <pre><code>{
+  "id": Number,
+  "enunciado": "String",
+  "tipo": "unica" | "multipla",
+  "alternativas": [
+    { "id": "a", "texto": "String" }
+  ],
+  "respostasCorretas": ["a"] 
+}</code></pre>
+                </section>
+
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>SISTEMA DE DOCUMENTAÇÃO V.2.0</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
