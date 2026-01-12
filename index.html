@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizLab | Plataforma de Simulados</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="container fade-in">
+        <header class="header">
+            <div class="header-brand" onclick="goHome()" style="cursor: pointer;" title="Ir para o início">
+                <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <div class="logo-container">
+                    <span class="logo-full">QuizLab</span>
+                    <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a href="docs.html" class="btn btn-ghost" title="Documentação">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </a>
+                <a href="https://meus-links-olive.vercel.app/" target="_blank" class="btn btn-ghost" title="Contato">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                </a>
+            </div>
+        </header>
+
+        <section class="hero-section">
+            <h1 class="hero-title neon-text">Simulados Inteligentes</h1>
+            <p style="font-size: 1.1rem; max-width: 640px; margin: 0 auto 40px; color: var(--text-secondary); line-height: 1.6;">
+                Plataforma técnica para criação e prática de simulados via JSON.
+                <br><span style="color:var(--primary-500); font-weight:600;">Privacidade Local. Performance Máxima.</span>
+            </p>
+            <button class="btn btn-primary" onclick="enterApp()" style="padding: 16px 48px;">
+                <span>Começar Agora</span>
+                <svg class="icon-svg" style="width:20px; height:20px" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </section>
+
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg class="icon-svg" style="width:32px;height:32px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                <div>
+                    <h3>Arquitetura JSON</h3>
+                    <p>Total compatibilidade com esquemas de dados estruturados para portabilidade.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg class="icon-svg" style="width:32px;height:32px" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
+                <div>
+                    <h3>Interface Otimizada</h3>
+                    <p>Design industrial focado em densidade de informação e ergonomia visual.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg class="icon-svg" style="width:32px;height:32px" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <div>
+                    <h3>Segurança Client-Side</h3>
+                    <p>Processamento isolado no ambiente do usuário, garantindo sigilo absoluto.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <img src="https://github.com/DessimA.png" alt="José Anderson" class="dev-profile-img">
+            <p style="margin-bottom: 20px;">
+                <strong style="color:var(--text-main)">José Anderson</strong>
+            </p>
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <a href="https://www.linkedin.com/in/dessim/" target="_blank" class="btn btn-ghost" title="LinkedIn">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+                <a href="https://github.com/DessimA" target="_blank" class="btn btn-ghost" title="GitHub">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                </a>
+                <a href="https://meus-links-olive.vercel.app/" target="_blank" class="btn btn-ghost" title="Website">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- App Container -->
+    <div id="appContainer" class="container hidden">
+        <header class="header">
+            <div class="header-brand" onclick="goHome()" style="cursor: pointer;" title="Ir para o início">
+                <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <div class="logo-container">
+                    <span class="logo-full">QuizLab</span>
+                    <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
+                </div>
+            </div>
+            <div class="header-subtitle" id="headerSubtitle">App</div>
+        </header>
+
+        <main class="content">
+            <!-- Upload Screen -->
+            <div id="uploadScreen" class="fade-in">
+                <div class="upload-area" id="uploadArea">
+                    <div style="margin-bottom: 24px; color: var(--primary-500);">
+                         <svg class="icon-svg icon-lg anim-bounce" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h2 class="neon-text">Importar Dados</h2>
+                    <p style="margin: 8px 0 32px; color: var(--text-secondary);">Solte o arquivo JSON ou clique abaixo para carregar.</p>
+                    <button class="btn btn-primary" id="btnSelectFile">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Selecionar Arquivo</span>
+                    </button>
+                    <input type="file" id="fileInput" class="hidden" accept=".json">
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="margin-bottom: 16px; font-size: 0.9rem; opacity: 0.7;">Ou se preferir:</p>
+                    <button class="btn btn-outline" onclick="showCreator()">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Criar Simulado</span>
+                    </button>
+                </div>
+
+                <div id="errorMessage" class="feedback-message incorrect hidden"></div>
+                <div id="successMessage" class="feedback-message correct hidden"></div>
+            </div>
+
+            <!-- Creator Screen -->
+            <div id="creatorScreen" class="hidden fade-in">
+                <div style="margin-bottom: 32px;">
+                    <button class="btn btn-ghost" onclick="hideCreator()" title="Voltar">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    </button>
+                </div>
+                
+                <div id="builderMetaSection" class="builder-card">
+                    <div class="builder-header" onclick="toggleCollapse('builderMetaSection')">
+                        <div class="builder-title-wrapper">
+                            <div class="status-icon" id="metaStatusIcon">
+                                <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span style="font-weight:700; color:var(--text-main); font-size:0.9rem">DADOS GERAIS</span>
+                        </div>
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    
+                    <div class="builder-card-body">
+                        <div class="input-group">
+                            <label class="input-label">Título *</label>
+                            <input type="text" id="builderTitle" class="input-field" oninput="validateMeta()">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Descrição</label>
+                            <textarea id="builderDesc" class="input-field" rows="2"></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="btnConfirmMeta" onclick="confirmMeta()" style="width:100%" disabled>
+                            <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Confirmar Dados</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="builderQuestionsContainer" class="hidden">
+                    <div id="builderQuestionsList"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px;">
+                        <button class="btn btn-secondary" id="btnAddQuestion" onclick="addBuilderQuestion()">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Nova Questão</span>
+                        </button>
+                        <button class="btn btn-primary" id="btnExport" onclick="exportBuilderJson()">
+                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>Exportar JSON</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quizScreen" class="hidden">
+                <div class="quiz-info-bar" id="quizInfoBar">
+                    <button class="toggle-compact-btn" onclick="toggleQuizCompact()" title="Alternar modo compacto">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="4 14 12 6 20 14"></polyline></svg>
+                    </button>
+                    <div class="quiz-details-container">
+                        <h2 id="quizTitle" style="font-size: 1.2rem; margin-bottom: 4px; color:var(--primary-500)"></h2>
+                        <p id="quizDescription" style="font-size: 0.85rem; color: var(--text-secondary);"></p>
+                    </div>
+                    <div class="score-display">
+                        <div class="score-item correct">
+                            <span class="score-value" id="correctCount">0</span>
+                            <span class="score-label">ACERTO</span>
+                        </div>
+                        <div class="score-item incorrect">
+                            <span class="score-value" id="incorrectCount">0</span>
+                            <span class="score-label">ERRO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+                </div>
+
+                <div id="questionContainer"></div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" title="Anterior">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    </button>
+                    <button class="btn btn-primary hidden" id="confirmBtn" onclick="confirmAnswer()">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Confirmar</span>
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                        <span>Próxima</span>
+                        <svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                    <button class="btn btn-primary hidden" id="finishBtn" onclick="finishQuiz()">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        <span>Finalizar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="resultScreen" class="hidden fade-in">
+                <div class="result-header">
+                    <div class="result-score" id="resultScore">0/0</div>
+                    <div class="result-percent" id="resultPercentage">0%</div>
+                </div>
+                <div id="reviewContainer" style="margin-top: 24px;"></div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn btn-primary" onclick="resetQuiz()">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 19 10"></polyline><polyline points="1 20 1 14 5 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <span>Reiniciar</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="customModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span id="modalTitle" class="modal-title">AVISO DO SISTEMA</span>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalBtnCancel" class="btn btn-secondary hidden">CANCELAR</button>
+                <button id="modalBtnConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
