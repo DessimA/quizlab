@@ -1,9 +1,8 @@
-# ⚡ QuizLab | Tech-Industrial Edition
+# ⚡ QuizLab
 
-**QuizLab** é uma plataforma de simulados educacionais de alta performance com estética **Cyber Green** e design focado em eficiência. Com uma arquitetura **Tech-Industrial** (formas retangulares e densidade de informação), o projeto prioriza o aproveitamento de tela e a privacidade do usuário, funcionando inteiramente no navegador (client-side).
+**QuizLab** é uma plataforma de simulados educacionais de alta performance com estética **Cyber Green** e design focado em eficiência. Construído com arquitetura **Client-Side** (100% no navegador), o projeto prioriza o aproveitamento total de tela e a privacidade do usuário, garantindo uma experiência rápida e segura.
 
-[![Deploy with Vercel](https://zeit.co/button)](https://quizlab-chi.vercel.app/)
-*(Acesse o projeto online)*
+[![Acessar QuizLab](https://img.shields.io/badge/Acessar-QuizLab-c4ff00?style=for-the-badge&logo=vercel&logoColor=black)](https://quizlab-chi.vercel.app/)
 
 ---
 
@@ -20,44 +19,45 @@
 
 ## 🔭 Visão Geral e Fluxo
 
-O QuizLab foi desenhado para ser uma ferramenta ágil. O diagrama abaixo ilustra o fluxo de navegação do usuário.
+O QuizLab foi desenhado para ser uma ferramenta ágil e intuitiva. O diagrama abaixo ilustra o fluxo de navegação do usuário.
 
 ```mermaid
 graph TD
-    A([Landing Page]) -->|Começar Agora| B[App: Tela de Upload]
+    A([Página Inicial]) -->|Começar Agora| B[App: Tela de Upload]
     
     B -->|Opção 1: Selecionar Arquivo| C{Validar JSON}
-    B -->|Opção 2: Criar Novo| D[Wizard Criador]
+    B -->|Opção 2: Criar Novo| D[Criador Assistido]
     
     C -->|Erro| B
-    C -->|Sucesso| E[Quiz Engine]
+    C -->|Sucesso| E[Motor de Quiz]
     
-    D -->|Preencher Dados| D1(Metadados)
+    D -->|Definir Título| D1(Dados Gerais)
     D1 -->|Adicionar Questões| D2(Lista de Questões)
     D2 -->|Exportar JSON| B
     
     E -->|Responder| E1(Navegação & Feedback)
-    E1 -->|Finalizar| F[Tela de Resultados]
+    E1 -->|Finalizar| F[Resultados & Revisão]
     
-    F -->|Reiniciar| B
+    F -->|Tentar Novamente| E
+    F -->|Voltar ao Início| B
 ```
 
 ---
 
 ## 🚀 Funcionalidades Principais
 
-- **🎨 Design Industrial**: Interface retangular compacta, otimizada para produtividade e foco.
-- **🛠️ Criador Wizard**: Assistente passo-a-passo com sistema de Accordion para criar simulados.
-- **📑 Documentação Integrada**: Central de ajuda dedicada acessível via `docs.html`.
-- **🔘 Icon-First**: Navegação intuitiva baseada em ícones.
-- **🔒 Privacidade Absoluta**: Sem servidores. Seus dados nunca saem do navegador.
-- **📱 UX Dinâmica**: Navbar inteligente (auto-hide) e suporte a **Double Tap** no mobile.
+- **🎨 Design Otimizado**: Interface compacta e retangular, projetada para máxima produtividade, eliminando desperdício de espaço.
+- **🛠️ Criador Assistido**: Sistema de etapas (Wizard) com Acordeão para criar e validar simulados de forma organizada.
+- **📑 Documentação Integrada**: Central de ajuda completa para usuários e desenvolvedores acessível via `docs.html`.
+- **🔘 Interface Intuitiva**: Navegação baseada em ícones e textos claros para um fluxo de uso sem fricção.
+- **🔒 Privacidade Absoluta**: Processamento local. Seus dados e simulados nunca saem do seu dispositivo.
+- **📱 UX Dinâmica**: Navbar que se oculta automaticamente no desktop e suporte a **Double Tap** no mobile para controle de visibilidade.
 
 ---
 
 ## 💻 Arquitetura Técnica
 
-Construído sob o princípio **DRY**, o sistema processa tudo localmente. O diagrama abaixo demonstra o fluxo de dados na memória.
+O sistema opera de forma reativa e puramente local, utilizando o navegador como motor de processamento.
 
 ```mermaid
 flowchart LR
@@ -67,57 +67,44 @@ flowchart LR
         direction TB
         UI[Interface DOM]
         Engine[Script.js Engine]
-        Memory[(Memória RAM)]
+        Memory[(Memória Temporária)]
     end
     
     File[Arquivo .JSON]
     
-    User -->|Arrasta/Seleciona| UI
-    UI -->|Evento Input| Engine
+    User -->|Carrega| UI
+    UI -->|Evento| Engine
     Engine -->|FileReader API| File
     File -->|Parse & Validação| Engine
-    Engine -->|Armazena Estado| Memory
-    Memory -->|Renderiza Questão| UI
-    UI -->|Feedback Visual| User
+    Engine -->|Estado| Memory
+    Memory -->|Renderiza| UI
+    UI -->|Feedback| User
 ```
 
-- **Vanilla CSS**: Sistema de Design Tokens, Glassmorphism e Grid.
-- **Vanilla JavaScript**: Lógica reativa sem dependências externas.
-- **SVG System**: Ícones vetoriais integrados para performance máxima.
-
----
-
-## 📂 Estrutura do Projeto
-
-```bash
-quizlab/
-├── index.html      # Núcleo da aplicação (Landing Page + App + Creator)
-├── docs.html       # Central de Documentação técnica e de usuário
-├── styles.css      # Sistema de design (Tokens, Componentes e Animações)
-├── script.js       # Engine do Quiz, Criador Visual e Navegação
-└── assets/         # Favicon e recursos visuais
-```
+- **Vanilla CSS**: Sistema de Design Tokens, Glassmorphism e Layouts Grid/Flexbox dinâmicos.
+- **Vanilla JavaScript**: Lógica pura sem dependências externas, focada em manipulação eficiente da DOM.
+- **SVG System**: Sistema de ícones vetoriais para nitidez absoluta em qualquer resolução.
 
 ---
 
 ## 📝 Especificação de Dados (JSON)
 
-O QuizLab utiliza um formato JSON estrito. Abaixo, a representação da estrutura de dados:
+O QuizLab utiliza um formato JSON estrito para garantir a integridade dos testes:
 
 ```mermaid
 classDiagram
     class Simulado {
         +String nomeSimulado
         +String descricao
-        +Array~Questao~ questoes
+        +Array questoes
     }
     
     class Questao {
         +Number id
         +String enunciado
         +String tipo
-        +Array~String~ respostasCorretas
-        +Array~Alternativa~ alternativas
+        +Array respostasCorretas
+        +Array alternativas
     }
     
     class Alternativa {
@@ -125,14 +112,13 @@ classDiagram
         +String texto
     }
     
-    Simulado *-- Questao : contém 1..n
-    Questao *-- Alternativa : contém 2..n
-    
-    note for Questao "Tipo: 'unica' ou 'multipla'"
-    note for Questao "respostasCorretas: Array de IDs ['a', 'c']"
+    Simulado *-- Questao : 1..n
+    Questao *-- Alternativa : 2..n
 ```
 
-Para mais detalhes e exemplos de código, consulte a **[Documentação Online](docs.html)**.
+### Regras de Validação
+- **Escolha Única**: Requer exatamente 1 resposta correta.
+- **Múltipla Escolha**: Requer pelo menos 2 respostas corretas.
 
 ---
 
@@ -140,17 +126,17 @@ Para mais detalhes e exemplos de código, consulte a **[Documentação Online](d
 
 | Token | Valor | Aplicação |
 |-------|-------|-----------|
-| `--primary-500` | `#c4ff00` | Ações principais e Neons |
-| `--bg-body` | `#050505` | Base do sistema |
-| `--radius-sm` | `2px` | Cantos técnicos e precisos |
-| `--success` | `#00ff9d` | Feedback positivo |
-| `--error` | `#ff0055` | Alertas e erros |
+| `--primary-500` | `#c4ff00` | Ações principais e destaques neon |
+| `--bg-body` | `#050505` | Fundo profundo e imersivo |
+| `--radius-sm` | `2px` | Bordas técnicas e precisas |
+| `--success` | `#00ff9d` | Respostas corretas e sucesso |
+| `--error` | `#ff0055` | Alertas e respostas incorretas |
 
 ---
 
 ## 🔧 Instalação e Uso
 
-Não é necessário instalar dependências.
+O projeto é estático e pronto para uso imediato.
 
 1. **Clone o repositório**:
    ```bash
@@ -163,7 +149,7 @@ Não é necessário instalar dependências.
 
 ## 📄 Licença e Créditos
 
-Projeto desenvolvido com excelência técnica por **José Anderson da Silva Costa**. Disponível para uso sob a licença MIT.
+Projeto desenvolvido por **José Anderson da Silva Costa**. Licenciado sob a **MIT License**.
 
 <p align="center">
   <a href="https://www.linkedin.com/in/dessim/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
