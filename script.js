@@ -477,8 +477,51 @@ function exportBuilderJson() {
     const title = document.getElementById('builderTitle').value;
     const desc = document.getElementById('builderDesc').value;
     const quiz = { nomeSimulado: title, descricao: desc, questoes: questions };
-    askToSave(quiz);
+    
+    // Store temporarily for the export flow
+    pendingSaveQuiz = quiz;
+    
+    // Open Options Modal
+    document.getElementById('saveToLibCheckbox').checked = true; // Default to true
+    document.getElementById('exportOptionsModal').classList.remove('hidden');
 }
+
+// Handler for Export Confirmation
+document.getElementById('btnConfirmExport').onclick = () => {
+    if (!pendingSaveQuiz) return;
+    
+    // 1. Download
+    downloadJSON(pendingSaveQuiz, pendingSaveQuiz.nomeSimulado);
+    
+    // 2. Save to Library (if checked)
+    const shouldSave = document.getElementById('saveToLibCheckbox').checked;
+    if (shouldSave) {
+        saveToLibrary(pendingSaveQuiz);
+    }
+    
+    // 3. Close Options and Open Action Modal
+    closeModal('exportOptionsModal');
+    document.getElementById('builderActionModal').classList.remove('hidden');
+};
+
+// Handlers for Post-Export Actions
+document.getElementById('btnActionLoad').onclick = () => {
+    closeModal('builderActionModal');
+    loadQuiz(pendingSaveQuiz, false);
+    pendingSaveQuiz = null;
+};
+
+document.getElementById('btnActionNew').onclick = () => {
+    closeModal('builderActionModal');
+    showCreator(); // Resets the UI
+    pendingSaveQuiz = null;
+};
+
+document.getElementById('btnActionHome').onclick = () => {
+    closeModal('builderActionModal');
+    changeScreen('uploadScreen');
+    pendingSaveQuiz = null;
+};
 
 function showModal(message, type = 'alert', callback = null) {
     const modal = document.getElementById('customModal');
@@ -488,14 +531,23 @@ function showModal(message, type = 'alert', callback = null) {
     if (!modal) return;
     msgEl.textContent = message;
     modalCallback = callback;
-    if (type === 'confirm') { btnCancel.classList.remove('hidden'); btnConfirm.textContent = 'CONFIRMAR'; }
-    else { btnCancel.classList.add('hidden'); btnConfirm.textContent = 'OK'; }
+    if (type === 'confirm') {
+        btnCancel.classList.remove('hidden');
+        btnConfirm.textContent = 'CONFIRMAR';
+    } else {
+        btnCancel.classList.add('hidden');
+        btnConfirm.textContent = 'OK';
+    }
     modal.classList.remove('hidden');
 }
 
-function closeModal() { const modal = document.getElementById('customModal'); if (modal) modal.classList.add('hidden'); modalCallback = null; }
+function closeModal(modalId = 'customModal') {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('hidden');
+    if (modalId === 'customModal') modalCallback = null;
+}
 
 const btnMConfirm = document.getElementById('modalBtnConfirm');
 if(btnMConfirm) btnMConfirm.onclick = () => { if (modalCallback) modalCallback(); closeModal(); };
 const btnMCancel = document.getElementById('modalBtnCancel');
-if(btnMCancel) btnMCancel.onclick = closeModal;
+if(btnMCancel) btnMCancel.onclick = () => closeModal();

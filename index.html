@@ -285,7 +285,48 @@
         </main>
     </div>
 
-    <!-- Custom Modal -->
+    <!-- Export Options Modal -->
+    <div id="exportOptionsModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span class="modal-title">EXPORTAR SIMULADO</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:16px">Seu simulado está pronto para ser baixado.</p>
+                
+                <div style="background:var(--bg-glass); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border-glass); display:flex; align-items:center; gap:12px;">
+                    <input type="checkbox" id="saveToLibCheckbox" style="width:20px; height:20px; accent-color:var(--primary-500); cursor:pointer">
+                    <label for="saveToLibCheckbox" style="cursor:pointer; font-size:0.9rem; color:var(--text-main); user-select:none;">Salvar também na Biblioteca Local?</label>
+                </div>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">*Salvar permite acesso rápido sem precisar fazer upload novamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('exportOptionsModal')" class="btn btn-secondary">CANCELAR</button>
+                <button id="btnConfirmExport" class="btn btn-primary">BAIXAR .JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Builder Post-Action Modal -->
+    <div id="builderActionModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--success)"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span class="modal-title" style="color:var(--success)">SUCESSO</span>
+            </div>
+            <div class="modal-body">
+                <p>O arquivo foi gerado. O que deseja fazer agora?</p>
+            </div>
+            <div class="modal-footer" style="flex-direction:column;">
+                <button id="btnActionLoad" class="btn btn-primary" style="width:100%">CARREGAR ESTE SIMULADO</button>
+                <button id="btnActionNew" class="btn btn-outline" style="width:100%">CRIAR NOVO SIMULADO</button>
+                <button id="btnActionHome" class="btn btn-ghost" style="width:100%">VOLTAR AO INÍCIO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal (Generic) -->
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
