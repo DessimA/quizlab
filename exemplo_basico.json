@@ -1,0 +1,69 @@
+{
+  "nomeSimulado": "Simulado Exemplo QuizLab",
+  "descricao": "Este é um simulado de exemplo para demonstrar a estrutura JSON suportada pelo QuizLab. Ele contém 5 questões variadas sobre conhecimentos gerais e tecnologia.",
+  "tags": ["exemplo", "geral", "tecnologia"],
+  "questoes": [
+    {
+      "id": 1,
+      "enunciado": "Qual é a capital do Brasil?",
+      "tipo": "unica",
+      "alternativas": [
+        { "id": "a", "texto": "Rio de Janeiro" },
+        { "id": "b", "texto": "São Paulo" },
+        { "id": "c", "texto": "Brasília" },
+        { "id": "d", "texto": "Salvador" }
+      ],
+      "respostasCorretas": ["c"]
+    },
+    {
+      "id": 2,
+      "enunciado": "Quais destas linguagens são consideradas linguagens de programação Web Front-end nativas?",
+      "tipo": "multipla",
+      "alternativas": [
+        { "id": "a", "texto": "HTML" },
+        { "id": "b", "texto": "Python" },
+        { "id": "c", "texto": "JavaScript" },
+        { "id": "d", "texto": "C++" },
+        { "id": "e", "texto": "CSS" }
+      ],
+      "respostasCorretas": ["c"]
+    },
+    {
+      "id": 3,
+      "enunciado": "Quem é considerado o pai da computação?",
+      "tipo": "unica",
+      "alternativas": [
+        { "id": "a", "texto": "Alan Turing" },
+        { "id": "b", "texto": "Bill Gates" },
+        { "id": "c", "texto": "Steve Jobs" },
+        { "id": "d", "texto": "Ada Lovelace" }
+      ],
+      "respostasCorretas": ["a"]
+    },
+    {
+      "id": 4,
+      "enunciado": "Selecione os planetas do sistema solar que são gasosos:",
+      "tipo": "multipla",
+      "alternativas": [
+        { "id": "a", "texto": "Terra" },
+        { "id": "b", "texto": "Júpiter" },
+        { "id": "c", "texto": "Marte" },
+        { "id": "d", "texto": "Saturno" }
+      ],
+      "respostasCorretas": ["b", "d"]
+    },
+    {
+      "id": 5,
+      "enunciado": "Quais elementos compõem a tríade da Web?",
+      "tipo": "multipla",
+      "alternativas": [
+        { "id": "a", "texto": "HTML (Estrutura)" },
+        { "id": "b", "texto": "SQL (Banco de Dados)" },
+        { "id": "c", "texto": "CSS (Estilo)" },
+        { "id": "d", "texto": "JavaScript (Comportamento)" },
+        { "id": "e", "texto": "PHP (Backend)" }
+      ],
+      "respostasCorretas": ["a", "c", "d"]
+    }
+  ]
+}

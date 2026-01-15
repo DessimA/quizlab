@@ -9,6 +9,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .search-container { margin-bottom: 20px; position: relative; }
+        .search-input { 
+            width: 100%; padding: 10px 12px; padding-left: 40px; background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border-glass); border-radius: var(--radius-md); 
+            color: #fff; font-size: 0.9rem; transition: 0.3s; 
+        }
+        .search-input:focus { border-color: var(--primary-500); background: rgba(0,0,0,0.5); outline: none; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px; }
+        .toc { background: rgba(196, 255, 0, 0.03); padding: 16px; border-radius: var(--radius-sm); border-left: 2px solid var(--primary-500); margin-bottom: 24px; }
+        .toc h3 { margin-bottom: 8px; color: var(--primary-500); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .toc ul { list-style: none; padding: 0; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; transition: 0.2s; }
+        .toc a:hover { color: #fff; padding-left: 2px; }
+        .highlight { background: rgba(196, 255, 0, 0.2); color: #fff; }
+        .tip-box { background: rgba(196, 255, 0, 0.05); border-left: 3px solid var(--success); padding: 12px; margin: 16px 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.85rem; }
+        .warning-box { background: rgba(255, 85, 85, 0.1); border-left: 3px solid var(--error); padding: 12px; margin: 16px 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.85rem; }
+        
+        .docs-content { padding: 24px; }
+        .docs-section { margin-bottom: 24px; }
+        .docs-section h2 { font-size: var(--font-h2); margin-bottom: 12px; }
+        .docs-section h3 { font-size: var(--font-h3); margin-top: 16px; margin-bottom: 8px; }
+        .docs-section p, .docs-section li { font-size: var(--font-body); margin-bottom: 12px; }
+        pre { padding: 12px; font-size: 0.8rem; margin-bottom: 16px; }
+    </style>
 </head>
 <body>
 
@@ -17,113 +43,212 @@
             <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
-            <span>QuizLab</span>
+            <span>QuizLab Docs</span>
+        </div>
+        <div style="display:flex; gap:16px">
+            <a href="exemplo_basico.json" class="btn btn-primary" download style="height: 36px; padding: 0 16px; font-size: 0.8rem;">
+                <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Baixar Exemplo
+            </a>
         </div>
     </header>
 
     <div class="container fade-in">
         <main class="content">
-            <h1 class="neon-text" style="margin-bottom: 40px; text-align: center;">CENTRAL DE AJUDA</h1>
+            <h1 class="neon-text" style="margin-bottom: 20px; text-align: center;">DOCUMENTAÇÃO OFICIAL</h1>
+            
+            <div class="search-container">
+                <svg class="icon-svg search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="docsSearch" class="search-input" placeholder="Buscar na documentação...">
+            </div>
 
-            <div class="docs-content">
+            <div class="toc">
+                <h3>Índice</h3>
+                <ul>
+                    <li><a href="#inicio">1. Início Rápido</a></li>
+                    <li><a href="#guia">2. Guia do Usuário</a></li>
+                    <li><a href="#json">3. Referência Técnica (JSON)</a></li>
+                    <li><a href="#recursos">4. Recursos & Acessibilidade</a></li>
+                    <li><a href="#faq">5. FAQ & Troubleshooting</a></li>
+                    <li><a href="#specs">6. Limites e Especificações</a></li>
+                </ul>
+            </div>
+
+            <div class="docs-content" id="docsContent">
                 
-                <section class="docs-section">
-                    <h2>Bem-vindo ao QuizLab</h2>
-                    <p>O QuizLab é uma ferramenta profissional para criação, gerenciamento e execução de simulados. Projetado com foco em privacidade e performance, ele funciona <strong>100% no seu navegador</strong>, sem enviar dados para servidores externos.</p>
+                <section id="inicio" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 1. Início Rápido</h2>
+                    <p>Comece a usar o QuizLab em menos de 1 minuto.</p>
+                    
+                    <h3>Passo 1: Obter um Simulado</h3>
+                    <p>Baixe nosso <a href="exemplo_basico.json" download style="color:var(--primary-500)">modelo de exemplo (.json)</a> ou crie o seu próprio usando o Criador Integrado.</p>
+                    
+                    <h3>Passo 2: Importar</h3>
+                    <p>Na tela inicial, arraste o arquivo para a área pontilhada ou clique em "Selecionar Arquivo".</p>
+                    
+                    <div class="tip-box">
+                        <strong>DICA PRO:</strong> Você pode salvar até 10 simulados na sua Biblioteca Local para acesso rápido sem precisar fazer upload novamente.
+                    </div>
                 </section>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
-                <section class="docs-section">
-                    <h2>📚 Biblioteca & Armazenamento</h2>
-                    <p>O QuizLab possui um sistema de cache inteligente para facilitar seus estudos:</p>
+                <section id="guia" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 1-4 4v14a3 3 0 0 0 3-3h7z"></path></svg> 2. Guia do Usuário</h2>
+                    
+                    <h3>2.1 Realizando Testes</h3>
                     <ul>
-                        <li><strong>Armazenamento Local:</strong> Seus simulados são salvos na memória do navegador (LocalStorage).</li>
-                        <li><strong>Limite de 10 Slots:</strong> Para garantir performance, você pode manter até 10 simulados salvos simultaneamente.</li>
-                        <li><strong>Gestão Automática:</strong> Ao tentar salvar o 11º simulado, o sistema oferecerá a opção de substituir o mais antigo ou exportá-lo antes da remoção.</li>
-                        <li><strong>Persistência:</strong> Seus dados permanecem salvos mesmo se você fechar a aba (desde que não limpe o cache do navegador).</li>
-                    </ul>
-                </section>
-
-                <section class="docs-section">
-                    <h2>📝 Realizando Simulados</h2>
-                    <p>Entenda como funciona o motor de provas:</p>
-                    <ul>
-                        <li><strong>Modo Foco:</strong> Em computadores, a barra de navegação se oculta automaticamente ao rolar para baixo para evitar distrações.</li>
-                        <li><strong>Navegação Mobile:</strong> Toque duas vezes rapidamente (Double Tap) em qualquer área vazia da tela para ocultar/exibir o menu superior.</li>
-                        <li><strong>Regras de Seleção:</strong>
+                        <li><strong>Navegação Livre:</strong> Use as setas laterais para navegar. Você pode pular questões e voltar depois.</li>
+                        <li><strong>Tipos de Questão:</strong>
                             <ul>
-                                <li><em>Única Escolha:</em> Selecione uma opção e clique em "Confirmar".</li>
-                                <li><em>Múltipla Escolha:</em> Você deve selecionar <strong>exatamente</strong> o número de respostas corretas indicado (ex: "Selecione 2 opções"). O botão de confirmação só aparecerá quando a quantidade estiver correta.</li>
+                                <li><em>Única Escolha:</em> Apenas uma resposta correta.</li>
+                                <li><em>Múltipla Escolha:</em> Selecione exatamente o número de opções solicitadas.</li>
                             </ul>
                         </li>
-                        <li><strong>Revisão:</strong> Ao finalizar, você terá acesso a um relatório detalhado de erros e acertos, com opção de reiniciar o teste imediatamente.</li>
+                        <li><strong>Progresso:</strong> A barra superior indica seu avanço. O grid de questões (em breve) mostrará o status de cada pergunta.</li>
                     </ul>
-                </section>
 
-                <section class="docs-section">
-                    <h2>🛠️ Criador de Simulados (Wizard)</h2>
-                    <p>Crie seus próprios testes sem precisar editar códigos:</p>
+                    <h3>2.2 Criando Simulados</h3>
+                    <p>O <strong>Criador Visual</strong> permite montar provas sem código:</p>
                     <ol>
-                        <li><strong>Dados Gerais:</strong> Defina um Título e Descrição. Clique no botão de confirmação para travar esses dados e iniciar a edição das questões.</li>
-                        <li><strong>Adicionando Questões:</strong> O sistema utiliza um formato de "Acordeão". Ao adicionar uma nova questão, a anterior é validada e minimizada automaticamente para organizar a tela.</li>
-                        <li><strong>Validação em Tempo Real:</strong> O botão "Nova Questão" só é habilitado se a questão atual estiver completa (Enunciado + Alternativas + Resposta Correta marcada).</li>
-                        <li><strong>Exportação:</strong> Ao terminar, clique em "Exportar JSON". O arquivo será baixado e também salvo automaticamente na sua Biblioteca Local (se houver espaço).</li>
+                        <li>Preencha Título e Descrição na seção "Dados Gerais".</li>
+                        <li>Adicione questões uma a uma. O sistema valida automaticamente se você preencheu tudo.</li>
+                        <li>Use o sistema de <strong>Rascunhos Automáticos</strong>: se você fechar o navegador, seu trabalho estará salvo ao voltar (Auto-save a cada 30s).</li>
+                        <li>Ao finalizar, exporte o JSON e compartilhe!</li>
                     </ol>
+
+                    <h3>2.3 Biblioteca Local</h3>
+                    <p>Gerencie seus estudos:</p>
+                    <ul>
+                        <li><strong>Busca:</strong> Encontre simulados por título ou tags.</li>
+                        <li><strong>Limite:</strong> Máximo de 10 itens para garantir performance máxima do navegador.</li>
+                    </ul>
                 </section>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
-                <section class="docs-section">
-                    <h2>💻 Guia para Desenvolvedores (JSON)</h2>
-                    <p>Se preferir criar seus simulados manualmente via editor de código, siga rigorosamente este esquema:</p>
+                <section id="json" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg> 3. Referência Técnica (JSON)</h2>
+                    <p>Estrutura completa para criação manual:</p>
                     
-                    <h3>Estrutura do Arquivo</h3>
                     <pre><code>{
-  "nomeSimulado": "Título do Simulado (Obrigatório)",
-  "descricao": "Descrição breve (Opcional)",
+  "nomeSimulado": "Título Obrigatório",
+  "descricao": "Texto opcional descrevendo a prova",
+  "tags": ["matematica", "dificil"], // Opcional
   "questoes": [
     {
-      "id": 1,
-      "enunciado": "Texto da pergunta (Aceita HTML básico)",
-      "tipo": "unica",  // ou "multipla"
+      "id": 1, // Numérico ou String
+      "enunciado": "Texto da questão &lt;b&gt;com HTML básico&lt;/b&gt;",
+      "tipo": "unica", // "unica" ou "multipla"
       "alternativas": [
-        { "id": "a", "texto": "Opção A" },
-        { "id": "b", "texto": "Opção B" }
+        { "id": "a", "texto": "Alternativa 1" },
+        { "id": "b", "texto": "Alternativa 2" }
       ],
-      "respostasCorretas": ["a"] // Array com IDs das corretas
+      "respostasCorretas": ["a"] // Array de IDs
     }
   ]
 }</code></pre>
 
-                    <h3>Regras de Validação de Dados</h3>
+                    <div class="warning-box">
+                        <strong>ATENÇÃO:</strong> O campo <code>respostasCorretas</code> deve sempre ser um Array, mesmo para questões de escolha única. Os IDs devem coincidir exatamente com os IDs das alternativas.
+                    </div>
+                </section>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
+
+                <section id="recursos" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 4. Recursos & Acessibilidade</h2>
                     <ul>
-                        <li><strong>Tipo "unica":</strong> O array <code>respostasCorretas</code> deve conter exatamente <strong>1 ID</strong>.</li>
-                        <li><strong>Tipo "multipla":</strong> O array <code>respostasCorretas</code> deve conter <strong>2 ou mais IDs</strong>.</li>
-                        <li><strong>IDs:</strong> Os IDs dentro de <code>respostasCorretas</code> devem corresponder exatamente aos IDs definidos nas <code>alternativas</code>.</li>
+                        <li><strong>Teclado:</strong> Navegue usando Tab, Enter e Setas Direcionais.</li>
+                        <li><strong>Leitores de Tela:</strong> Interface otimizada com atributos ARIA.</li>
+                        <li><strong>Modo Compacto:</strong> Ideal para telas pequenas, oculta informações não essenciais.</li>
                     </ul>
                 </section>
 
-                <section class="docs-section">
-                    <h2>❓ Perguntas Frequentes (FAQ)</h2>
+                <section id="specs" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> 6. Limites e Especificações</h2>
+                    <div style="overflow-x:auto">
+                        <table style="width:100%; border-collapse:collapse; margin-top:16px; font-size:0.9rem; color:var(--text-secondary)">
+                            <thead>
+                                <tr style="border-bottom:1px solid var(--primary-500); text-align:left;">
+                                    <th style="padding:12px 8px; color:var(--primary-500)">Especificação</th>
+                                    <th style="padding:12px 8px; color:var(--primary-500)">Limite</th>
+                                    <th style="padding:12px 8px; color:var(--primary-500)">Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom:1px solid var(--border-glass)">
+                                    <td style="padding:12px 8px">Simulados na Biblioteca</td>
+                                    <td style="padding:12px 8px">10</td>
+                                    <td style="padding:12px 8px">Performance do LocalStorage</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border-glass)">
+                                    <td style="padding:12px 8px">Questões por Simulado</td>
+                                    <td style="padding:12px 8px">∞ (Rec. <500)</td>
+                                    <td style="padding:12px 8px">Fluidez da Interface</td>
+                                </tr>
+                                <tr style="border-bottom:1px solid var(--border-glass)">
+                                    <td style="padding:12px 8px">Tamanho do JSON</td>
+                                    <td style="padding:12px 8px">~5MB</td>
+                                    <td style="padding:12px 8px">Limite do Navegador</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
+
+                <section id="faq" class="docs-section">
+                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> 5. FAQ & Troubleshooting</h2>
                     
-                    <p><strong>P: Meus simulados ficam salvos na nuvem?</strong><br>
-                    R: Não. O QuizLab é "Zero Data". Tudo fica gravado apenas no seu navegador atual. Se você limpar o cache ou usar navegação anônima, os dados serão perdidos.</p>
+                    <p><strong>P: Como importo vários simulados de uma vez?</strong><br>
+                    R: Atualmente, importe um por vez. Isso garante a validação correta de cada arquivo.</p>
 
-                    <p><strong>P: Posso usar no celular?</strong><br>
-                    R: Sim. A interface é 100% responsiva e possui recursos exclusivos para mobile, como o "Modo Compacto" e controle por gestos.</p>
+                    <p><strong>P: O QuizLab funciona offline?</strong><br>
+                    R: Sim! Após carregar a página, tudo funciona sem internet.</p>
 
-                    <p><strong>P: O arquivo não carrega. O que fazer?</strong><br>
-                    R: Verifique se o arquivo está no formato <code>.json</code> e se segue a estrutura descrita acima. Erros de vírgula ou aspas no JSON são as causas mais comuns.</p>
+                    <p><strong>P: "Botão Confirmar não aparece"</strong><br>
+                    R: Em questões de múltipla escolha, você deve selecionar EXATAMENTE o número de respostas corretas pedido.</p>
+
+                    <p><strong>P: Meu JSON dá "Erro de Formato"</strong><br>
+                    R: Verifique se não há vírgulas sobrando no final de listas ou arrays. Use um validador online como jsonlint.com.</p>
+                    
+                    <div style="margin-top:24px">
+                        <a href="troubleshooting.html" class="btn btn-outline" style="width:100%; justify-content:center; white-space: normal; height: auto; padding: 12px;">
+                            VER GUIA COMPLETO DE SOLUÇÃO DE PROBLEMAS
+                        </a>
+                    </div>
                 </section>
 
             </div>
         </main>
 
         <footer class="footer">
-            <p>SISTEMA DE DOCUMENTAÇÃO OFICIAL V.2.0</p>
+            <p>QUIZLAB DOCUMENTATION • v2.1</p>
         </footer>
     </div>
 
+    <script>
+        document.getElementById('docsSearch').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const sections = document.querySelectorAll('.docs-section');
+            
+            sections.forEach(section => {
+                const text = section.innerText.toLowerCase();
+                const match = text.includes(term);
+                section.style.display = match ? 'block' : 'none';
+                
+                // Highlight logic (simple implementation)
+                if(term.length > 2 && match) {
+                    // Reset highlights first could be complex, keeping it simple for now: 
+                    // just filtering visibility is usually enough for docs
+                }
+            });
+
+            // Always show TOC if search is empty
+            if(term === '') sections.forEach(s => s.style.display = 'block');
+        });
+    </script>
 </body>
 </html>

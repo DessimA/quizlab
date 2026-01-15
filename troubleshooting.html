@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solução de Problemas | QuizLab</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-brand" onclick="location.href='index.html'" style="cursor: pointer;" title="Voltar ao início">
+            <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <span>QuizLab Help</span>
+        </div>
+        <a href="docs.html" class="btn btn-ghost">Voltar para Docs</a>
+    </header>
+
+    <div class="container fade-in">
+        <main class="content">
+            <h1 class="neon-text" style="margin-bottom: 8px; text-align: center; color:var(--error); font-size: var(--font-h1);">SOLUÇÃO DE PROBLEMAS</h1>
+            <p style="text-align:center; margin-bottom:24px; color:var(--text-secondary); font-size: var(--font-body);">Diagnóstico e resolução para erros comuns</p>
+
+            <div class="docs-content" style="padding: 24px;">
+                
+                <section class="docs-section">
+                    <h2>📁 Problemas de Upload e Arquivo</h2>
+                    
+                    <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
+                        <h3 style="color:var(--error)">Erro: "Arquivo não é JSON válido"</h3>
+                        <p><strong>Causa Provável:</strong> O arquivo contém erros de sintaxe ou a extensão não é .json.</p>
+                        <p><strong>Solução:</strong></p>
+                        <ol>
+                            <li>Abra o arquivo no Bloco de Notas ou VS Code.</li>
+                            <li>Verifique se começa com <code>{</code> e termina com <code>}</code>.</li>
+                            <li>Cole o conteúdo no site <a href="https://jsonlint.com" target="_blank" style="color:var(--primary-500)">JSONLint</a> para validar.</li>
+                        </ol>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
+                        <h3 style="color:var(--error)">Erro: "Campo Obrigatório Ausente"</h3>
+                        <p><strong>Causa Provável:</strong> O JSON não possui o campo <code>nomeSimulado</code> ou <code>questoes</code>.</p>
+                        <p><strong>Solução:</strong> Baixe o <a href="exemplo_basico.json" style="color:var(--primary-500)">Arquivo de Exemplo</a> e compare a estrutura.</p>
+                    </div>
+                </section>
+
+                <section class="docs-section">
+                    <h2>📝 Problemas Durante o Quiz</h2>
+                    
+                    <div class="feature-card" style="margin-bottom:16px">
+                        <h3>Botão "Confirmar" não habilita</h3>
+                        <p><strong>Causa:</strong> Em questões de múltipla escolha, você selecionou mais ou menos opções do que o exigido.</p>
+                        <p><strong>Solução:</strong> Leia atentamente o aviso "(SELECIONE EXATAMENTE X)". Se pedir 2, marque apenas 2.</p>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px">
+                        <h3>Travou ou Tela Branca</h3>
+                        <p><strong>Causa:</strong> Erro raro de memória ou script.</p>
+                        <p><strong>Solução:</strong> Recarregue a página (F5). Infelizmente o progresso daquele simulado será perdido, mas o sistema voltará ao normal.</p>
+                    </div>
+                </section>
+
+                <section class="docs-section">
+                    <h2>💾 Problemas na Biblioteca</h2>
+                    
+                    <div class="feature-card" style="margin-bottom:16px">
+                        <h3>Simulados sumiram</h3>
+                        <p><strong>Causa:</strong> Limpeza de cache do navegador ou uso de aba anônima.</p>
+                        <p><strong>Prevenção:</strong> Sempre exporte seus simulados importantes para o computador (Botão Download na biblioteca).</p>
+                    </div>
+                    
+                    <div class="feature-card" style="margin-bottom:16px">
+                        <h3>Não salva mais nada (Limite Atingido)</h3>
+                        <p><strong>Solução:</strong> O limite é de 10 simulados. Exclua os antigos para liberar espaço. O sistema avisará quando chegar no limite.</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

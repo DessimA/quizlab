@@ -52,12 +52,13 @@ graph TD
 
 ## 🚀 Funcionalidades Principais
 
-- **📚 Biblioteca Local**: Armazene até 10 simulados diretamente no navegador para acesso rápido sem precisar fazer upload repetido.
-- **🎨 Design Otimizado**: Interface compacta e retangular, projetada para máxima produtividade, eliminando desperdício de espaço.
-- **🛠️ Criador Assistido**: Sistema de etapas (Wizard) com Acordeão para criar e validar simulados de forma organizada.
-- **📑 Documentação Integrada**: Central de ajuda completa para usuários e desenvolvedores acessível via `docs.html`.
-- **🔒 Privacidade Absoluta**: Processamento local. Seus dados e simulados nunca saem do seu dispositivo.
-- **📱 UX Dinâmica**: Navbar que se oculta automaticamente no desktop e suporte a **Double Tap** no mobile para controle de visibilidade.
+- **📚 Biblioteca Local Avançada**: Armazene até 10 simulados com sistema de **Busca por Tags**, ordenação e estatísticas de uso detalhadas.
+- **📊 Estatísticas de Desempenho**: Acompanhe o número de vezes jogado, data da última vez e média de acertos por simulado.
+- **🎨 Interface Otimizada**: Design industrial focado em eficiência, agora com **Skeleton Screens** para carregamento fluido.
+- **🛠️ Criador Assistido**: Sistema de etapas (Wizard) com reordenação via **Drag & Drop**, preview do JSON e salvamento de rascunhos.
+- **📑 Documentação Interativa**: Central de ajuda reformulada com busca interna, guia de troubleshooting e arquivo de exemplo para download.
+- **🔒 Privacidade Absoluta**: Processamento 100% local. Seus dados e simulados nunca saem do seu dispositivo.
+- **📱 UX Dinâmica & Acessível**: Navegação livre no quiz, grid de progresso clicável, e suporte completo a **Atalhos de Teclado (A11Y)**.
 
 ---
 
@@ -65,10 +66,10 @@ graph TD
 
 O sistema opera de forma reativa e puramente local, utilizando o navegador como motor de processamento.
 
-- **Vanilla CSS**: Sistema de Design Tokens, Glassmorphism e Layouts Grid/Flexbox dinâmicos.
-- **Vanilla JavaScript**: Lógica pura sem dependências externas, focada em manipulação eficiente da DOM.
-- **LocalStorage API**: Gerenciamento persistente da biblioteca de simulados.
-- **SVG System**: Sistema de ícones vetoriais para nitidez absoluta em qualquer resolução.
+- **Vanilla CSS**: Sistema de Design Tokens, Glassmorphism, animações de Skeleton e Layouts Grid/Flexbox.
+- **Vanilla JavaScript**: Lógica pura e modularizada, validação robusta de JSON com diagnóstico de erros.
+- **LocalStorage API**: Gerenciamento persistente da biblioteca e sistema de rascunhos (Auto-save).
+- **SVG System**: Ícones vetoriais e animações CSS para feedback visual imediato (Toasts/Loaders).
 
 ---
 
@@ -77,67 +78,33 @@ O sistema opera de forma reativa e puramente local, utilizando o navegador como 
 O sistema de cache foi projetado para equilibrar conveniência e performance:
 
 1.  **Limite Rígido:** Máximo de **10 simulados** salvos.
-2.  **Gestão de Cota:** Ao tentar salvar o 11º item, o sistema identifica o simulado mais antigo e oferece:
-    *   Exportar o antigo e substituir.
-    *   Apenas substituir (excluir o antigo).
-    *   Cancelar salvamento (apenas carregar o novo temporariamente).
-3.  **Metadados:** Armazena data de adição, título e contagem de questões.
+2.  **Organização:** Filtros por Título, Descrição ou **Tags** (novo campo opcional).
+3.  **Estatísticas:** A cada conclusão de simulado, o sistema atualiza automaticamente a média de acertos e o contador de jogadas.
+4.  **Busca em Tempo Real:** Encontre rapidamente seus testes com o filtro dinâmico integrado.
 
 ---
 
 ## 📝 Especificação de Dados (JSON)
 
-O QuizLab utiliza um formato JSON estrito para garantir a integridade dos testes:
+O formato JSON do QuizLab suporta campos avançados para organização:
 
-```mermaid
-classDiagram
-    class Simulado {
-        +String nomeSimulado
-        +String descricao
-        +Array questoes
+```json
+{
+  "nomeSimulado": "...",
+  "descricao": "...",
+  "tags": ["matemática", "ENEM"],
+  "questoes": [
+    {
+      "id": 1,
+      "enunciado": "...",
+      "tipo": "unica",
+      "alternativas": [...],
+      "respostasCorretas": [...]
     }
-    
-    class Questao {
-        +Number id
-        +String enunciado
-        +String tipo
-        +Array respostasCorretas
-        +Array alternativas
-    }
-    
-    class Alternativa {
-        +String id
-        +String texto
-    }
-    
-    Simulado *-- Questao : 1..n
-    Questao *-- Alternativa : 2..n
+  ]
+}
 ```
 
-### Regras de Validação
-- **Escolha Única**: Requer exatamente 1 resposta correta.
-- **Múltipla Escolha**: Requer pelo menos 2 respostas corretas.
-
----
-
-## 🎨 Identidade Visual (Cyber Green)
-
-| Token | Valor | Aplicação |
-|-------|-------|-----------|
-| `--primary-500` | `#c4ff00` | Ações principais e destaques neon |
-| `--bg-body` | `#050505` | Fundo profundo e imersivo |
-| `--radius-sm` | `2px` | Bordas técnicas e precisas |
-| `--success` | `#00ff9d` | Respostas corretas e sucesso |
-| `--error` | `#ff0055` | Alertas e respostas incorretas |
-
----
-
-## 📄 Licença e Créditos
-
-Projeto desenvolvido por **José Anderson da Silva Costa**. Licenciado sob a **MIT License**.
-
-<p align="center">
-  <a href="https://www.linkedin.com/in/dessim/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-  <a href="https://github.com/DessimA" target="_blank"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
-  <a href="https://meus-links-olive.vercel.app/" target="_blank"><img src="https://img.shields.io/badge/Website-c4ff00?style=for-the-badge&logo=google-chrome&logoColor=black" alt="Website"></a>
-</p>
+### Novas Funcionalidades de Navegação
+- **Navegação Livre:** O sistema agora permite pular questões e navegar diretamente via grid de progresso.
+- **Modo Revisão:** Antes de finalizar, você revisa o status de todas as questões para garantir que nada ficou em branco.
