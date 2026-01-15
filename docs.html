@@ -30,7 +30,7 @@
         
         .docs-content { padding: 24px; }
         .docs-section { margin-bottom: 24px; }
-        .docs-section h2 { font-size: var(--font-h2); margin-bottom: 12px; }
+        .docs-section h2 { font-size: var(--font-h2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .docs-section h3 { font-size: var(--font-h3); margin-top: 16px; margin-bottom: 8px; }
         .docs-section p, .docs-section li { font-size: var(--font-body); margin-bottom: 12px; }
         pre { padding: 12px; font-size: 0.8rem; margin-bottom: 16px; }
@@ -39,16 +39,20 @@
 <body>
 
     <header class="header">
-        <div class="header-brand" onclick="location.href='index.html'" style="cursor: pointer;" title="Voltar ao início">
+        <div class="header-brand" data-action="go-home" title="Voltar ao início">
             <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
-            <span>QuizLab Docs</span>
+            <div class="logo-container">
+                <span class="logo-full">QuizLab</span>
+                <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
+            </div>
+            <div class="header-subtitle">Docs</div>
         </div>
         <div style="display:flex; gap:16px">
-            <a href="exemplo_basico.json" class="btn btn-primary" download style="height: 36px; padding: 0 16px; font-size: 0.8rem;">
-                <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Baixar Exemplo
+            <a href="exemplo_basico.json" class="btn btn-primary" download style="height: 32px; padding: 0 12px; font-size: 0.75rem;">
+                <span data-icon="download" data-size="xs"></span>
+                <span class="hide-mobile">Baixar Exemplo</span>
             </a>
         </div>
     </header>
@@ -58,7 +62,7 @@
             <h1 class="neon-text" style="margin-bottom: 20px; text-align: center;">DOCUMENTAÇÃO OFICIAL</h1>
             
             <div class="search-container">
-                <svg class="icon-svg search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span data-icon="search" class="search-icon"></span>
                 <input type="text" id="docsSearch" class="search-input" placeholder="Buscar na documentação...">
             </div>
 
@@ -77,7 +81,7 @@
             <div class="docs-content" id="docsContent">
                 
                 <section id="inicio" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 1. Início Rápido</h2>
+                    <h2><span data-icon="play" data-size="md"></span> 1. Início Rápido</h2>
                     <p>Comece a usar o QuizLab em menos de 1 minuto.</p>
                     
                     <h3>Passo 1: Obter um Simulado</h3>
@@ -94,7 +98,7 @@
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
                 <section id="guia" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 1-4 4v14a3 3 0 0 0 3-3h7z"></path></svg> 2. Guia do Usuário</h2>
+                    <h2><span data-icon="book" data-size="md"></span> 2. Guia do Usuário</h2>
                     
                     <h3>2.1 Realizando Testes</h3>
                     <ul>
@@ -105,7 +109,7 @@
                                 <li><em>Múltipla Escolha:</em> Selecione exatamente o número de opções solicitadas.</li>
                             </ul>
                         </li>
-                        <li><strong>Progresso:</strong> A barra superior indica seu avanço. O grid de questões (em breve) mostrará o status de cada pergunta.</li>
+                        <li><strong>Progresso:</strong> A barra superior indica seu avanço. O grid de questões mostrará o status de cada pergunta.</li>
                     </ul>
 
                     <h3>2.2 Criando Simulados</h3>
@@ -128,7 +132,7 @@
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
                 <section id="json" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg> 3. Referência Técnica (JSON)</h2>
+                    <h2><span data-icon="plus" data-size="md"></span> 3. Referência Técnica (JSON)</h2>
                     <p>Estrutura completa para criação manual:</p>
                     
                     <pre><code>{
@@ -157,7 +161,7 @@
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
                 <section id="recursos" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 4. Recursos & Acessibilidade</h2>
+                    <h2><span data-icon="info" data-size="md"></span> 4. Recursos & Acessibilidade</h2>
                     <ul>
                         <li><strong>Teclado:</strong> Navegue usando Tab, Enter e Setas Direcionais.</li>
                         <li><strong>Leitores de Tela:</strong> Interface otimizada com atributos ARIA.</li>
@@ -166,7 +170,7 @@
                 </section>
 
                 <section id="specs" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> 6. Limites e Especificações</h2>
+                    <h2><span data-icon="alert" data-size="md"></span> 6. Limites e Especificações</h2>
                     <div style="overflow-x:auto">
                         <table style="width:100%; border-collapse:collapse; margin-top:16px; font-size:0.9rem; color:var(--text-secondary)">
                             <thead>
@@ -200,7 +204,7 @@
                 <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 40px 0;">
 
                 <section id="faq" class="docs-section">
-                    <h2><svg class="icon-svg" viewBox="0 0 24 24" style="color:var(--primary-500); margin-right:8px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> 5. FAQ & Troubleshooting</h2>
+                    <h2><span data-icon="search" data-size="md"></span> 5. FAQ & Troubleshooting</h2>
                     
                     <p><strong>P: Como importo vários simulados de uma vez?</strong><br>
                     R: Atualmente, importe um por vez. Isso garante a validação correta de cada arquivo.</p>
@@ -229,25 +233,31 @@
         </footer>
     </div>
 
-    <script>
-        document.getElementById('docsSearch').addEventListener('input', function(e) {
-            const term = e.target.value.toLowerCase();
-            const sections = document.querySelectorAll('.docs-section');
-            
-            sections.forEach(section => {
-                const text = section.innerText.toLowerCase();
-                const match = text.includes(term);
-                section.style.display = match ? 'block' : 'none';
-                
-                // Highlight logic (simple implementation)
-                if(term.length > 2 && match) {
-                    // Reset highlights first could be complex, keeping it simple for now: 
-                    // just filtering visibility is usually enough for docs
-                }
-            });
+    <!-- Core -->
+    <script src="js/core/config.js"></script>
+    <script src="js/components/icon-system.js"></script>
+    <script src="js/ui/event-delegator.js"></script>
 
-            // Always show TOC if search is empty
-            if(term === '') sections.forEach(s => s.style.display = 'block');
+    <script>
+        window.addEventListener('load', () => {
+            IconSystem.inject();
+            EventDelegator.init();
+            
+            // Re-register go-home for docs specifically
+            EventDelegator.register('go-home', () => location.href = 'index.html');
+
+            document.getElementById('docsSearch').addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const sections = document.querySelectorAll('.docs-section');
+                
+                sections.forEach(section => {
+                    const text = section.innerText.toLowerCase();
+                    const match = text.includes(term);
+                    section.style.display = match ? 'block' : 'none';
+                });
+
+                if(term === '') sections.forEach(s => s.style.display = 'block');
+            });
         });
     </script>
 </body>

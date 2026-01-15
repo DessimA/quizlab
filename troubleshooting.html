@@ -13,13 +13,20 @@
 <body>
 
     <header class="header">
-        <div class="header-brand" onclick="location.href='index.html'" style="cursor: pointer;" title="Voltar ao início">
+        <div class="header-brand" data-action="go-home" title="Voltar ao início">
             <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
-            <span>QuizLab Help</span>
+            <div class="logo-container">
+                <span class="logo-full">QuizLab</span>
+                <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
+            </div>
+            <div class="header-subtitle">Ajuda</div>
         </div>
-        <a href="docs.html" class="btn btn-ghost">Voltar para Docs</a>
+        <a href="docs.html" class="btn btn-ghost">
+            <span data-icon="book" data-size="sm"></span>
+            <span class="hide-mobile">Docs</span>
+        </a>
     </header>
 
     <div class="container fade-in">
@@ -85,5 +92,17 @@
         </main>
     </div>
 
+    <!-- Core -->
+    <script src="js/core/config.js"></script>
+    <script src="js/components/icon-system.js"></script>
+    <script src="js/ui/event-delegator.js"></script>
+
+    <script>
+        window.addEventListener('load', () => {
+            IconSystem.inject();
+            EventDelegator.init();
+            EventDelegator.register('go-home', () => location.href = 'index.html');
+        });
+    </script>
 </body>
 </html>
