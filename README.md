@@ -1,110 +1,236 @@
-# ⚡ QuizLab | Tech-Industrial Edition
+# QuizLab | Documentação Técnica & Arquitetura
 
-**QuizLab** é uma plataforma de simulados educacionais de alta performance com estética **Cyber Green** e design focado em eficiência. Construído com arquitetura **Client-Side** (100% no navegador), o projeto prioriza o aproveitamento total de tela e a privacidade do usuário, garantindo uma experiência rápida e segura.
+![Version](https://img.shields.io/badge/version-1.2.0-blue?style=flat-square)
+![Status](https://img.shields.io/badge/status-production-success?style=flat-square)
+![Tech](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20CSS3%20%7C%20HTML5-yellow?style=flat-square)
+![Pattern](https://img.shields.io/badge/pattern-Event%20Delegation%20%26%20Module-orange?style=flat-square)
 
-[![Acessar QuizLab](https://img.shields.io/badge/Acessar-QuizLab-c4ff00?style=for-the-badge&logo=vercel&logoColor=black)](https://quizlab-chi.vercel.app/)
-
----
-
-## 📋 Índice
-
-1. [Visão Geral e Fluxo](#-visão-geral-e-fluxo)
-2. [Funcionalidades Principais](#-funcionalidades-principais)
-3. [Arquitetura Técnica](#-arquitetura-técnica)
-4. [Biblioteca Local (Cache)](#-biblioteca-local-cache)
-5. [Especificação de Dados (JSON)](#-especificação-de-dados-json)
-6. [Identidade Visual](#-identidade-visual-cyber-green)
-7. [Licença](#-licença-e-créditos)
+> **Autor:** José Anderson ([@DessimA](https://github.com/DessimA))  
+> **LinkedIn:** [/in/dessim](https://www.linkedin.com/in/dessim/)  
+> **Website:** [meus-links-olive.vercel.app](https://meus-links-olive.vercel.app/)
 
 ---
 
-## 🔭 Visão Geral e Fluxo
+## 📑 Índice
 
-O QuizLab foi desenhado para ser uma ferramenta ágil e intuitiva. O diagrama abaixo ilustra o fluxo de navegação do usuário.
+1. [Visão Geral e Filosofia](#-visão-geral-e-filosofia)
+2. [Arquitetura de Software](#-arquitetura-de-software)
+3. [Gerenciamento de Estado (QuizEngine)](#-gerenciamento-de-estado-quizengine)
+4. [Sistema de Eventos (Delegator)](#-sistema-de-eventos-delegator)
+5. [Interface e UX (ScreenManager)](#-interface-e-ux-screenmanager)
+6. [Persistência de Dados](#-persistência-de-dados)
+7. [Protocolo JSON](#-protocolo-json)
+8. [Design System](#-design-system)
+9. [Contribuição](#-contribuição)
+
+---
+
+## 🔭 Visão Geral e Filosofia
+
+O **QuizLab** é uma Single Page Application (SPA) desenvolvida puramente em **Vanilla JavaScript (ES6+)**. O objetivo técnico é provar que aplicações complexas e reativas podem ser construídas sem o *overhead* de frameworks modernos (React, Vue, Angular), utilizando padrões de projeto clássicos e APIs nativas do navegador.
+
+**Pilares Técnicos:**
+*   **Zero Dependencies:** Nenhuma biblioteca externa (npm, builds, bundlers).
+*   **Client-Side First:** Toda a lógica e persistência ocorrem no navegador do usuário.
+*   **Modularidade:** Código separado por responsabilidade em IIFEs (Immediately Invoked Function Expressions).
+*   **DRY (Don't Repeat Yourself):** Reutilização intensiva de lógica de renderização e validação.
+
+---
+
+## 🏗 Arquitetura de Software
+
+O projeto não utiliza classes (POO clássica), mas sim **Objetos Singleton** expostos no escopo global `window`, simulando *namespaces*.
+
+### Diagrama de Comunicação de Módulos
 
 ```mermaid
 graph TD
-    A([Página Inicial]) -->|Começar Agora| B[App: Tela de Upload]
+    %% Camada de Entrada
+    DOM[DOM Events] --> Delegator[EventDelegator.js]
     
-    B -->|Carregar JSON| C{Validar JSON}
-    B -->|Criar Novo| D[Wizard Criador]
-    B -->|Meus Simulados| L[Biblioteca Local]
+    %% Camada de Controle
+    Delegator -- "Route Action" --> Main[Main.js]
     
-    L -->|Iniciar| E
-    L -->|Exportar/Excluir| L
+    %% Camada de Lógica de Negócio (Features)
+    Main -- "Init/Reset" --> Quiz[QuizEngine.js]
+    Main -- "CRUD Drafts" --> Creator[CreatorManager.js]
+    Main -- "CRUD Library" --> Lib[LibraryManager.js]
     
-    C -->|Erro| B
-    C -->|Sucesso| S{Salvar na Biblioteca?}
-    S -->|Sim/Não| E[Motor de Quiz]
+    %% Camada de Visualização
+    Main -- "Change View" --> Screen[ScreenManager.js]
+    Quiz -- "Get State" --> Screen
+    Creator -- "Validation" --> Validator[Validator.js]
     
-    D -->|Definir Título| D1(Dados Gerais)
-    D1 -->|Adicionar Questões| D2(Lista de Questões)
-    D2 -->|Exportar JSON| S
+    %% Camada de Infraestrutura
+    Quiz -- "Save Stats" --> Storage[StorageManager.js]
+    Lib -- "Get/Set" --> Storage
+    Main -- "Toast Msg" --> Toast[ToastSystem.js]
+    Main -- "Alerts" --> Modal[ModalManager.js]
     
-    E -->|Responder| E1(Navegação & Feedback)
-    E1 -->|Finalizar| F[Resultados & Revisão]
-    
-    F -->|Tentar Novamente| E
-    F -->|Voltar ao Início| B
+    %% Persistência
+    Storage <--> LocalStorage[(Browser LocalStorage)]
+```
+
+### Estrutura de Pastas e Responsabilidades
+
+*   `js/main.js`: **Entry Point**. Inicializa os componentes e registra o mapa de eventos global.
+*   `js/core/`:
+    *   `config.js`: Constantes globais (`CONFIG`), Enums de tipos de questão e limites.
+    *   `storage-manager.js`: *Facade* para o `localStorage`. Trata serialização JSON e erros.
+    *   `validator.js`: Validação de Schema JSON e regras de input do criador.
+*   `js/features/`:
+    *   `quiz-engine.js`: O "cérebro". Mantém o estado atual (`currentQuestion`, `userAnswers`, `score`).
+    *   `creator-manager.js`: Lógica do Wizard de criação, Drag & Drop e exportação.
+    *   `library-manager.js`: Renderização da grid de simulados salvos e lógica de busca.
+*   `js/ui/`:
+    *   `screen-manager.js`: Controla visibilidade de `.container` e atualiza Headers.
+    *   `event-delegator.js`: Implementa o padrão **Command**.
+
+---
+
+## ⚙ Gerenciamento de Estado (QuizEngine)
+
+O `QuizEngine` não manipula o DOM. Ele apenas detém a verdade sobre o progresso do usuário.
+
+**Estrutura do State (`_state`):**
+```javascript
+{
+    quizData: Object,        // O JSON carregado
+    libraryId: String|null,  // ID se estiver salvo na biblioteca
+    currentQuestion: Int,    // Índice atual (0-based)
+    userAnswers: Array,      // Array<String|Array> (respostas do user)
+    questionAnswered: Array, // Array<Boolean> (flags de confirmação)
+    visitedQuestions: Array, // Array<Boolean> (para navegação)
+    correctCount: Int,
+    incorrectCount: Int
+}
+```
+
+**Lógica de "Confirmar Resposta":**
+1.  Usuário seleciona alternativa -> Atualiza `userAnswers[idx]`.
+2.  Usuário clica "Confirmar" -> `QuizEngine.confirm()`:
+    *   Trava a questão (`questionAnswered[idx] = true`).
+    *   Compara com `quizData.respostasCorretas`.
+    *   Incrementa `correctCount` ou `incorrectCount`.
+    *   Retorna `true/false` para a UI renderizar o feedback.
+
+---
+
+## 🎮 Sistema de Eventos (Delegator)
+
+Para evitar centenas de `onclick` espalhados, usamos **Event Delegation**. Um único *listener* no `window` captura todos os cliques.
+
+**Como funciona:**
+1.  O elemento HTML recebe um atributo `data-action="nome-da-acao"`.
+    *   Ex: `<button data-action="next-question">`
+2.  `EventDelegator.js` intercepta o clique.
+3.  Verifica se o alvo (ou pai) tem `data-action`.
+4.  Busca a função correspondente no registro do `main.js` e a executa.
+
+**Vantagens:** Performance superior e código HTML desacoplado da lógica JS.
+
+---
+
+## 🖥 Interface e UX (ScreenManager)
+
+### Painel de Informações (HUD)
+O HUD (`#quizInfoBar`) possui dois estados controlados via CSS e JS:
+
+1.  **Expandido (Padrão):** Mostra Título, Badge de Score (Acertos/Erros) e Botão de Visibilidade.
+2.  **Oculto (`.hidden-panel`):**
+    *   O CSS remove o `background`, `border` e oculta todos os filhos diretos (`display: none`).
+    *   **Exceção:** O botão `.toggle-visibility-btn` permanece visível, flutuando à direita, sem bordas, apenas o ícone.
+    *   Isso libera espaço vertical para questões longas.
+
+### Fluxo de Revisão e Finalização
+Para garantir integridade:
+1.  **Botão Finalizar:** Só é injetado no DOM na **última questão** E se ela estiver **respondida**.
+2.  **Tela de Revisão (`renderFinalReview`):**
+    *   Filtra questões onde `questionAnswered[i] === false`.
+    *   Gera cards clicáveis com badge amarela `PENDENTE`.
+    *   Ao clicar, invoca `jump-to-question` -> `QuizEngine.goTo(i)` -> `ScreenManager.change('quizScreen')`.
+
+---
+
+## 💾 Persistência de Dados
+
+O sistema utiliza chaves específicas no `localStorage` para evitar conflitos:
+
+| Chave | Conteúdo | Descrição |
+|:--- |:--- |:--- |
+| `quizlab_library` | `Array<Object>` | Lista de simulados importados/criados. Inclui metadados (score médio). |
+| `quizlab_draft` | `Object` | Rascunho automático do Criador (salvo a cada 30s). |
+| `quizlab_first_visit` | `Boolean` | Flag para exibir modal de onboarding. |
+
+**Estrutura de Item na Biblioteca:**
+```javascript
+{
+    id: "quiz_1700000000000",
+    data: { ...JSON Completo... },
+    meta: {
+        addedAt: Timestamp,
+        timesPlayed: Integer,
+        averageScore: Integer (0-100)
+    }
+}
 ```
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 📜 Protocolo JSON
 
-- **📚 Biblioteca Local Avançada**: Armazene até 10 simulados com sistema de **Busca por Tags**, ordenação e estatísticas de uso detalhadas.
-- **📊 Estatísticas de Desempenho**: Acompanhe o número de vezes jogado, data da última vez e média de acertos por simulado.
-- **🎨 Interface Otimizada**: Design industrial focado em eficiência, agora com **Skeleton Screens** para carregamento fluido.
-- **🛠️ Criador Assistido**: Sistema de etapas (Wizard) com reordenação via **Drag & Drop**, preview do JSON e salvamento de rascunhos.
-- **📑 Documentação Interativa**: Central de ajuda reformulada com busca interna, guia de troubleshooting e arquivo de exemplo para download.
-- **🔒 Privacidade Absoluta**: Processamento 100% local. Seus dados e simulados nunca saem do seu dispositivo.
-- **📱 UX Dinâmica & Acessível**: Navegação livre no quiz, grid de progresso clicável, e suporte completo a **Atalhos de Teclado (A11Y)**.
-
----
-
-## 💻 Arquitetura Técnica
-
-O sistema opera de forma reativa e puramente local, utilizando o navegador como motor de processamento.
-
-- **Vanilla CSS**: Sistema de Design Tokens, Glassmorphism, animações de Skeleton e Layouts Grid/Flexbox.
-- **Vanilla JavaScript**: Lógica pura e modularizada, validação robusta de JSON com diagnóstico de erros.
-- **LocalStorage API**: Gerenciamento persistente da biblioteca e sistema de rascunhos (Auto-save).
-- **SVG System**: Ícones vetoriais e animações CSS para feedback visual imediato (Toasts/Loaders).
-
----
-
-## 📚 Biblioteca Local (Cache)
-
-O sistema de cache foi projetado para equilibrar conveniência e performance:
-
-1.  **Limite Rígido:** Máximo de **10 simulados** salvos.
-2.  **Organização:** Filtros por Título, Descrição ou **Tags** (novo campo opcional).
-3.  **Estatísticas:** A cada conclusão de simulado, o sistema atualiza automaticamente a média de acertos e o contador de jogadas.
-4.  **Busca em Tempo Real:** Encontre rapidamente seus testes com o filtro dinâmico integrado.
-
----
-
-## 📝 Especificação de Dados (JSON)
-
-O formato JSON do QuizLab suporta campos avançados para organização:
+O sistema valida estritamente arquivos importados. O schema obrigatório é:
 
 ```json
 {
-  "nomeSimulado": "...",
-  "descricao": "...",
-  "tags": ["matemática", "ENEM"],
+  "nomeSimulado": "String (Obrigatório)",
+  "descricao": "String",
+  "tags": ["Array", "de", "Strings"],
   "questoes": [
     {
-      "id": 1,
-      "enunciado": "...",
-      "tipo": "unica",
-      "alternativas": [...],
-      "respostasCorretas": [...]
+      "id": "Any (usado internamente)",
+      "enunciado": "String (HTML safe)",
+      "tipo": "unica | multipla",
+      "alternativas": [
+        { "id": "a", "texto": "..." },
+        { "id": "b", "texto": "..." }
+      ],
+      "respostasCorretas": ["a"] // Array mesmo se for única
     }
   ]
 }
 ```
 
-### Novas Funcionalidades de Navegação
-- **Navegação Livre:** O sistema agora permite pular questões e navegar diretamente via grid de progresso.
-- **Modo Revisão:** Antes de finalizar, você revisa o status de todas as questões para garantir que nada ficou em branco.
+---
+
+## 🎨 Design System
+
+Utilizamos variáveis CSS (`:root`) em `styles.css` para consistência e "Glassmorphism".
+
+### Cores Semânticas (Badges & Feedback)
+O sistema de cores é crítico para a UX de feedback.
+
+| Variável | Hex | Uso |
+|:--- |:--- |:--- |
+| `--primary-500` | `#c4ff00` | Ações, Neon, Foco, Seleção. |
+| `--success` | `#00ff9d` | Resposta Correta, Badge "Respondida". |
+| `--error` | `#ff0055` | Resposta Incorreta. |
+| `--pending` | `#ffd700` | (Manual no CSS) Badge "Pendente". |
+| `--bg-glass` | `rgba(15,15,15,0.92)` | Fundo de cards e modais. |
+
+### Componentes de UI
+*   **IconSystem:** Injeção de SVG via Javascript (`IconSystem.render('name')`) para evitar requisições de imagens externas.
+*   **Toast:** Sistema de notificação flutuante não-bloqueante.
+*   **Modal:** Sistema de sobreposição para confirmações críticas (ex: sair do quiz sem salvar).
+
+---
+
+## 🤝 Contribuição
+
+Quer ajudar a evoluir o QuizLab? Ficaremos felizes com sua colaboração!
+
+Por favor, leia nosso **[Guia de Contribuição (CONTRIBUTING.md)](CONTRIBUTING.md)** para entender os padrões de arquitetura, convenções de código e o fluxo de Pull Requests.
+
+---
+
+*Documentação gerada com base na versão v1.2.0.*
