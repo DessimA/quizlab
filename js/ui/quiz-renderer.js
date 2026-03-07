@@ -1,6 +1,5 @@
 (function(window) {
     const QuizRenderer = {
-
         renderQuestion() {
             const data = QuizEngine.getCurrentData();
             const container = document.getElementById('questionContainer');
@@ -13,13 +12,14 @@
             });
 
             if (data.isAnswered) {
-                container.appendChild(this._buildFeedback(data));
+                const feedback = this._buildFeedback(data);
+                if (feedback) container.appendChild(feedback);
             }
 
             this.renderGrid();
             this._updateNav(data);
+            this._updateModeIndicator(data.mode);
             IconSystem.inject(container);
-
             this._focusContainer(container);
         },
 
@@ -27,28 +27,39 @@
             const div = document.createElement('div');
             div.className = 'question-text';
 
+            const flagColor = data.isFlagged ? 'var(--error)' : 'var(--text-muted)';
+            const flagTitle = data.isFlagged ? 'Remover marcação' : 'Marcar para revisão';
+            const flagIcon = IconSystem.render('flag', 'sm');
+
             const badge = `<span class="badge" style="margin-bottom:var(--space-sm);display:block;width:fit-content;">QUESTÃO ${data.index + 1}/${data.total}</span>`;
+            const flagBtn = `<button class="btn btn-ghost" data-action="flag-question" title="${flagTitle}"
+                style="float:right;color:${flagColor};padding:2px 6px;" aria-label="${flagTitle}">${flagIcon}</button>`;
             const hint = data.question.tipo === CONFIG.QUESTION_TYPES.MULTIPLE
                 ? `<div class="font-mono text-primary" style="font-size:var(--font-tiny);margin-top:var(--space-xs);" aria-live="polite">(SELECIONE EXATAMENTE ${data.question.respostasCorretas.length})</div>`
                 : '';
 
-            div.innerHTML = badge + data.question.enunciado + hint;
+            div.innerHTML = badge + flagBtn + data.question.enunciado + hint;
             return div;
         },
 
         _buildAlternative(alt, data) {
-            const { question, userAnswer, isAnswered } = data;
+            const { question, userAnswer, isAnswered, mode } = data;
             const inputType = question.tipo === CONFIG.QUESTION_TYPES.SINGLE ? 'radio' : 'checkbox';
             const isSelected = userAnswer && (Array.isArray(userAnswer) ? userAnswer.includes(alt.id) : userAnswer === alt.id);
             const isCorrect = question.respostasCorretas.includes(alt.id);
+            const isExam = mode === CONFIG.QUIZ_MODES.EXAM;
 
             let cls = 'alternative';
             let ariaLabel = alt.texto;
 
             if (isAnswered) {
                 cls += ' disabled';
-                if (isCorrect) { cls += ' correct'; ariaLabel += ' — resposta correta'; }
-                else if (isSelected) { cls += ' incorrect'; ariaLabel += ' — resposta incorreta'; }
+                if (!isExam) {
+                    if (isCorrect) { cls += ' correct'; ariaLabel += ' — resposta correta'; }
+                    else if (isSelected) { cls += ' incorrect'; ariaLabel += ' — resposta incorreta'; }
+                } else if (isSelected) {
+                    cls += ' selected';
+                }
             } else if (isSelected) {
                 cls += ' selected';
             }
@@ -75,7 +86,7 @@
 
             const icon = document.createElement('div');
             icon.style.marginLeft = 'auto';
-            if (isAnswered && (isSelected || isCorrect)) {
+            if (isAnswered && !isExam && (isSelected || isCorrect)) {
                 icon.innerHTML = isCorrect
                     ? IconSystem.render('check', 'sm')
                     : IconSystem.render('cross', 'sm');
@@ -86,14 +97,16 @@
         },
 
         _buildFeedback(data) {
+            if (data.mode === CONFIG.QUIZ_MODES.EXAM) return null;
+
             const correct = QuizEngine.checkAnswer(data.index);
             const div = document.createElement('div');
             div.className = `feedback-message ${correct ? 'correct' : 'incorrect'}`;
             div.setAttribute('role', 'status');
             div.setAttribute('aria-live', 'assertive');
-            div.innerHTML = `<div>${!correct
-                ? `CORRETO: <strong>${data.question.respostasCorretas.join(', ').toUpperCase()}</strong>`
-                : 'RESPOSTA CORRETA'
+            div.innerHTML = `<div>${correct
+                ? 'RESPOSTA CORRETA'
+                : `RESPOSTA INCORRETA — CORRETO: <strong>${data.question.respostasCorretas.join(', ').toUpperCase()}</strong>`
             }</div>`;
             return div;
         },
@@ -108,29 +121,36 @@
             grid.setAttribute('aria-label', 'Navegação entre questões');
 
             state.quizData.questoes.forEach((_, i) => {
+                const status = QuizEngine.getQuestionStatus(i);
+                const isCurrent = i === state.currentQuestion;
+                const isFlagged = QuizEngine.isFlagged(i);
+
                 const item = document.createElement('button');
                 item.className = 'grid-item';
                 item.setAttribute('role', 'listitem');
                 item.type = 'button';
 
-                const isCurrent = i === state.currentQuestion;
-                const isAnswered = state.questionAnswered[i];
-                const isCorrect = isAnswered && QuizEngine.checkAnswer(i);
-                const isVisited = state.visitedQuestions[i];
-
                 if (isCurrent) item.classList.add('current');
-                if (isAnswered) item.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
-                else if (isVisited) item.classList.add('visited');
+                if (status === 'correct') item.classList.add('answered-correct');
+                if (status === 'incorrect') item.classList.add('answered-incorrect');
+                if (status === 'skipped') item.classList.add('visited');
+                if (isFlagged) item.style.outline = '2px solid var(--error)';
 
-                const statusText = isCurrent ? 'atual' : isAnswered ? (isCorrect ? 'correta' : 'incorreta') : isVisited ? 'visitada' : 'não visitada';
-                item.setAttribute('aria-label', `Questão ${i + 1}, ${statusText}`);
+                const statusLabel = { correct: 'correta', incorrect: 'incorreta', skipped: 'pulada', pending: 'não visitada' };
+                item.setAttribute('aria-label', `Questão ${i + 1}${isFlagged ? ' (marcada)' : ''}, ${isCurrent ? 'atual' : statusLabel[status]}`);
                 item.setAttribute('aria-current', isCurrent ? 'true' : 'false');
-
                 item.textContent = i + 1;
                 item.dataset.action = 'jump-to-question';
                 item.dataset.index = i;
                 grid.appendChild(item);
             });
+        },
+
+        _updateModeIndicator(mode) {
+            const el = document.getElementById('modeIndicator');
+            if (!el) return;
+            el.textContent = mode === CONFIG.QUIZ_MODES.EXAM ? 'EXAME' : 'ESTUDO';
+            el.style.color = mode === CONFIG.QUIZ_MODES.EXAM ? 'var(--error)' : 'var(--success)';
         },
 
         _updateNav(data) {

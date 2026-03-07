@@ -170,6 +170,23 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
 /* Icon System */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    line-height: 1;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.icon-ms-xs  { font-size: 16px; }
+.icon-ms-sm  { font-size: 18px; }
+.icon-ms-md  { font-size: 20px; }
+.icon-ms-lg  { font-size: 32px; }
+.icon-ms-xl  { font-size: 48px; }
+
 .icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; z-index: 1; }
 .icon-xs { width: 14px; height: 14px; }
 .icon-sm { width: 16px; height: 16px; }
