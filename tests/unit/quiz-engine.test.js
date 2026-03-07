@@ -264,8 +264,8 @@ describe('QuizEngine — getStats()', () => {
 
     it('retorna skipped corretamente para questões visitadas mas não respondidas', () => {
         QuizEngine.init(QUIZ_MULTI_QUESTION);
+        QuizEngine.select('a'); QuizEngine.confirm();
         QuizEngine.next();
-        QuizEngine.prev();
         const stats = QuizEngine.getStats();
         assert.equal(stats.skipped, 1);
     });
