@@ -1,6 +1,5 @@
 (function(window) {
     const ReviewManager = {
-
         renderFinalReview() {
             const list = document.getElementById('finalReviewList');
             const state = QuizEngine.getState();
@@ -31,6 +30,7 @@
         finalizeProcess() {
             const stats = QuizEngine.getStats();
             QuizEngine.saveStatsToLibrary();
+            QuizEngine.stopTimer();
 
             document.getElementById('resultScore').textContent = `${stats.correct}/${stats.total}`;
             document.getElementById('resultPercentage').textContent = `${stats.percent}%`;
@@ -39,10 +39,16 @@
             if (!rev) return;
 
             rev.innerHTML = '';
+
+            if (stats.flagged.length > 0) {
+                rev.appendChild(this._buildFlaggedSection(stats.flagged));
+            }
+
             const statusMap = {
-                correct:   { text: 'ACERTO', cls: 'correct' },
-                incorrect: { text: 'ERRO',   cls: 'incorrect' },
-                pending:   { text: 'PULOU',  cls: 'pending' }
+                correct: { text: 'ACERTO', cls: 'correct' },
+                incorrect: { text: 'ERRO', cls: 'incorrect' },
+                skipped: { text: 'PULOU', cls: 'pending' },
+                pending: { text: 'NÃO VIU', cls: 'pending' }
             };
 
             QuizEngine.getState().quizData.questoes.forEach((q, i) => {
@@ -50,7 +56,44 @@
                 rev.appendChild(this._buildResultCard(q, i, statusMap[status]));
             });
 
+            this._renderHistory(rev);
             ScreenManager.change(CONFIG.ELEMENTS.RESULT_SCREEN);
+        },
+
+        _buildFlaggedSection(flaggedIndexes) {
+            const flagIcon = IconSystem.render('flag', 'sm', 'color:var(--error);vertical-align:middle;');
+            const section = document.createElement('div');
+            section.style.cssText = 'margin-bottom:var(--space-lg);padding:var(--space-md);border:1px solid var(--error);border-radius:var(--radius-md);background:var(--error-bg);';
+            section.innerHTML = `
+                <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--error);margin-bottom:var(--space-sm);display:flex;align-items:center;gap:4px;">
+                    ${flagIcon} QUESTÕES MARCADAS (${flaggedIndexes.length})
+                </div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);">
+                    ${flaggedIndexes.map(i => `<span class="badge" style="margin-right:4px;">Q.${i + 1}</span>`).join('')}
+                </div>`;
+            return section;
+        },
+
+        _renderHistory(container) {
+            if (!QuizEngine.getState().libraryId) return;
+            const lib = StorageManager.getLibrary();
+            const item = lib.find(i => i.id === QuizEngine.getState().libraryId);
+            if (!item || !item.meta.history || item.meta.history.length < 2) return;
+
+            const section = document.createElement('div');
+            section.style.cssText = 'margin-top:var(--space-xl);padding-top:var(--space-lg);border-top:1px solid var(--border-glass);';
+            section.innerHTML = `
+                <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);margin-bottom:var(--space-md);">HISTÓRICO DE TENTATIVAS</div>
+                <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+                    ${item.meta.history.map((h, idx) => `
+                        <div style="flex:1;min-width:80px;text-align:center;padding:var(--space-sm);background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);">
+                            <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:${h.score >= 70 ? 'var(--success)' : h.score >= 50 ? 'var(--primary-500)' : 'var(--error)'};">${h.score}%</div>
+                            <div style="font-size:0.65rem;color:var(--text-muted);">${new Date(h.playedAt).toLocaleDateString()}</div>
+                            <div style="font-size:0.65rem;color:var(--text-muted);">${h.correct}/${h.total}</div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            container.appendChild(section);
         },
 
         _buildPendingCard(q, i) {
@@ -65,24 +108,27 @@
             const text = q.enunciado.length > 120 ? q.enunciado.substring(0, 120) + '...' : q.enunciado;
             btn.innerHTML = `
                 <div class="review-card-header">
-                    <span class="text-primary">QUESTÃO ${i + 1}</span>
-                    <span class="badge pending">PENDENTE ⚠</span>
+                    <span style="font-family:var(--font-mono);font-size:0.75rem;">Q.${String(i + 1).padStart(2, '0')}</span>
+                    <span class="badge" style="background:rgba(255,215,0,0.1);color:#ffd700;border-color:#ffd700;">PENDENTE</span>
                 </div>
-                <div class="review-card-body">${text}</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;font-style:italic;">Clique para responder</div>`;
+                <div class="review-card-body">${text}</div>`;
             return btn;
         },
 
-        _buildResultCard(q, i, status) {
+        _buildResultCard(q, i, statusInfo) {
             const div = document.createElement('div');
             div.className = 'review-card';
-            div.setAttribute('aria-label', `Questão ${i + 1}: ${status.text}`);
+            const isFlagged = QuizEngine.isFlagged(i);
+            const flagIcon = isFlagged ? IconSystem.render('flag', 'xs', 'color:var(--error);vertical-align:middle;margin-left:4px;') : '';
+            const text = q.enunciado.length > 120 ? q.enunciado.substring(0, 120) + '...' : q.enunciado;
             div.innerHTML = `
                 <div class="review-card-header">
-                    <span class="text-primary">QUESTÃO ${i + 1}</span>
-                    <span class="badge ${status.cls}">${status.text}</span>
+                    <span style="font-family:var(--font-mono);font-size:0.75rem;display:flex;align-items:center;">
+                        Q.${String(i + 1).padStart(2, '0')}${flagIcon}
+                    </span>
+                    <span class="badge ${statusInfo.cls}">${statusInfo.text}</span>
                 </div>
-                <div class="review-card-body">${q.enunciado}</div>`;
+                <div class="review-card-body">${text}</div>`;
             return div;
         }
     };

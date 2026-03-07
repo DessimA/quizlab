@@ -1,17 +1,16 @@
-/**
- * Global Configuration & Constants
- */
 (function(window) {
     const CONFIG = {
         STORAGE: {
             LIBRARY_KEY: 'quizlab_library',
             DRAFT_KEY: 'quizlab_draft',
-            FIRST_VISIT_KEY: 'quizlab_first_visit'
+            FIRST_VISIT_KEY: 'quizlab_first_visit',
+            SESSION_KEY: 'quizlab_session'
         },
         LIMITS: {
             MAX_LIBRARY_SLOTS: 10,
             ENUNCIADO_MIN_LENGTH: 5,
-            RECOMMENDED_MAX_QUESTIONS: 500
+            RECOMMENDED_MAX_QUESTIONS: 500,
+            MAX_HISTORY_ENTRIES: 10
         },
         TIMINGS: {
             AUTOSAVE_INTERVAL: 30000,
@@ -22,6 +21,10 @@
         QUESTION_TYPES: {
             SINGLE: 'unica',
             MULTIPLE: 'multipla'
+        },
+        QUIZ_MODES: {
+            STUDY: 'study',
+            EXAM: 'exam'
         },
         ELEMENTS: {
             QUIZ_SCREEN: 'quizScreen',

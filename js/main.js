@@ -15,7 +15,27 @@
                     location.reload();
                 }
             },
-            'enter-app': () => ScreenManager.change('uploadScreen'),
+            'enter-app': () => {
+                ScreenManager.change('uploadScreen');
+
+                const session = StorageManager.getSession();
+                if (session && session.quizData) {
+                    const minutesAgo = Math.round((Date.now() - session.savedAt) / 60000);
+                    ModalManager.confirm(
+                        `Sessão anterior encontrada: "${session.quizData.nomeSimulado}" (${minutesAgo} min atrás). Retomar de onde parou?`,
+                        () => {
+                            QuizEngine.restoreSession(session);
+                            ScreenManager.change(CONFIG.ELEMENTS.QUIZ_SCREEN);
+                            QuizRenderer.renderQuestion();
+                        }
+                    );
+                    return;
+                }
+                if (StorageManager.isFirstVisit()) {
+                    ModalManager.open('onboardingModal');
+                    StorageManager.markFirstVisit();
+                }
+            },
             'show-library': () => { ScreenManager.change('libraryScreen'); LibraryManager.render(); },
             'show-creator': () => { CreatorManager.reset(); ScreenManager.change('creatorScreen'); },
 
@@ -48,6 +68,19 @@
                 const quiz = CreatorManager.buildQuizObject();
                 if (!quiz) return;
                 window.pendingSaveQuiz = quiz;
+
+                if (CreatorManager._editingId) {
+                    ModalManager.confirm(
+                        'Atualizar o simulado na biblioteca com as alterações?',
+                        () => {
+                            StorageManager.replaceInLibrary(CreatorManager._editingId, quiz);
+                            ToastSystem.show('Simulado atualizado na biblioteca!');
+                            CreatorManager._editingId = null;
+                        }
+                    );
+                    return;
+                }
+
                 ModalManager.open('exportOptionsModal');
             },
 
@@ -67,7 +100,30 @@
 
             'load-quiz': (e, target) => {
                 const item = StorageManager.getLibrary().find(i => i.id === target.dataset.id);
-                if (item) ScreenManager.loadQuiz(item.data, item.id);
+                if (item) ScreenManager.loadQuizOptions(item.data, item.id);
+            },
+            'confirm-quiz-options': () => {
+                const { data, libraryId } = window.pendingQuizLoad || {};
+                if (!data) return;
+
+                const mode = document.querySelector('input[name="quizMode"]:checked')?.value || CONFIG.QUIZ_MODES.STUDY;
+                const shuffleQuestions = document.getElementById('optShuffleQuestions')?.checked || false;
+                const shuffleOptions = document.getElementById('optShuffleOptions')?.checked || false;
+
+                ModalManager.close('quizOptionsModal');
+                ScreenManager.loadQuiz(data, libraryId, { mode, shuffleQuestions, shuffleOptions });
+                window.pendingQuizLoad = null;
+            },
+            'flag-question': () => {
+                const idx = QuizEngine.getState().currentQuestion;
+                QuizEngine.flagQuestion(idx);
+                QuizRenderer.renderQuestion();
+            },
+            'edit-quiz': (e, target) => {
+                const item = StorageManager.getLibrary().find(i => i.id === target.dataset.id);
+                if (!item) return;
+                CreatorManager.loadForEdit(item);
+                ScreenManager.change(CONFIG.ELEMENTS.CREATOR_SCREEN);
             },
             'download-quiz': (e, target) => {
                 const item = StorageManager.getLibrary().find(i => i.id === target.dataset.id);
@@ -93,6 +149,22 @@
             'select-file-trigger': () => document.getElementById('fileInput').click(),
             'confirm-export': () => _finalizeExport()
         });
+
+        window.addEventListener('quizlab:timer-expired', () => {
+            ToastSystem.show('Tempo esgotado! Finalizando simulado...', 'error');
+            setTimeout(() => ReviewManager.renderFinalReview(), 1000);
+        });
+
+        window.addEventListener('quizlab:timer-tick', (e) => {
+            const el = document.getElementById('timerDisplay');
+            if (!el) return;
+            const r = e.detail.remaining;
+            const m = Math.floor(r / 60).toString().padStart(2, '0');
+            const s = (r % 60).toString().padStart(2, '0');
+            el.textContent = `${m}:${s}`;
+            el.classList.toggle('timer-warning', r <= 60);
+        });
+
 
         document.getElementById('fileInput').onchange = (e) => FileHandler.handle(e.target.files[0]);
 
