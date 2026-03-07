@@ -24,7 +24,9 @@
             timer:        'timer',
             shuffle:      'shuffle',
             history:      'history',
-            school:       'school'
+            school:       'school',
+            upload_file:  'upload_file',
+            quiz:         'quiz'
         },
 
         _svgFallbacks: {
