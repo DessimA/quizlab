@@ -1,0 +1,13 @@
+{
+    "name": "quizlab",
+    "version": "1.2.0",
+    "description": "Plataforma de simulados client-side",
+    "scripts": {
+        "test": "node --test --recursive tests/",
+        "test:unit": "node --test --recursive tests/unit/",
+        "test:integration": "node --test --recursive tests/integration/"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
