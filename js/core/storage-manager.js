@@ -38,7 +38,7 @@
 
         addToLibrary(quiz) {
             const library = this.getLibrary();
-            const newId = `quiz_${Date.now()}`;
+            const newId = `quiz_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             const newItem = {
                 id: newId,
                 data: quiz,
