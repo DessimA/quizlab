@@ -7,7 +7,10 @@ load('js/core/config.js');
 
 global.StorageManager = {
     getLibrary: () => [],
-    saveLibrary: () => true
+    saveLibrary: () => true,
+    updateQuizStats: () => true,
+    saveSession: () => true,
+    clearSession: () => {}
 };
 
 load('js/features/quiz-engine.js');
@@ -38,17 +41,17 @@ const QUIZ_MULTIPLE = {
             tipo: 'multipla',
             alternativas: [
                 { id: 'a', texto: 'HTML' },
-                { id: 'b', texto: 'Python' },
-                { id: 'c', texto: 'CSS' },
-                { id: 'd', texto: 'Java' }
+                { id: 'b', texto: 'CSS' },
+                { id: 'c', texto: 'Python' },
+                { id: 'd', texto: 'SQL' }
             ],
-            respostasCorretas: ['a', 'c']
+            respostasCorretas: ['a', 'b']
         }
     ]
 };
 
 const QUIZ_MULTI_QUESTION = {
-    nomeSimulado: 'Múltiplas Questões',
+    nomeSimulado: 'Teste Multi Questão',
     questoes: [
         {
             id: 1, enunciado: 'Q1', tipo: 'unica',
@@ -69,23 +72,37 @@ const QUIZ_MULTI_QUESTION = {
 };
 
 describe('QuizEngine — init()', () => {
-    it('inicializa o estado com os valores corretos', () => {
-        QuizEngine.init(QUIZ_SINGLE, 'lib_123');
+    it('inicializa o estado corretamente', () => {
+        QuizEngine.init(QUIZ_SINGLE);
         const state = QuizEngine.getState();
-
         assert.equal(state.currentQuestion, 0);
         assert.equal(state.correctCount, 0);
         assert.equal(state.incorrectCount, 0);
-        assert.equal(state.libraryId, 'lib_123');
         assert.deepEqual(state.userAnswers, [null]);
         assert.deepEqual(state.questionAnswered, [false]);
         assert.deepEqual(state.visitedQuestions, [true]);
+        assert.deepEqual(state.flagged, []);
     });
 
-    it('marca apenas a primeira questão como visitada', () => {
-        QuizEngine.init(QUIZ_MULTI_QUESTION);
-        const state = QuizEngine.getState();
-        assert.deepEqual(state.visitedQuestions, [true, false, false]);
+    it('inicializa com modo estudo por padrão', () => {
+        QuizEngine.init(QUIZ_SINGLE);
+        assert.equal(QuizEngine.getState().mode, CONFIG.QUIZ_MODES.STUDY);
+    });
+
+    it('inicializa com modo exame quando especificado', () => {
+        QuizEngine.init(QUIZ_SINGLE, null, { mode: CONFIG.QUIZ_MODES.EXAM });
+        assert.equal(QuizEngine.getState().mode, CONFIG.QUIZ_MODES.EXAM);
+    });
+
+    it('embaralha questões quando shuffleQuestions é true', () => {
+        const original = QUIZ_MULTI_QUESTION.questoes.map(q => q.id);
+        let shuffled = false;
+        for (let i = 0; i < 20; i++) {
+            QuizEngine.init(QUIZ_MULTI_QUESTION, null, { shuffleQuestions: true });
+            const current = QuizEngine.getState().quizData.questoes.map(q => q.id);
+            if (current.join() !== original.join()) { shuffled = true; break; }
+        }
+        assert.ok(shuffled, 'Após 20 tentativas, ao menos uma deve estar embaralhada');
     });
 });
 
@@ -148,7 +165,7 @@ describe('QuizEngine — canConfirmCurrent()', () => {
     it('retorna true quando múltipla escolha está completa', () => {
         QuizEngine.init(QUIZ_MULTIPLE);
         QuizEngine.select('a');
-        QuizEngine.select('c');
+        QuizEngine.select('b');
         assert.equal(QuizEngine.canConfirmCurrent(), true);
     });
 });
@@ -180,7 +197,7 @@ describe('QuizEngine — confirm() e checkAnswer()', () => {
 
     it('detecta resposta correta em múltipla escolha independente da ordem', () => {
         QuizEngine.init(QUIZ_MULTIPLE);
-        QuizEngine.select('c');
+        QuizEngine.select('b');
         QuizEngine.select('a');
         QuizEngine.confirm();
         assert.equal(QuizEngine.getState().correctCount, 1);
@@ -244,6 +261,22 @@ describe('QuizEngine — getStats()', () => {
         assert.equal(stats.percent, 0);
         assert.equal(stats.unanswered, 3);
     });
+
+    it('retorna skipped corretamente para questões visitadas mas não respondidas', () => {
+        QuizEngine.init(QUIZ_MULTI_QUESTION);
+        QuizEngine.next();
+        QuizEngine.prev();
+        const stats = QuizEngine.getStats();
+        assert.equal(stats.skipped, 1);
+    });
+
+    it('retorna flagged corretamente', () => {
+        QuizEngine.init(QUIZ_MULTI_QUESTION);
+        QuizEngine.flagQuestion(0);
+        QuizEngine.flagQuestion(2);
+        const stats = QuizEngine.getStats();
+        assert.deepEqual(stats.flagged, [0, 2]);
+    });
 });
 
 describe('QuizEngine — reset()', () => {
@@ -259,13 +292,24 @@ describe('QuizEngine — reset()', () => {
         assert.deepEqual(state.userAnswers, [null]);
         assert.ok(state.quizData, 'quizData deve ser mantido após reset');
     });
+
+    it('limpa flags após reset', () => {
+        QuizEngine.init(QUIZ_MULTI_QUESTION);
+        QuizEngine.flagQuestion(0);
+        QuizEngine.reset();
+        assert.deepEqual(QuizEngine.getState().flagged, []);
+    });
 });
 
 describe('QuizEngine — getQuestionStatus()', () => {
     beforeEach(() => QuizEngine.init(QUIZ_MULTI_QUESTION));
 
-    it('retorna "pending" para questão não respondida', () => {
-        assert.equal(QuizEngine.getQuestionStatus(0), 'pending');
+    it('retorna "skipped" para questão visitada mas não respondida (Q0 visitada por padrão)', () => {
+        assert.equal(QuizEngine.getQuestionStatus(0), 'skipped');
+    });
+
+    it('retorna "pending" para questão nunca visitada', () => {
+        assert.equal(QuizEngine.getQuestionStatus(1), 'pending');
     });
 
     it('retorna "correct" para acerto confirmado', () => {
@@ -278,5 +322,26 @@ describe('QuizEngine — getQuestionStatus()', () => {
         QuizEngine.select('b');
         QuizEngine.confirm();
         assert.equal(QuizEngine.getQuestionStatus(0), 'incorrect');
+    });
+});
+
+describe('QuizEngine — flagQuestion() e isFlagged()', () => {
+    beforeEach(() => QuizEngine.init(QUIZ_MULTI_QUESTION));
+
+    it('marca uma questão como flagged', () => {
+        QuizEngine.flagQuestion(1);
+        assert.equal(QuizEngine.isFlagged(1), true);
+    });
+
+    it('remove a flag ao chamar novamente (toggle)', () => {
+        QuizEngine.flagQuestion(1);
+        QuizEngine.flagQuestion(1);
+        assert.equal(QuizEngine.isFlagged(1), false);
+    });
+
+    it('não afeta outras questões ao marcar uma', () => {
+        QuizEngine.flagQuestion(0);
+        assert.equal(QuizEngine.isFlagged(1), false);
+        assert.equal(QuizEngine.isFlagged(2), false);
     });
 });

@@ -86,6 +86,109 @@ describe('StorageManager — biblioteca (CRUD)', () => {
     });
 });
 
+describe('StorageManager — addToLibrary() com limite', () => {
+    it('retorna LIMIT_REACHED quando a biblioteca está cheia', () => {
+        for (let i = 0; i < CONFIG.LIMITS.MAX_LIBRARY_SLOTS; i++) {
+            StorageManager.addToLibrary({ ...SAMPLE_QUIZ, nomeSimulado: `Quiz ${i}` });
+        }
+        const result = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        assert.equal(result.success, false);
+        assert.equal(result.reason, 'LIMIT_REACHED');
+    });
+
+    it('addToLibrary() inicializa history como array vazio', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.deepEqual(item.meta.history, []);
+    });
+});
+
+describe('StorageManager — replaceInLibrary()', () => {
+    it('substitui o conteúdo mantendo o mesmo id', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const updated = { ...SAMPLE_QUIZ, nomeSimulado: 'Quiz Atualizado' };
+        const result = StorageManager.replaceInLibrary(id, updated);
+        assert.equal(result, true);
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.data.nomeSimulado, 'Quiz Atualizado');
+    });
+
+    it('atualiza questionsCount nos metadados após substituição', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const withMore = {
+            ...SAMPLE_QUIZ,
+            questoes: [
+                ...SAMPLE_QUIZ.questoes,
+                { id: 2, enunciado: 'Q2', tipo: 'unica', alternativas: [{ id: 'a', texto: 'A' }], respostasCorretas: ['a'] }
+            ]
+        };
+        StorageManager.replaceInLibrary(id, withMore);
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.meta.questionsCount, 2);
+    });
+
+    it('retorna false para id inexistente', () => {
+        assert.equal(StorageManager.replaceInLibrary('id_inexistente', SAMPLE_QUIZ), false);
+    });
+});
+
+describe('StorageManager — updateQuizStats()', () => {
+    it('registra a primeira tentativa corretamente', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        StorageManager.updateQuizStats(id, { percent: 80, correct: 4, total: 5 });
+
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.meta.timesPlayed, 1);
+        assert.equal(item.meta.averageScore, 80);
+        assert.equal(item.meta.history.length, 1);
+        assert.equal(item.meta.history[0].score, 80);
+        assert.ok(item.meta.lastPlayed !== null);
+    });
+
+    it('calcula a média corretamente após múltiplas tentativas', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        StorageManager.updateQuizStats(id, { percent: 60, correct: 3, total: 5 });
+        StorageManager.updateQuizStats(id, { percent: 100, correct: 5, total: 5 });
+
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.meta.timesPlayed, 2);
+        assert.equal(item.meta.averageScore, 80);
+        assert.equal(item.meta.history.length, 2);
+    });
+
+    it('limita o histórico a MAX_HISTORY_ENTRIES entradas', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        for (let i = 0; i < CONFIG.LIMITS.MAX_HISTORY_ENTRIES + 5; i++) {
+            StorageManager.updateQuizStats(id, { percent: 50, correct: 1, total: 2 });
+        }
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.meta.history.length, CONFIG.LIMITS.MAX_HISTORY_ENTRIES);
+    });
+
+    it('retorna false para id inexistente', () => {
+        assert.equal(StorageManager.updateQuizStats('id_invalido', { percent: 50 }), false);
+    });
+});
+
+describe('StorageManager — sessão (session)', () => {
+    it('getSession() retorna null quando não há sessão', () => {
+        assert.equal(StorageManager.getSession(), null);
+    });
+
+    it('saveSession() e getSession() funcionam corretamente', () => {
+        const session = { quizData: SAMPLE_QUIZ, currentQuestion: 2, savedAt: Date.now() };
+        StorageManager.saveSession(session);
+        const result = StorageManager.getSession();
+        assert.equal(result.currentQuestion, 2);
+    });
+
+    it('clearSession() remove a sessão', () => {
+        StorageManager.saveSession({ quizData: SAMPLE_QUIZ });
+        StorageManager.clearSession();
+        assert.equal(StorageManager.getSession(), null);
+    });
+});
+
 describe('StorageManager — rascunho (draft)', () => {
     it('getDraft() retorna null quando não há rascunho', () => {
         assert.equal(StorageManager.getDraft(), null);

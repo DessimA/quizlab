@@ -64,16 +64,6 @@ describe('Fluxo completo — quiz respondido integralmente', () => {
         assert.equal(stats.incorrect, 3);
         assert.equal(stats.percent, 0);
     });
-
-    it('questões puladas aparecem como pending no status', () => {
-        QuizEngine.select('a'); QuizEngine.confirm();
-        QuizEngine.goTo(2);
-        QuizEngine.select('b'); QuizEngine.confirm();
-
-        assert.equal(QuizEngine.getQuestionStatus(0), 'correct');
-        assert.equal(QuizEngine.getQuestionStatus(1), 'pending');
-        assert.equal(QuizEngine.getQuestionStatus(2), 'correct');
-    });
 });
 
 describe('Fluxo — navegação e estado de visita', () => {
@@ -101,6 +91,25 @@ describe('Fluxo — navegação e estado de visita', () => {
         QuizEngine.goTo(2);
         assert.equal(QuizEngine.getCurrentData().isLast, true);
     });
+
+    it('questão visitada mas não respondida retorna "skipped"', () => {
+        QuizEngine.next();
+        assert.equal(QuizEngine.getQuestionStatus(1), 'skipped');
+    });
+
+    it('questão nunca visitada retorna "pending"', () => {
+        assert.equal(QuizEngine.getQuestionStatus(2), 'pending');
+    });
+
+    it('questões puladas aparecen como skipped e pending por diferença de visita', () => {
+        QuizEngine.select('a'); QuizEngine.confirm();
+        QuizEngine.goTo(2);
+        QuizEngine.select('b'); QuizEngine.confirm();
+
+        assert.equal(QuizEngine.getQuestionStatus(0), 'correct');
+        assert.equal(QuizEngine.getQuestionStatus(1), 'pending');
+        assert.equal(QuizEngine.getQuestionStatus(2), 'correct');
+    });
 });
 
 describe('Fluxo — persistência na biblioteca', () => {
@@ -119,6 +128,7 @@ describe('Fluxo — persistência na biblioteca', () => {
         const item = StorageManager.getLibrary().find(i => i.id === id);
         assert.equal(item.meta.timesPlayed, 1);
         assert.equal(item.meta.averageScore, 100);
+        assert.equal(item.meta.history.length, 1);
         assert.ok(item.meta.lastPlayed !== null);
     });
 
@@ -139,6 +149,7 @@ describe('Fluxo — persistência na biblioteca', () => {
 
         const item = StorageManager.getLibrary().find(i => i.id === id);
         assert.equal(item.meta.timesPlayed, 2);
+        assert.equal(item.meta.history.length, 2);
         assert.ok(item.meta.averageScore > 0);
     });
 });
