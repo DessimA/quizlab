@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Verificar Versão do Node
+        run: node -v
+
       - name: Rodar testes unitários
         run: npm run test:unit
 

@@ -3,9 +3,9 @@
     "version": "1.2.0",
     "description": "Plataforma de simulados client-side",
     "scripts": {
-        "test": "node --test --recursive tests/",
-        "test:unit": "node --test --recursive tests/unit/",
-        "test:integration": "node --test --recursive tests/integration/"
+        "test": "node --test tests/**/*.test.js",
+        "test:unit": "node --test tests/unit/**/*.test.js",
+        "test:integration": "node --test tests/integration/**/*.test.js"
     },
     "engines": {
         "node": ">=21.0.0"
