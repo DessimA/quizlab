@@ -260,45 +260,66 @@
                 <div class="quiz-info-bar" id="quizInfoBar">
                     <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
                         <span class="badge" id="quizBadgeTitle" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">QUIZ</span>
-                        <div class="score-display">
-                            <div class="score-mini correct">
+                        <div class="score-display" aria-label="Pontuação atual">
+                            <div class="score-mini correct" 
+                                 aria-live="polite" 
+                                 aria-atomic="true"
+                                 aria-label="Acertos">
                                 <span id="correctCount">0</span> ACERTOS
                             </div>
-                            <div class="score-mini incorrect">
+                            <div class="score-mini incorrect" 
+                                 aria-live="polite" 
+                                 aria-atomic="true"
+                                 aria-label="Erros">
                                 <span id="incorrectCount">0</span> ERROS
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-ghost toggle-visibility-btn" data-action="toggle-visibility" title="Ocultar/Exibir painel" style="width: 28px; height: 28px; padding: 0;">
-                        <span data-icon="eye" data-size="xs"></span>
+                    <button class="btn btn-ghost toggle-visibility-btn" 
+                            data-action="toggle-visibility" 
+                            aria-label="Ocultar painel de informações"
+                            aria-pressed="false"
+                            style="width: 28px; height: 28px; padding: 0;">
+                        <span data-icon="eye" data-size="xs" aria-hidden="true"></span>
                     </button>
                 </div>
 
                 <div class="progress-section">
                     <div id="questionGrid" class="question-grid"></div>
-                    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+                    <div class="progress-track" 
+                         role="progressbar" 
+                         aria-label="Progresso do simulado"
+                         aria-valuemin="0" 
+                         aria-valuemax="100" 
+                         aria-valuenow="0">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
                 </div>
 
                 <div id="questionContainer"></div>
 
                 <div class="navigation">
-                    <button class="btn btn-secondary" id="prevBtn" data-action="prev-question" title="Anterior">
-                        <span data-icon="arrowLeft"></span>
+                    <button class="btn btn-secondary" id="prevBtn" 
+                            data-action="prev-question" 
+                            aria-label="Questão anterior">
+                        <span data-icon="arrowLeft" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-outline hidden" id="skipBtn" data-action="next-question">
                         <span>Pular</span>
-                        <span data-icon="arrowRight" data-size="xs"></span>
+                        <span data-icon="arrowRight" data-size="xs" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-primary hidden" id="confirmBtn" data-action="confirm-answer">
-                        <span data-icon="check"></span>
+                        <span data-icon="check" aria-hidden="true"></span>
                         <span>Confirmar</span>
                     </button>
-                    <button class="btn btn-primary" id="nextBtn" data-action="next-question">
+                    <button class="btn btn-primary" id="nextBtn" 
+                            data-action="next-question"
+                            aria-label="Próxima questão">
                         <span>Próxima</span>
-                        <span data-icon="arrowRight"></span>
+                        <span data-icon="arrowRight" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-primary hidden" id="finishBtn" data-action="finish-quiz">
-                        <span data-icon="check" data-size="sm"></span>
+                        <span data-icon="check" data-size="sm" aria-hidden="true"></span>
                         <span>Finalizar</span>
                     </button>
                 </div>
@@ -312,12 +333,12 @@
                 <div id="finalReviewList" style="margin-bottom: 40px;"></div>
                 
                 <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" data-action="back-to-quiz" title="Voltar ao Quiz">
-                        <span data-icon="arrowLeft"></span>
+                    <button class="btn btn-secondary" data-action="back-to-quiz" aria-label="Voltar ao Quiz">
+                        <span data-icon="arrowLeft" aria-hidden="true"></span>
                         <span>Voltar ao Quiz</span>
                     </button>
-                    <button class="btn btn-primary" data-action="finalize-process" title="Finalizar e ver resultado">
-                        <span data-icon="check"></span>
+                    <button class="btn btn-primary" data-action="finalize-process" aria-label="Finalizar e ver resultado">
+                        <span data-icon="check" aria-hidden="true"></span>
                         <span>Finalizar e Ver Resultado</span>
                     </button>
                 </div>
@@ -331,12 +352,12 @@
                 </div>
                 <div id="reviewContainer" style="margin-top: 24px;"></div>
                 <div style="display: flex; justify-content: center; gap: 12px; margin-top: 40px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" data-action="reset-quiz" title="Refazer Simulado Atual">
-                        <span data-icon="play"></span>
+                    <button class="btn btn-secondary" data-action="reset-quiz" aria-label="Refazer Simulado Atual">
+                        <span data-icon="play" aria-hidden="true"></span>
                         <span>Tentar Novamente</span>
                     </button>
-                    <button class="btn btn-primary" data-action="go-home" title="Voltar ao Início">
-                        <span data-icon="logo" data-size="sm"></span>
+                    <button class="btn btn-primary" data-action="go-home" aria-label="Voltar ao Início">
+                        <span data-icon="logo" data-size="sm" aria-hidden="true"></span>
                         <span>Início</span>
                     </button>
                 </div>
@@ -348,7 +369,7 @@
     <div id="exportOptionsModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="download" data-size="sm" style="color:var(--primary-500)"></span>
+                <span data-icon="download" data-size="sm" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">EXPORTAR SIMULADO</span>
             </div>
             <div class="modal-body">
@@ -371,7 +392,7 @@
     <div id="builderActionModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="check" data-size="md" style="color:var(--success)"></span>
+                <span data-icon="check" data-size="md" style="color:var(--success)" aria-hidden="true"></span>
                 <span class="modal-title" style="color:var(--success)">SUCESSO</span>
             </div>
             <div class="modal-body">
@@ -389,7 +410,7 @@
     <div id="previewModal" class="modal-overlay hidden">
         <div class="modal-card" style="max-width: 800px; width: 90%;">
             <div class="modal-header">
-                <span data-icon="eye" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="eye" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">PREVIEW JSON</span>
             </div>
             <div class="modal-body">
@@ -406,7 +427,7 @@
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="info" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="info" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span id="modalTitle" class="modal-title">AVISO DO SISTEMA</span>
             </div>
             <div class="modal-body">
@@ -423,7 +444,7 @@
     <div id="limitModal" class="modal-overlay hidden">
         <div class="modal-card" style="border-top-color: var(--error);">
             <div class="modal-header">
-                <span data-icon="alert" data-size="md" style="color:var(--error)"></span>
+                <span data-icon="alert" data-size="md" style="color:var(--error)" aria-hidden="true"></span>
                 <span class="modal-title" style="color:var(--error)">LIMITE DE ARMAZENAMENTO</span>
             </div>
             <div class="modal-body">
@@ -447,7 +468,7 @@
     <div id="onboardingModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="logo" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="logo" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">BEM-VINDO AO QUIZLAB</span>
             </div>
             <div class="modal-body">
@@ -494,6 +515,7 @@
     
     <!-- Components -->
     <script src="js/components/icon-system.js"></script>
+    <script src="js/components/focus-trap.js"></script>
     <script src="js/components/modal-manager.js"></script>
     <script src="js/components/toast-system.js"></script>
     
@@ -501,10 +523,12 @@
     <script src="js/features/quiz-engine.js"></script>
     <script src="js/features/library-manager.js"></script>
     <script src="js/features/creator-manager.js"></script>
+    <script src="js/features/review-manager.js"></script>
     <script src="js/features/file-handler.js"></script>
     
     <!-- UI -->
     <script src="js/ui/screen-manager.js"></script>
+    <script src="js/ui/quiz-renderer.js"></script>
     <script src="js/ui/event-delegator.js"></script>
     
     <!-- Main -->

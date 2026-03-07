@@ -25,6 +25,19 @@
             }
             this.currentScreen = screenId;
             this._updateSubtitle();
+            this._manageFocus(screenId);
+        },
+
+        _manageFocus(screenId) {
+            requestAnimationFrame(() => {
+                const screen = document.getElementById(screenId);
+                if (!screen) return;
+                const heading = screen.querySelector('h1, h2');
+                if (heading) {
+                    heading.setAttribute('tabindex', '-1');
+                    heading.focus();
+                }
+            });
         },
 
         _updateSubtitle() {
