@@ -78,25 +78,34 @@
         },
 
         inject(container = document) {
-            const elements = container.querySelectorAll('[data-icon]');
-            const fontLoaded = document.fonts
-                ? document.fonts.check('1em Material Symbols Outlined')
-                : false;
+            const elements = [...container.querySelectorAll('[data-icon]')];
+            if (elements.length === 0) return;
 
-            elements.forEach(el => {
-                const name = el.dataset.icon;
-                const size = el.dataset.size || 'sm';
-                const style = el.getAttribute('style') || '';
+            const renderAll = (fontLoaded) => {
+                elements.forEach(el => {
+                    const name  = el.dataset.icon;
+                    const size  = el.dataset.size || 'sm';
+                    const style = el.getAttribute('style') || '';
 
-                const hasSvgFallback = !!this._svgFallbacks[name];
-                const forceSvg = !fontLoaded && hasSvgFallback;
+                    const forceSvg = !fontLoaded && !!this._svgFallbacks[name];
 
-                el.innerHTML = forceSvg
-                    ? this._renderSvg(name, size, style)
-                    : this.render(name, size, style);
+                    el.innerHTML = forceSvg
+                        ? this._renderSvg(name, size, style)
+                        : this.render(name, size, style);
 
-                el.removeAttribute('data-icon');
-            });
+                    el.removeAttribute('data-icon');
+                });
+            };
+
+            if (document.fonts && document.fonts.load) {
+                document.fonts.load('1em Material Symbols Outlined').then(() => {
+                    renderAll(true);
+                }).catch(() => {
+                    renderAll(false);
+                });
+            } else {
+                renderAll(document.fonts ? document.fonts.check('1em Material Symbols Outlined') : false);
+            }
         }
     };
 

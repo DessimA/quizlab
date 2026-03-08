@@ -229,5 +229,11 @@
             const desc = document.getElementById('builderDesc').value;
             if (title || desc) StorageManager.saveDraft({ title, desc, timestamp: Date.now() });
         }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
     });
 })();

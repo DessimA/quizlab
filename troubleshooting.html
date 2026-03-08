@@ -133,6 +133,10 @@
             EventDelegator.register('go-home', () => location.href = 'index.html');
             EventDelegator.register('toggle-theme', () => ThemeManager.toggle());
         });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
