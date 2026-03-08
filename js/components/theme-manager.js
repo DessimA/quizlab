@@ -12,13 +12,27 @@
         apply(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem(this.STORAGE_KEY, theme);
-            // Atualiza todos os botões de toggle na página
+
             document.querySelectorAll('[data-action="toggle-theme"]').forEach(btn => {
                 btn.setAttribute('aria-label', theme === this.DARK ? 'Ativar tema claro' : 'Ativar tema escuro');
                 btn.setAttribute('title',      theme === this.DARK ? 'Tema Claro' : 'Tema Escuro');
-                const icon = btn.querySelector('[data-icon]');
-                if (icon) icon.setAttribute('data-icon', theme === this.DARK ? 'sun' : 'moon');
-                if (window.IconSystem) IconSystem.inject(btn);
+
+                const iconName = theme === this.DARK ? 'sun' : 'moon';
+                const iconEl = btn.querySelector('[data-icon-name]');
+
+                if (iconEl) {
+                    iconEl.dataset.iconName = iconName;
+                    if (window.IconSystem) {
+                        iconEl.innerHTML = IconSystem.render(iconName, iconEl.dataset.iconSize || 'sm');
+                    }
+                } else {
+                    const span = btn.querySelector('span');
+                    if (span && window.IconSystem) {
+                        span.dataset.iconName = iconName;
+                        span.dataset.iconSize = 'sm';
+                        span.innerHTML = IconSystem.render(iconName, 'sm');
+                    }
+                }
             });
         },
 
