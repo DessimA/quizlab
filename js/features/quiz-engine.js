@@ -104,6 +104,8 @@
                 clearInterval(this._timerInterval);
                 this._timerInterval = null;
             }
+            const el = document.getElementById('timerDisplay');
+            if (el) el.style.display = 'none';
         },
 
         flagQuestion(index) {

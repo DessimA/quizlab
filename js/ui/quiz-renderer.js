@@ -137,9 +137,11 @@
                 item.setAttribute('role', 'listitem');
                 item.type = 'button';
 
+                const isExam = QuizEngine.getState().mode === CONFIG.QUIZ_MODES.EXAM;
+
                 if (isCurrent) item.classList.add('current');
-                if (status === 'correct') item.classList.add('answered-correct');
-                if (status === 'incorrect') item.classList.add('answered-incorrect');
+                if (status === 'correct') item.classList.add(isExam ? 'visited' : 'answered-correct');
+                if (status === 'incorrect') item.classList.add(isExam ? 'visited' : 'answered-incorrect');
                 if (status === 'skipped') item.classList.add('visited');
                 if (isFlagged) item.style.outline = '2px solid var(--error)';
 
@@ -164,12 +166,16 @@
             const state = QuizEngine.getState();
             const canConfirm = QuizEngine.canConfirmCurrent();
             const fill = document.getElementById('progressFill');
+            const isExam = state.mode === CONFIG.QUIZ_MODES.EXAM;
 
             document.getElementById('prevBtn').disabled = data.index === 0;
             document.getElementById('confirmBtn').classList.toggle('hidden', data.isAnswered || !canConfirm);
             document.getElementById('skipBtn').classList.toggle('hidden', data.isAnswered || data.isLast);
             document.getElementById('nextBtn').classList.toggle('hidden', !data.isAnswered || data.isLast);
             document.getElementById('finishBtn').classList.toggle('hidden', !(data.isLast && data.isAnswered));
+
+            const scoreDisplay = document.querySelector('.score-display');
+            if (scoreDisplay) scoreDisplay.style.visibility = isExam ? 'hidden' : 'visible';
 
             if (fill) {
                 const percent = ((data.index + 1) / data.total) * 100;
