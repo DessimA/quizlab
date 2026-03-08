@@ -121,7 +121,7 @@
                 </div>
                 <div class="lib-actions">
                     ${resumeBtn}
-                    <button class="btn btn-primary" data-action="load-quiz" data-id="${item.id}"><span data-icon="play"></span> Iniciar</button>
+                    <button class="btn btn-primary" data-action="load-quiz" data-id="${item.id}" title="Iniciar"><span data-icon="play"></span></button>
                     <button class="btn btn-outline" data-action="edit-quiz" data-id="${item.id}" title="Editar"><span data-icon="edit"></span></button>
                     <button class="btn btn-outline" data-action="download-quiz" data-id="${item.id}" title="Exportar"><span data-icon="download"></span></button>
                     <button class="btn btn-ghost btn-delete" data-action="delete-quiz" data-id="${item.id}" title="Excluir"><span data-icon="trash"></span></button>
