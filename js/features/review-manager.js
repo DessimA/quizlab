@@ -118,7 +118,13 @@
             const div = document.createElement('div');
             div.className = 'review-card';
             const isFlagged = QuizEngine.isFlagged(i);
-            const flagIcon = isFlagged ? IconSystem.render('flag', 'xs', 'color:var(--error);vertical-align:middle;margin-left:4px;') : '';
+            const flagIcon = isFlagged 
+                ? IconSystem.render('flag', 'xs', 'color:var(--error);vertical-align:middle;margin-left:4px;') 
+                : '';
+
+            const showDetail = statusInfo.cls !== 'correct';
+            const detailHtml = showDetail ? this._buildAnswerDetail(q, i) : '';
+
             div.innerHTML = `
                 <div class="review-card-header">
                     <span style="font-family:var(--font-mono);font-size:0.75rem;display:flex;align-items:center;">
@@ -126,8 +132,43 @@
                     </span>
                     <span class="badge ${statusInfo.cls}">${statusInfo.text}</span>
                 </div>
-                <div class="review-card-body">${Utils.truncate(q.enunciado)}</div>`;
+                <div class="review-card-body">${showDetail ? q.enunciado : Utils.truncate(q.enunciado)}</div>
+                ${detailHtml}`;
             return div;
+        },
+
+        _buildAnswerDetail(q, i) {
+            const state = QuizEngine.getState();
+            const raw = state.userAnswers[i];
+            const userIds = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+
+            const altsHtml = q.alternativas.map((alt, idx) => {
+                const isCorrect = q.respostasCorretas.includes(alt.id);
+                const isChosen = userIds.includes(alt.id);
+
+                if (!isCorrect && !isChosen) return '';
+
+                const letter = String.fromCharCode(65 + idx);
+                const color = isCorrect ? 'var(--success)' : 'var(--error)';
+                const bg = isCorrect ? 'rgba(0, 255, 157, 0.05)' : 'rgba(255, 0, 85, 0.05)';
+                const label = isCorrect ? 'CORRETA' : 'SUA RESPOSTA';
+
+                return `
+                    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px;
+                                border-radius:var(--radius-sm);background:${bg};
+                                border:1px solid ${color};margin-top:6px;">
+                        <span style="font-family:var(--font-mono);font-size:0.7rem;
+                                     color:${color};font-weight:700;white-space:nowrap;
+                                     padding-top:2px;">${letter}. ${label}</span>
+                        <span style="font-size:0.85rem;color:var(--text-main);">${alt.texto}</span>
+                    </div>`;
+            }).join('');
+
+            return `
+                <div style="margin-top:var(--space-sm);padding-top:var(--space-sm);
+                            border-top:1px solid var(--border-glass);">
+                    ${altsHtml}
+                </div>`;
         }
     };
 
