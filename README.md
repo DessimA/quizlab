@@ -39,10 +39,10 @@ Toda a lógica de negócio, validação, estado e persistência ocorre no lado d
 
 **Pilares do projeto:**
 
-- **Zero Dependencies** — nenhuma biblioteca externa, npm, bundler ou framework.
-- **Client-Side First** — lógica e persistência vivem inteiramente no navegador.
-- **Modularidade** — cada responsabilidade é isolada em um módulo IIFE próprio.
-- **DRY** — lógica de renderização e validação reutilizável em toda a base de código.
+- **Zero Dependencies** nenhuma biblioteca externa, npm, bundler ou framework.
+- **Client-Side First** lógica e persistência vivem inteiramente no navegador.
+- **Modularidade** cada responsabilidade é isolada em um módulo IIFE próprio.
+- **DRY** lógica de renderização e validação reutilizável em toda a base de código.
 
 ---
 
@@ -165,8 +165,8 @@ Utils.truncate(text)        // corta com reticências
 ### `validator.js`
 Valida estruturas de dados em dois contextos:
 
-- `validateQuiz(data)` — valida um objeto JSON completo antes de importar ou exportar. Retorna `{ valid: Boolean, errors: String[] }`.
-- `isQuestionCardValid(card)` — valida um card de questão no DOM do criador em tempo real.
+- `validateQuiz(data)` valida um objeto JSON completo antes de importar ou exportar. Retorna `{ valid: Boolean, errors: String[] }`.
+- `isQuestionCardValid(card)` valida um card de questão no DOM do criador em tempo real.
 
 ### `quiz-engine.js`
 O "cérebro" da aplicação. Não toca no DOM. Mantém e expõe o estado completo do quiz em andamento.
@@ -179,8 +179,8 @@ O "cérebro" da aplicação. Não toca no DOM. Mantém e expõe o estado complet
     mode: 'study' | 'exam',
     currentQuestion: Number,    // índice atual (base 0)
     userAnswers: Array,         // String | String[] | null por questão
-    questionAnswered: Array,    // Boolean[] — true após confirmar
-    visitedQuestions: Array,    // Boolean[] — true ao navegar para a questão
+    questionAnswered: Array,    // Boolean[] true após confirmar
+    visitedQuestions: Array,    // Boolean[] true ao navegar para a questão
     correctCount: Number,
     incorrectCount: Number,
     flagged: Number[],          // índices das questões marcadas
@@ -205,8 +205,8 @@ O "cérebro" da aplicação. Não toca no DOM. Mantém e expõe o estado complet
 ### `creator-manager.js`
 Gerencia o Wizard de criação em dois estágios:
 
-1. **Meta** — título (obrigatório), descrição, tags e tempo limite opcional.
-2. **Questões** — adição, remoção, reordenação via *drag & drop* nativo e validação em tempo real de cada card.
+1. **Meta** título (obrigatório), descrição, tags e tempo limite opcional.
+2. **Questões** adição, remoção, reordenação via *drag & drop* nativo e validação em tempo real de cada card.
 
 Suporta edição de simulados existentes da biblioteca (`loadForEdit`). Ao exportar, oferece opção de salvar na biblioteca ou apenas baixar o arquivo JSON. Salva rascunho automaticamente a cada 30 segundos via `autosave`.
 
@@ -290,8 +290,8 @@ flowchart TD
 ### Modo de Jogo
 Ao iniciar um simulado, o usuário escolhe:
 
-- **Modo Estudo** — feedback visual imediato após confirmar cada resposta (alternativa correta/incorreta destacada). O progresso é salvo automaticamente no `localStorage` após cada ação.
-- **Modo Exame** — sem feedback durante o quiz. O resultado só é exibido ao final. O timer é obrigatório e não pode ser desabilitado. O progresso **não é salvo** no modo exame.
+- **Modo Estudo** feedback visual imediato após confirmar cada resposta (alternativa correta/incorreta destacada). O progresso é salvo automaticamente no `localStorage` após cada ação.
+- **Modo Exame** sem feedback durante o quiz. O resultado só é exibido ao final. O timer é obrigatório e não pode ser desabilitado. O progresso **não é salvo** no modo exame.
 
 O usuário também pode optar por embaralhar a ordem das questões e/ou a ordem das alternativas de cada questão de forma independente.
 
@@ -338,89 +338,89 @@ O usuário também pode optar por embaralhar a ordem das questões e/ou a ordem 
 
 ## Requisitos Funcionais
 
-**RF01 — Importar simulado via JSON**
+**RF01 Importar simulado via JSON**
 O sistema deve aceitar arquivos `.json`, validar sua estrutura e adicioná-los à biblioteca automaticamente.
 
-**RF02 — Criar simulado via interface**
+**RF02 Criar simulado via interface**
 O sistema deve oferecer um Wizard em dois estágios (meta e questões) para criação de simulados sem necessidade de editar JSON manualmente.
 
-**RF03 — Editar simulado existente**
+**RF03 Editar simulado existente**
 O sistema deve permitir carregar qualquer simulado da biblioteca no criador para edição, preservando o ID original ao salvar.
 
-**RF04 — Exportar simulado como arquivo JSON**
+**RF04 Exportar simulado como arquivo JSON**
 O sistema deve permitir baixar qualquer simulado da biblioteca como arquivo `.json` compatível com o protocolo de importação.
 
-**RF05 — Biblioteca de simulados**
+**RF05 Biblioteca de simulados**
 O sistema deve armazenar, listar, buscar, ordenar e excluir simulados salvos. Deve exibir métricas de desempenho por simulado.
 
-**RF06 — Modo Estudo**
+**RF06 Modo Estudo**
 O sistema deve exibir feedback visual imediato (correto/incorreto) após a confirmação de cada resposta e salvar o progresso automaticamente.
 
-**RF07 — Modo Exame**
+**RF07 Modo Exame**
 O sistema deve executar o quiz sem feedback, com timer decrescente, e exibir o resultado somente ao final ou quando o tempo esgotar.
 
-**RF08 — Questões de única e múltipla escolha**
+**RF08 Questões de única e múltipla escolha**
 O sistema deve suportar questões com exatamente uma resposta correta e questões com múltiplas respostas corretas, com comportamento de seleção adequado a cada tipo.
 
-**RF09 — Embaralhamento**
+**RF09 Embaralhamento**
 O sistema deve permitir embaralhar a ordem das questões e/ou a ordem das alternativas de forma independente antes de iniciar o quiz.
 
-**RF10 — Marcação de questões (flag)**
+**RF10 Marcação de questões (flag)**
 O sistema deve permitir marcar e desmarcar questões durante o quiz para referência futura.
 
-**RF11 — Navegação livre entre questões**
+**RF11 Navegação livre entre questões**
 O sistema deve permitir navegar para qualquer questão visitada anteriormente via grade de progresso.
 
-**RF12 — Revisão antes de finalizar**
+**RF12 Revisão antes de finalizar**
 O sistema deve exibir uma tela de revisão listando questões não confirmadas antes de permitir a finalização definitiva.
 
-**RF13 — Retomar sessão salva**
+**RF13 Retomar sessão salva**
 O sistema deve detectar e oferecer a retomada de progresso salvo de sessões anteriores no Modo Estudo.
 
-**RF14 — Tema claro e escuro**
+**RF14 Tema claro e escuro**
 O sistema deve oferecer alternância entre tema escuro (padrão) e claro, com persistência da preferência.
 
-**RF15 — Onboarding de primeira visita**
+**RF15 Onboarding de primeira visita**
 O sistema deve exibir um modal de boas-vindas na primeira vez que o usuário acessa a aplicação.
 
-**RF16 — Rascunho automático**
+**RF16 Rascunho automático**
 O sistema deve salvar automaticamente o estado do criador a cada 30 segundos enquanto o usuário edita.
 
 ---
 
 ## Requisitos Não Funcionais
 
-**RNF01 — Zero Dependências**
+**RNF01 Zero Dependências**
 A aplicação não deve depender de nenhuma biblioteca, framework ou pacote npm externo. Todo o código é Vanilla JavaScript (ES6+).
 
-**RNF02 — Funciona Offline (PWA)**
+**RNF02 Funciona Offline (PWA)**
 Após o primeiro carregamento, a aplicação deve funcionar sem conexão com a internet. O Service Worker usa estratégia *Cache First* para fontes e *Network First* para HTML, CSS e JS. O nome do cache é versionado por `APP_VERSION`.
 
-**RNF03 — Persistência Client-Side**
+**RNF03 Persistência Client-Side**
 Todos os dados (biblioteca, sessão, rascunho, preferências) são armazenados no `localStorage` do navegador. Não há comunicação com servidor.
 
-**RNF04 — Responsividade**
+**RNF04 Responsividade**
 A interface deve funcionar corretamente em telas mobile (< 480px), tablet (768px–1023px) e desktop (≥ 1024px), com layouts adaptados para cada breakpoint.
 
-**RNF05 — Performance de Eventos**
+**RNF05 Performance de Eventos**
 Todos os eventos de clique, input e change devem ser capturados por um único listener por tipo no `document` (Event Delegation), evitando múltiplos listeners em elementos dinâmicos.
 
-**RNF06 — Integridade de Estado**
+**RNF06 Integridade de Estado**
 O `QuizEngine` não deve manipular o DOM diretamente. O `StorageManager` deve ser o único ponto de acesso ao `localStorage`. Cada módulo deve ter responsabilidade única e bem definida (SRP).
 
-**RNF07 — Acessibilidade**
+**RNF07 Acessibilidade**
 Modais devem implementar *focus trap* para manter a navegação por teclado dentro do modal enquanto aberto. Botões de toggle de tema devem ter `aria-label` atualizado dinamicamente.
 
-**RNF08 — Limite de Armazenamento**
+**RNF08 Limite de Armazenamento**
 A biblioteca é limitada a 10 simulados e o histórico de partidas a 10 entradas por simulado, prevenindo crescimento ilimitado do `localStorage`.
 
-**RNF09 — Tempo Mínimo de Loading**
+**RNF09 Tempo Mínimo de Loading**
 Operações de leitura de arquivo devem exibir um overlay de carregamento por no mínimo 500ms, evitando flash de conteúdo em arquivos pequenos.
 
-**RNF10 — Testes Automatizados**
+**RNF10 Testes Automatizados**
 Toda lógica de negócio dos módulos `QuizEngine`, `Validator` e `StorageManager` deve ser coberta por testes unitários. Fluxos completos de quiz devem ser cobertos por testes de integração. Os testes usam o runner nativo do Node.js (sem dependências externas).
 
-**RNF11 — Versionamento do Código**
+**RNF11 Versionamento do Código**
 A versão da aplicação deve ser definida em um único arquivo (`version.js`) e referenciada pelos demais pontos que precisam dela (`sw.js`, badges).
 
 ---
@@ -430,14 +430,14 @@ A versão da aplicação deve ser definida em um único arquivo (`version.js`) e
 O sistema valida estritamente qualquer arquivo importado. Campos marcados como obrigatórios causam falha de validação com mensagem descritiva.
 ```json
 {
-  "nomeSimulado": "String — obrigatório",
-  "descricao": "String — opcional",
+  "nomeSimulado": "String obrigatório",
+  "descricao": "String opcional",
   "tags": ["array", "de", "strings", "opcional"],
   "tempoLimiteMinutos": 30,
   "questoes": [
     {
-      "id": "qualquer valor — usado internamente como hash",
-      "enunciado": "String — obrigatório, mínimo 5 chars",
+      "id": "qualquer valor usado internamente como hash",
+      "enunciado": "String obrigatório, mínimo 5 chars",
       "tipo": "unica | multipla",
       "alternativas": [
         { "id": "a", "texto": "Texto da alternativa" },
@@ -511,11 +511,11 @@ O tema claro sobrescreve as variáveis via seletor `[data-theme="light"]`, sem d
 
 ### Componentes de UI
 
-- **IconSystem** — injeta SVGs inline via `data-icon` attribute, evitando requisições externas de imagem. Usa `document.fonts.load()` para aguardar o carregamento da fonte de ícones antes de renderizar.
-- **ToastSystem** — notificações flutuantes com auto-dismiss (4s), tipos `info`, `success` e `error`.
-- **ModalManager** — gerencia sobreposições de confirmação (`confirm`), alerta (`alert`) e custom. Suporta múltiplos modais identificados por ID.
-- **FocusTrap** — ao abrir um modal, prende o foco dentro dele para compatibilidade com navegação por teclado.
-- **ThemeManager** — alterna `data-theme` no `<html>`, persiste no `localStorage` e atualiza o ícone e `aria-label` do botão de toggle dinamicamente.
+- **IconSystem** injeta SVGs inline via `data-icon` attribute, evitando requisições externas de imagem. Usa `document.fonts.load()` para aguardar o carregamento da fonte de ícones antes de renderizar.
+- **ToastSystem** notificações flutuantes com auto-dismiss (4s), tipos `info`, `success` e `error`.
+- **ModalManager** gerencia sobreposições de confirmação (`confirm`), alerta (`alert`) e custom. Suporta múltiplos modais identificados por ID.
+- **FocusTrap** ao abrir um modal, prende o foco dentro dele para compatibilidade com navegação por teclado.
+- **ThemeManager** alterna `data-theme` no `<html>`, persiste no `localStorage` e atualiza o ícone e `aria-label` do botão de toggle dinamicamente.
 
 ---
 
@@ -530,10 +530,10 @@ npm run test:integration  # apenas integração
 
 **Cobertura:**
 
-- `quiz-engine.test.js` — init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
-- `validator.test.js` — casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
-- `storage-manager.test.js` — CRUD da biblioteca, session, draft, histórico com limite, primeira visita.
-- `quiz-flow.test.js` — fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
+- `quiz-engine.test.js` init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
+- `validator.test.js` casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
+- `storage-manager.test.js` CRUD da biblioteca, session, draft, histórico com limite, primeira visita.
+- `quiz-flow.test.js` fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
 
 Os testes rodam em Node.js >= 21 sem DOM real. O ambiente é simulado via polyfills em `tests/setup/environment.js` e os módulos IIFE são carregados via `tests/setup/loader.js`.
 
@@ -541,13 +541,13 @@ Os testes rodam em Node.js >= 21 sem DOM real. O ambiente é simulado via polyfi
 
 ## CI/CD
 
-**`ci.yml`** — Executa em Pull Requests para `main` e `develop` e em pushes para `develop`:
+**`ci.yml`** Executa em Pull Requests para `main` e `develop` e em pushes para `develop`:
 1. Checkout do código
 2. Setup Node.js 22
 3. `npm run test:unit`
 4. `npm run test:integration`
 
-**`deploy.yml`** — Executa em push para `main` (produção):
+**`deploy.yml`** Executa em push para `main` (produção):
 1. Checkout do código
 2. Setup Node.js 22
 3. `npm test` (suite completa)
