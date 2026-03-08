@@ -58,13 +58,24 @@
         EventDelegator.registerMultiple({
             'go-home': () => {
                 const isResult = ScreenManager.currentScreen === CONFIG.ELEMENTS.RESULT_SCREEN;
-                const isBusy = (QuizEngine.getState().quizData && !isResult)
-                    || document.getElementById('creatorScreen').offsetParent;
-                if (isBusy) {
-                    ModalManager.confirm("Sair agora? Progresso não salvo será perdido.", () => location.reload());
-                } else {
+                const state = QuizEngine.getState();
+                const isQuizActive = state.quizData && !isResult;
+                const isCreatorActive = document.getElementById('creatorScreen').offsetParent;
+
+                if (!isQuizActive && !isCreatorActive) {
                     location.reload();
+                    return;
                 }
+
+                const hasProgress = isQuizActive && state.questionAnswered.some(a => a);
+                const isStudyMode = state.mode === CONFIG.QUIZ_MODES.STUDY;
+                const progressIsSaved = isQuizActive && isStudyMode && hasProgress;
+
+                const message = progressIsSaved
+                    ? "Seu progresso está salvo. Você pode retomar este simulado pela biblioteca quando quiser."
+                    : "Sair agora? O progresso atual não será salvo.";
+
+                ModalManager.confirm(message, () => location.reload());
             },
 
             'enter-app': () => {
