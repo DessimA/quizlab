@@ -34,7 +34,7 @@
     <!-- Landing Page -->
     <div id="landingPage" class="container fade-in">
         <header class="header">
-            <div class="header-brand" data-action="go-home" title="Ir para o início">
+            <div class="header-brand" data-action="go-home" title="Início">
                 <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
@@ -43,71 +43,166 @@
                     <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <a href="docs.html" class="btn btn-ghost" title="Documentação">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <a href="docs.html" class="btn btn-ghost" title="Documentação" aria-label="Abrir documentação">
                     <span data-icon="book" data-size="sm"></span>
+                    <span class="hide-mobile" style="font-size:0.8rem;margin-left:4px;">Docs</span>
                 </a>
-                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" class="btn btn-ghost" title="Contato">
+                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" title="Contato" aria-label="Contato">
                     <span data-icon="mail" data-size="sm"></span>
                 </a>
             </div>
         </header>
 
-        <section class="hero-section">
-            <h1 class="hero-title neon-text">Simulados Inteligentes</h1>
-            <p class="hero-desc">
-                Plataforma técnica para criação e prática de simulados via JSON.
-                <br><span style="color:var(--primary-500); font-weight:600;">Privacidade Local. Performance Máxima.</span>
+        <section class="hero-section" style="padding:var(--space-3xl) 0 var(--space-xl);">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(196,255,0,0.08);border:1px solid rgba(196,255,0,0.25);border-radius:var(--radius-full);padding:4px 14px;margin-bottom:var(--space-lg);">
+                <span data-icon="school" data-size="xs" style="color:var(--primary-500);"></span>
+                <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--primary-500);letter-spacing:0.08em;">100% NO SEU NAVEGADOR</span>
+            </div>
+
+            <h1 class="hero-title neon-text" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:var(--space-md);">
+                Estude com Simulados<br>do Jeito Certo
+            </h1>
+
+            <p class="hero-desc" style="font-size:1rem;max-width:520px;margin:0 auto var(--space-xl);">
+                Crie, importe e pratique simulados completos com feedback imediato, histórico de desempenho e revisão detalhada. Tudo salvo localmente sem cadastro, sem servidor.
             </p>
-            <button class="btn btn-primary" data-action="enter-app" style="padding: 8px 32px;">
-                <span>Começar Agora</span>
-                <span data-icon="arrowRight" data-size="sm"></span>
-            </button>
+
+            <div style="display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-2xl);">
+                <button class="btn btn-primary" data-action="enter-app" style="min-width:180px;font-size:0.9rem;padding:14px 28px;">
+                    <span data-icon="play" data-size="sm"></span>
+                    Começar Agora
+                </button>
+                <a href="docs.html" class="btn btn-outline" style="min-width:140px;font-size:0.9rem;padding:14px 28px;">
+                    <span data-icon="book" data-size="sm"></span>
+                    Como Funciona
+                </a>
+            </div>
+
+            <div class="stat-strip">
+                <div class="stat-item">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Simulados salvos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Questões por simulado</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Cadastros necessários</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Privacidade local</div>
+                </div>
+            </div>
         </section>
 
-        <section class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="download" data-size="lg"></span>
+        <section style="margin-bottom:var(--space-2xl);">
+            <h2 style="text-align:center;font-size:var(--font-h2);color:var(--text-secondary);margin-bottom:var(--space-xl);font-weight:600;">
+                Pronto em 3 passos
+            </h2>
+            <div class="step-flow">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="upload_file" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Importe ou Crie</h3>
+                    </div>
+                    <p>Suba um arquivo de simulado ou use o criador integrado para montar suas questões do zero.</p>
                 </div>
-                <div>
-                    <h3>Arquitetura JSON</h3>
-                    <p>Total compatibilidade com esquemas de dados estruturados para portabilidade.</p>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="quiz" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Escolha o Modo</h3>
+                    </div>
+                    <p>Estude com feedback imediato em cada resposta, ou simule uma prova real sem dicas.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="history" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Acompanhe a Evolução</h3>
+                    </div>
+                    <p>Veja seu histórico de tentativas, média de acertos e revise as questões que errou.</p>
                 </div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="eye" data-size="lg"></span>
+        </section>
+
+        <section style="margin-bottom:var(--space-2xl);">
+            <h2 style="text-align:center;font-size:var(--font-h2);color:var(--text-secondary);margin-bottom:var(--space-xl);font-weight:600;">
+                Tudo que você precisa
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="shuffle" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Embaralhamento</h3>
+                        <p>Questões e alternativas em ordem aleatória a cada tentativa.</p>
+                    </div>
                 </div>
-                <div>
-                    <h3>Interface Otimizada</h3>
-                    <p>Design industrial focado em densidade de informação e ergonomia visual.</p>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="timer" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Modo Cronometrado</h3>
+                        <p>Defina um limite de tempo e simule a pressão de uma prova real.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="check" data-size="lg"></span>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="flag" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Marcar para Revisão</h3>
+                        <p>Sinalize questões de dúvida e volte a elas antes de finalizar.</p>
+                    </div>
                 </div>
-                <div>
-                    <h3>Segurança Client-Side</h3>
-                    <p>Processamento isolado no ambiente do usuário, garantindo sigilo absoluto.</p>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="book" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Biblioteca Local</h3>
+                        <p>Salve até 10 simulados no navegador para acessar sem fazer upload novamente.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="edit" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Criador Integrado</h3>
+                        <p>Monte simulados completos com questões de única ou múltipla escolha.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="download" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Exportação JSON</h3>
+                        <p>Salve seus simulados em arquivo e compartilhe com quem quiser.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <footer class="footer">
-            <img src="https://github.com/DessimA.png" alt="José Anderson" class="dev-profile-img">
-            <p style="margin-bottom: 20px;">
-                <strong style="color:var(--text-main)">José Anderson</strong>
-            </p>
-            <div style="display: flex; justify-content: center; gap: 12px;">
-                <a href="https://www.linkedin.com/in/dessim/" target="_blank" class="btn btn-ghost" title="LinkedIn">
+            <p>QUIZLAB • Feito por José Anderson</p>
+            <div style="display:flex;justify-content:center;gap:12px;margin-top:var(--space-sm);">
+                <a href="https://www.linkedin.com/in/dessim/" target="_blank" rel="noopener" class="btn btn-ghost" title="LinkedIn" aria-label="LinkedIn">
                     <span data-icon="linkedin" data-size="sm"></span>
                 </a>
-                <a href="https://github.com/DessimA" target="_blank" class="btn btn-ghost" title="GitHub">
+                <a href="https://github.com/DessimA" target="_blank" rel="noopener" class="btn btn-ghost" title="GitHub" aria-label="GitHub">
                     <span data-icon="github" data-size="sm"></span>
                 </a>
-                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" class="btn btn-ghost" title="Website">
+                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" title="Website" aria-label="Website">
                     <span data-icon="externalLink" data-size="sm"></span>
                 </a>
             </div>
@@ -236,7 +331,7 @@
                             <input type="text" id="builderTags" class="input-field" placeholder="ex: matemática, nível médio, ENEM">
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Limite de Tempo (minutos) <span style="color:var(--text-muted);font-size:0.75rem;">opcional — apenas no Modo Exame</span></label>
+                            <label class="input-label">Limite de Tempo (minutos) <span style="color:var(--text-muted);font-size:0.75rem;">opcional apenas no Modo Exame</span></label>
                             <input type="number" id="builderTimer" class="input-field" placeholder="Ex: 60" min="1" max="300">
                         </div>
                         <button class="btn btn-primary" id="btnConfirmMeta" data-action="confirm-meta" style="width:100%" disabled>
