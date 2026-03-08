@@ -77,13 +77,19 @@ body {
     background-image: url('assets/background.jpg'), var(--bg-image-fallback);
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-attachment: scroll;
     color: var(--text-main);
     min-height: 100vh;
     line-height: 1.4;
     position: relative;
     padding-top: calc(var(--header-height-mobile) + var(--space-lg));
     font-size: var(--font-body);
+}
+
+@media (min-width: 1024px) {
+    body {
+        background-attachment: fixed;
+    }
 }
 
 body::before {
@@ -129,7 +135,7 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 
 .icon-logo { width: 20px; height: 20px; }
 
-.logo-container { display: inline-flex; align-items: center; position: relative; height: 1.2rem; font-family: var(--font-mono); }
+.logo-container { display: inline-flex; align-items: center; position: relative; height: auto; min-height: 1.2rem; font-family: var(--font-mono); }
 .logo-full {
     display: inline-block; white-space: nowrap; overflow: hidden; width: 0;
     animation: typing 2s steps(7, end) forwards, blink 0.8s step-end infinite, hideFull 0.5s ease forwards 4s;
@@ -172,8 +178,10 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 .btn-ghost:hover { color: var(--primary-500); filter: drop-shadow(0 0 8px var(--primary-500)); background: rgba(255, 255, 255, 0.05); }
 
 .header .btn-ghost {
-    width: 32px;
-    height: 32px;
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
     padding: 0;
 }
 
@@ -271,8 +279,10 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     pointer-events: auto;
     background: transparent;
     border: none;
-    width: 32px;
-    height: 32px;
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
 }
 
 .quiz-info-bar.hidden-panel .toggle-visibility-btn:hover {
@@ -545,6 +555,8 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     margin-bottom: 4px;
 }
 
+.stat-item p { font-size: 0.85rem; line-height: 1.4; color: var(--text-secondary); margin: 0; }
+
 .stat-label {
     font-size: 0.72rem;
     color: var(--text-muted);
@@ -703,4 +715,35 @@ pre {
     font-size: 0.78rem;
     margin-bottom: var(--space-md);
     overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+@media (max-width: 899px) {
+    .docs-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-brand { font-size: 0.85rem; }
+    .logo-full { display: none; }
+    .logo-abbr { position: static; opacity: 1; animation: none; }
+    .hero-title { font-size: 1.5rem; }
+    .btn { padding: 6px 12px; font-size: 0.75rem; }
+}
+
+@media (min-width: 768px) {
+    body { padding-top: calc(var(--header-height) + var(--space-xl)); }
+    .header { height: var(--header-height); padding: 0 var(--space-xl); }
+    .features-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+    .quiz-info-bar { flex-direction: row; justify-content: space-between; padding: var(--space-md) var(--space-xl); text-align: left; }
+    .score-display { width: auto; }
+    .score-item { flex-direction: column; min-width: 80px; }
+    .navigation { flex-direction: row; gap: var(--space-md); }
+    .navigation .btn { width: auto; flex: none; }
 }
