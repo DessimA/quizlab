@@ -27,58 +27,46 @@
             if (shuffleQuestions) questoes = this._shuffle(questoes);
             if (shuffleOptions) questoes = questoes.map(q => ({ ...q, alternativas: this._shuffle(q.alternativas) }));
 
-            const processedData = { ...quizData, questoes };
-
-            this._state.quizData = processedData;
+            this._state.quizData = { ...quizData, questoes };
             this._state.libraryId = libraryId;
             this._state.mode = mode;
-            this._state.currentQuestion = 0;
-            this._state.userAnswers = new Array(questoes.length).fill(null);
-            this._state.questionAnswered = new Array(questoes.length).fill(false);
-            this._state.visitedQuestions = new Array(questoes.length).fill(false);
-            this._state.visitedQuestions[0] = true;
-            this._state.correctCount = 0;
-            this._state.incorrectCount = 0;
-            this._state.flagged = [];
 
-            this.stopTimer();
-
-            // Modo Exame: 2 minutos por questão (proporcional a 130min/65 questões)
-            const timerMin = mode === CONFIG.QUIZ_MODES.EXAM ? (processedData.questoes.length * 2) : 0;
-            
-            if (timerMin > 0) {
-                this._state.timerSeconds = timerMin * 60;
-                this._state.timerRemaining = timerMin * 60;
-                this.startTimer();
-            } else {
-                this._state.timerSeconds = 0;
-                this._state.timerRemaining = 0;
-            }
+            this._resetProgress(questoes.length);
+            this._initTimer(mode, questoes.length);
         },
 
         reset() {
             if (!this._state.quizData) return;
-            const { quizData, libraryId, mode } = this._state;
+            const { mode, quizData } = this._state;
 
+            this._resetProgress(quizData.questoes.length);
+            this._initTimer(mode, quizData.questoes.length);
+            StorageManager.clearSession();
+        },
+
+        _resetProgress(questionCount) {
             this._state.currentQuestion = 0;
-            this._state.userAnswers = new Array(quizData.questoes.length).fill(null);
-            this._state.questionAnswered = new Array(quizData.questoes.length).fill(false);
-            this._state.visitedQuestions = new Array(quizData.questoes.length).fill(false);
+            this._state.userAnswers = new Array(questionCount).fill(null);
+            this._state.questionAnswered = new Array(questionCount).fill(false);
+            this._state.visitedQuestions = new Array(questionCount).fill(false);
             this._state.visitedQuestions[0] = true;
             this._state.correctCount = 0;
             this._state.incorrectCount = 0;
             this._state.flagged = [];
+        },
 
+        _initTimer(mode, questionCount) {
             this.stopTimer();
-            
-            const timerMin = mode === CONFIG.QUIZ_MODES.EXAM ? (quizData.questoes.length * 2) : 0;
-            if (timerMin > 0) {
-                this._state.timerSeconds = timerMin * 60;
-                this._state.timerRemaining = timerMin * 60;
+
+            const isExam = mode === CONFIG.QUIZ_MODES.EXAM;
+            const totalSeconds = isExam ? questionCount * CONFIG.TIMINGS.SECONDS_PER_QUESTION : 0;
+
+            this._state.timerSeconds = totalSeconds;
+            this._state.timerRemaining = totalSeconds;
+
+            if (totalSeconds > 0) {
                 this.startTimer();
             }
-
-            StorageManager.clearSession();
         },
 
         _shuffle(arr) {
@@ -109,8 +97,6 @@
                 clearInterval(this._timerInterval);
                 this._timerInterval = null;
             }
-            const el = document.getElementById('timerDisplay');
-            if (el) el.style.display = 'none';
         },
 
         flagQuestion(index) {
@@ -158,7 +144,7 @@
         select(alternativeId) {
             const idx = this._state.currentQuestion;
             const q = this.getCurrentQuestion();
-            if (q.tipo === 'unica') {
+            if (q.tipo === CONFIG.QUESTION_TYPES.SINGLE) {
                 this._state.userAnswers[idx] = alternativeId;
             } else {
                 if (!this._state.userAnswers[idx]) this._state.userAnswers[idx] = [];
@@ -186,7 +172,7 @@
             const q = this._state.quizData.questoes[idx];
             const ans = this._state.userAnswers[idx];
             if (!ans) return false;
-            if (q.tipo === 'unica') return q.respostasCorretas.includes(ans);
+            if (q.tipo === CONFIG.QUESTION_TYPES.SINGLE) return q.respostasCorretas.includes(ans);
             return [...ans].sort().join() === [...q.respostasCorretas].sort().join();
         },
 
@@ -195,7 +181,7 @@
             const q = this.getCurrentQuestion();
             const ans = this._state.userAnswers[idx];
             if (!ans) return false;
-            if (q.tipo === 'unica') return !!ans;
+            if (q.tipo === CONFIG.QUESTION_TYPES.SINGLE) return !!ans;
             const correctCount = Array.isArray(q.respostasCorretas) ? q.respostasCorretas.length : 1;
             return Array.isArray(ans) && ans.length === correctCount;
         },
@@ -253,7 +239,7 @@
 
         _saveSession() {
             if (this._state.mode !== CONFIG.QUIZ_MODES.STUDY) return;
-            
+
             StorageManager.saveSession({
                 quizData: this._state.quizData,
                 libraryId: this._state.libraryId,

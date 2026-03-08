@@ -32,6 +32,10 @@
             return this.set(CONFIG.STORAGE.LIBRARY_KEY, lib);
         },
 
+        getById(id) {
+            return this.getLibrary().find(item => item.id === id) || null;
+        },
+
         addToLibrary(quiz) {
             const library = this.getLibrary();
             if (library.length >= CONFIG.LIMITS.MAX_LIBRARY_SLOTS) {

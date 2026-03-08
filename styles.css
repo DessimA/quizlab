@@ -205,7 +205,7 @@
 /* ── Inputs ── */
 [data-theme="light"] .input-field {
     color: var(--text-main);
-    background: rgba(255, 255, 255, 0.80);
+    background-color: rgba(255, 255, 255, 0.80);
 }
 [data-theme="light"] .input-field::placeholder {
     color: var(--text-muted);

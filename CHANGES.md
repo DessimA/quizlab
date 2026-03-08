@@ -57,3 +57,36 @@ Além disso, o timer só aparecia após o primeiro tick (1 segundo de atraso).
 
 4. `styles.css` — `.exam-timer-bar` com visual destacado e `.timer-warning` com animação
    de pulso quando restam 60 segundos ou menos.
+
+---
+
+## Refatoração DRY e Performance
+
+### config.js — Utils namespace
+Funções puras reutilizadas em múltiplos módulos foram centralizadas em `Utils`:
+- `Utils.formatTime(seconds)` → substitui 3 implementações inline idênticas
+  em `main.js`, `screen-manager.js` e `quiz-engine.js`
+- `Utils.truncate(text)` → substitui duplicação em `_buildPendingCard` e
+  `_buildResultCard` no `review-manager.js`
+- `TIMINGS.SECONDS_PER_QUESTION` → constante que antes estava hardcoded como `* 2`
+  (minutos) em dois lugares; agora é `120` segundos com semântica clara
+
+### storage-manager.js — getById(id)
+Método conveniente que evita `.getLibrary().find(i => i.id === id)` repetido
+três vezes no `main.js` (load-quiz, edit-quiz, download-quiz).
+
+### quiz-engine.js — _resetProgress() e _initTimer()
+`init()` e `reset()` compartilhavam ~15 linhas idênticas. Extraídas para dois
+métodos privados, eliminando a sincronização manual entre os dois pontos de entrada.
+`stopTimer()` não toca mais o DOM — responsabilidade devolvida à camada de UI
+via eventos (`quizlab:timer-expired`), mantendo o SRP do engine.
+
+### screen-manager.js — resumeSession(session)
+`load-quiz` e `resume-quiz` no `main.js` executavam a mesma sequência de 4 chamadas
+(`restoreSession → change → renderQuestion → _syncExamTimerBar`). Centralizado
+em `ScreenManager.resumeSession()`.
+
+### main.js — _navigateQuiz(action)
+`confirm-answer`, `next-question`, `prev-question` e `select-alternative`
+seguem o padrão `engine.action() + renderQuestion()`. A closure `_navigateQuiz`
+elimina a repetição sem introduzir acoplamento extra.
