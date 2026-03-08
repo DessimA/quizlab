@@ -24,10 +24,15 @@
             </div>
             <div class="header-subtitle">Ajuda</div>
         </div>
-        <a href="docs.html" class="btn btn-ghost">
-            <span data-icon="book" data-size="sm"></span>
-            <span class="hide-mobile">Docs</span>
-        </a>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
+                <span data-icon="sun" data-size="sm"></span>
+            </button>
+            <a href="docs.html" class="btn btn-ghost">
+                <span data-icon="book" data-size="sm"></span>
+                <span class="hide-mobile">Docs</span>
+            </a>
+        </div>
     </header>
 
     <div class="container fade-in">
@@ -117,13 +122,16 @@
     <!-- Core -->
     <script src="js/core/config.js"></script>
     <script src="js/components/icon-system.js"></script>
+    <script src="js/components/theme-manager.js"></script>
     <script src="js/ui/event-delegator.js"></script>
 
     <script>
         window.addEventListener('load', () => {
+            ThemeManager.init();
             IconSystem.inject();
             EventDelegator.init();
             EventDelegator.register('go-home', () => location.href = 'index.html');
+            EventDelegator.register('toggle-theme', () => ThemeManager.toggle());
         });
     </script>
 </body>
