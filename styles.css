@@ -86,12 +86,6 @@ body {
     font-size: var(--font-body);
 }
 
-@media (min-width: 1024px) {
-    body {
-        background-attachment: fixed;
-    }
-}
-
 body::before {
     content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: var(--bg-overlay); z-index: -1; pointer-events: none;
@@ -161,9 +155,9 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     display: inline-flex; align-items: center; justify-content: center; gap: var(--space-sm);
     padding: 10px 24px; font-size: 0.8rem; font-weight: 600; border-radius: var(--radius-full);
     cursor: pointer; border: none; font-family: var(--font-sans); text-transform: uppercase;
-    letter-spacing: 0.01em; white-space: normal; text-align: center; line-height: 1.2;
+    letter-spacing: 0.01em; white-space: nowrap; text-align: center; line-height: 1.2;
     min-height: 40px; transition: all var(--transition-fast);
-    position: relative; overflow: hidden; /* Fix for ripple and size distortion */
+    position: relative; overflow: hidden; flex-shrink: 0;
 }
 .btn-primary { background: var(--primary-500); color: var(--text-inverse); box-shadow: var(--primary-glow); }
 .btn-primary:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255,255,255,0.3); }
@@ -177,11 +171,26 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 .btn-ghost { background: transparent; color: var(--text-secondary); padding: var(--space-sm); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); min-height: 40px; }
 .btn-ghost:hover { color: var(--primary-500); filter: drop-shadow(0 0 8px var(--primary-500)); background: rgba(255, 255, 255, 0.05); }
 
-.header .btn-ghost {
+.header .btn {
+    height: auto;
+    min-height: 40px;
+    min-width: 40px;
+    width: auto;
+    padding: 0 var(--space-sm);
+}
+
+.toggle-visibility-btn {
     min-width: 44px;
     min-height: 44px;
     width: 44px;
     height: 44px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+#prevBtn {
+    width: 44px;
+    min-width: 44px;
     padding: 0;
 }
 
@@ -255,9 +264,12 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 .quiz-info-bar {
     display: flex; align-items: center; justify-content: space-between;
     background: var(--bg-glass); border: 1px solid var(--border-glass);
-    border-radius: var(--radius-md); padding: 6px 12px;
+    border-radius: var(--radius-md); 
     margin-bottom: var(--space-lg); transition: all 0.3s var(--ease-out-expo);
-    overflow: hidden; height: 44px;
+    height: auto;
+    min-height: 44px;
+    overflow: visible;
+    padding: 0 var(--space-md);
 }
 
 .quiz-info-bar.hidden-panel {
@@ -343,8 +355,24 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 .lib-title { font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 2px; }
 .lib-date { font-size: var(--font-tiny); color: var(--text-muted); font-family: var(--font-mono); }
 .lib-meta { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: var(--space-md); flex: 1; }
-.lib-actions { display: flex; gap: var(--space-xs); margin-top: auto; }
-.lib-actions .btn { flex: 1; padding: 6px 8px; font-size: 0.7rem; }
+.lib-actions { 
+    display: flex; 
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: auto; 
+}
+.lib-actions .btn {
+    flex: none;
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+    font-size: 0.75rem;
+}
+.lib-actions .btn:first-child {
+    flex: 1;
+    width: auto;
+    padding: 0 var(--space-sm);
+}
 
 .library-stats {
     background: rgba(196, 255, 0, 0.05); border: 1px solid var(--primary-500); color: var(--primary-500);
@@ -464,13 +492,6 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     counter-reset: steps;
 }
 
-@media (min-width: 768px) {
-    .step-flow {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-}
-
 .step-item {
     flex: 1;
     display: flex;
@@ -479,23 +500,6 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     text-align: center;
     padding: var(--space-lg);
     position: relative;
-}
-
-.step-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    right: -8px;
-    top: 28px;
-    width: 16px;
-    height: 2px;
-    background: var(--border-glass);
-    display: none;
-}
-
-@media (min-width: 768px) {
-    .step-item:not(:last-child)::after {
-        display: block;
-    }
 }
 
 .step-number {
@@ -534,13 +538,6 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     grid-template-columns: 1fr 1fr;   /* 2 colunas sempre iguais */
     gap: var(--space-sm);
     margin: var(--space-xl) 0;
-}
-
-@media (min-width: 640px) {
-    .stat-strip {
-        grid-template-columns: repeat(4, 1fr);   /* 4 colunas no tablet+ */
-        gap: var(--space-md);
-    }
 }
 
 .stat-item {
@@ -582,13 +579,6 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-xl);
-}
-
-@media (min-width: 900px) {
-    .docs-layout {
-        grid-template-columns: 220px 1fr;
-        align-items: start;
-    }
 }
 
 .docs-sidebar {
@@ -730,40 +720,177 @@ pre {
     overflow-x: auto;
 }
 
-@media (max-width: 767px) {
-    .container {
-        padding: 0 var(--space-md);    /* 16px */
+/* =======================================================
+   QUIZLAB — SISTEMA RESPONSIVO UNIFICADO
+   Organizado em camadas: Base → Mobile → Tablet → Desktop
+   ======================================================= */
+
+/* ───────────────────────────────────────────────────────
+   CAMADA 2 — MOBILE PEQUENO (< 480px)
+   ─────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.5rem;
     }
-    .hide-mobile {
-        display: none !important;
+
+    /* CTAs do hero: full-width e touch target confortável */
+    .hero-section .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
     }
 }
 
-@media (max-width: 899px) {
+
+/* ───────────────────────────────────────────────────────
+   CAMADA 3 — MOBILE (< 768px)
+   ─────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+    .container {
+        padding: 0 var(--space-md);
+    }
+
+    .hide-mobile {
+        display: none !important;
+    }
+
+    /* Navigation quiz: empilhada verticalmente
+       prevBtn expande para full-width como os outros */
+    .navigation {
+        flex-direction: column-reverse;
+        gap: var(--space-sm);
+        align-items: stretch;
+    }
+
+    .navigation .btn,
+    #prevBtn {
+        width: 100%;
+        flex: 1;
+        padding: 0 var(--space-md);
+        min-width: unset;
+    }
+
+    /* Library: 1 coluna em mobile */
+    .library-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Docs: sidebar escondida em mobile */
     .docs-sidebar {
         display: none;
     }
 }
 
-@media (max-width: 480px) {
-    .hero-section .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    .header-brand { font-size: 0.85rem; }
-    .logo-full { display: none; }
-    .logo-abbr { position: static; opacity: 1; animation: none; }
-    .hero-title { font-size: 1.5rem; }
-    .btn { padding: 6px 12px; font-size: 0.75rem; }
-}
+
+/* ───────────────────────────────────────────────────────
+   CAMADA 4 — TABLET (768px – 1023px)
+   ─────────────────────────────────────────────────────── */
 
 @media (min-width: 768px) {
-    body { padding-top: calc(var(--header-height) + var(--space-xl)); }
-    .header { height: var(--header-height); padding: 0 var(--space-xl); }
-    .features-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
-    .quiz-info-bar { flex-direction: row; justify-content: space-between; padding: var(--space-md) var(--space-xl); text-align: left; }
-    .score-display { width: auto; }
-    .score-item { flex-direction: column; min-width: 80px; }
-    .navigation { flex-direction: row; gap: var(--space-md); }
-    .navigation .btn { width: auto; flex: none; }
+    body {
+        padding-top: calc(var(--header-height) + var(--space-xl));
+    }
+
+    .header {
+        height: var(--header-height);
+        padding: 0 var(--space-xl);
+    }
+
+    /* Step indicator */
+    .step-flow {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .step-item:not(:last-child)::after {
+        display: block;
+    }
+
+    /* Stat strip */
+    .stat-strip {
+        grid-template-columns: repeat(4, 1fr);   /* 4 colunas no tablet+ */
+        gap: var(--space-md);
+    }
+
+    /* Features: 3 colunas */
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md);
+    }
+
+    /* quiz-info-bar: horizontal, sem padding excessivo */
+    .quiz-info-bar {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0 var(--space-md);
+        text-align: left;
+    }
+
+    .score-display {
+        width: auto;
+    }
+
+    /* Navigation quiz: botões em linha
+       prevBtn retorna ao tamanho de ícone */
+    .navigation {
+        flex-direction: row;
+        gap: var(--space-md);
+        align-items: center;
+    }
+
+    .navigation .btn {
+        width: auto;
+        flex: none;
+    }
+
+    #prevBtn {
+        width: 44px;
+        flex: none;
+        padding: 0;
+        min-width: 44px;
+    }
+
+    /* Library: 2 colunas no tablet */
+    .library-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Docs: sidebar oculta até 899px */
+    .docs-sidebar {
+        display: none;
+    }
+}
+
+
+/* ───────────────────────────────────────────────────────
+   CAMADA 5 — DESKTOP (≥ 1024px)
+   ─────────────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+    body {
+        background-attachment: fixed;
+    }
+
+    /* Library: volta ao auto-fill inteligente */
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+}
+
+
+/* ───────────────────────────────────────────────────────
+   CAMADA 6 — DOCS SIDEBAR (breakpoint próprio)
+   ─────────────────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+    .docs-sidebar {
+        display: block;
+    }
+
+    .docs-layout {
+        grid-template-columns: 220px 1fr;
+        align-items: start;
+    }
 }
