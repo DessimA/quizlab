@@ -35,13 +35,16 @@
             ModalManager.alert(errorHtml, 'ERRO DE FORMATO DETECTADO');
         },
 
+        _generateHash(quiz) {
+            return (quiz.questoes || []).map(q => q.id).join('|');
+        },
+
         _findDuplicate(data) {
             const lib = StorageManager.getLibrary();
             const byName = lib.find(item => item.data.nomeSimulado === data.nomeSimulado);
             if (!byName) return null;
 
-            const sameContent = byName.data.questoes.length === data.questoes.length &&
-                byName.data.questoes[0]?.id === data.questoes[0]?.id;
+            const sameContent = this._generateHash(byName.data) === this._generateHash(data);
 
             return { item: byName, sameContent };
         },

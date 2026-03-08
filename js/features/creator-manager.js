@@ -5,6 +5,7 @@
     const CreatorManager = {
         questionCount: 0,
         _editingId: null,
+        _dragSrcEl: null,
 
         reset() {
             document.getElementById('builderTitle').value = '';
@@ -73,6 +74,10 @@
             div.className = 'builder-card slide-up';
             div.id = qId;
             div.draggable = true;
+            
+            // Add listeners for drag and drop
+            div.addEventListener('dragstart', (e) => this._onDragStart(e));
+            div.addEventListener('dragend', (e) => this._onDragEnd(e));
 
             div.innerHTML = `
                 <div class="builder-header" data-action="toggle-collapse" data-target="${qId}">
@@ -231,38 +236,36 @@
                 code.textContent = JSON.stringify(quiz, null, 2);
                 ModalManager.open('previewModal');
             }
+        },
+
+        _onDragStart(e) {
+            if (e.currentTarget.classList.contains('builder-card')) {
+                this._dragSrcEl = e.currentTarget;
+                e.dataTransfer.effectAllowed = 'move';
+                e.currentTarget.style.opacity = '0.4';
+            }
+        },
+
+        _onDragEnd(e) {
+            if (e.currentTarget.classList.contains('builder-card')) {
+                e.currentTarget.style.opacity = '1';
+            }
+        },
+
+        _onDrop(e) {
+            const target = e.target.closest('.builder-card');
+            if (this._dragSrcEl && target && this._dragSrcEl !== target) {
+                const list = document.getElementById('builderQuestionsList');
+                const allNodes = Array.from(list.children);
+                if (allNodes.indexOf(this._dragSrcEl) < allNodes.indexOf(target)) {
+                    list.insertBefore(this._dragSrcEl, target.nextSibling);
+                } else {
+                    list.insertBefore(this._dragSrcEl, target);
+                }
+                this.renumberQuestions();
+            }
         }
     };
-
-    let dragSrcEl = null;
-
-    window.addEventListener('dragstart', (e) => {
-        if (e.target.classList.contains('builder-card')) {
-            dragSrcEl = e.target;
-            e.dataTransfer.effectAllowed = 'move';
-            e.target.style.opacity = '0.4';
-        }
-    });
-
-    window.addEventListener('dragend', (e) => {
-        if (e.target.classList.contains('builder-card')) {
-            e.target.style.opacity = '1';
-        }
-    });
-
-    window.addEventListener('drop', (e) => {
-        const target = e.target.closest('.builder-card');
-        if (dragSrcEl && target && dragSrcEl !== target) {
-            const list = document.getElementById('builderQuestionsList');
-            const allNodes = Array.from(list.children);
-            if (allNodes.indexOf(dragSrcEl) < allNodes.indexOf(target)) {
-                list.insertBefore(dragSrcEl, target.nextSibling);
-            } else {
-                list.insertBefore(dragSrcEl, target);
-            }
-            CreatorManager.renumberQuestions();
-        }
-    });
 
     window.CreatorManager = CreatorManager;
 })(window);

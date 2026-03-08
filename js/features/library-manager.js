@@ -5,6 +5,8 @@
             if (!container) return;
 
             const query = document.getElementById('librarySearch')?.value.toLowerCase().trim() || '';
+            const sortBy = document.getElementById('librarySort')?.value || 'recent';
+            
             let library = StorageManager.getLibrary();
 
             if (query) {
@@ -16,21 +18,36 @@
                 });
             }
 
+            // Sort logic (using a copy to avoid mutation)
+            const sortedLibrary = [...library].sort((a, b) => {
+                switch (sortBy) {
+                    case 'oldest':
+                        return a.meta.addedAt - b.meta.addedAt;
+                    case 'az':
+                        return (a.data.nomeSimulado || '').localeCompare(b.data.nomeSimulado || '');
+                    case 'questions':
+                        return b.meta.questionsCount - a.meta.questionsCount;
+                    case 'recent':
+                    default:
+                        return b.meta.addedAt - a.meta.addedAt;
+                }
+            });
+
             container.innerHTML = '';
 
-            if (library.length === 0) {
+            if (sortedLibrary.length === 0) {
                 container.innerHTML = `<div class="empty-state" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted); grid-column: 1 / -1;"><p>${query ? 'Nenhum resultado encontrado.' : 'Nenhum simulado salvo ainda.'}</p></div>`;
                 return;
             }
 
             const activeSession = StorageManager.getSession();
-            library.forEach(item => this.renderCard(item, container, activeSession));
+            sortedLibrary.forEach(item => this.renderCard(item, container, activeSession));
             
             // Inject icons since we are replacing the whole innerHTML
             if (window.IconSystem) IconSystem.inject(container);
             
             // Update capacity bar if elements exist
-            this._updateCapacityUI(library.length);
+            this._updateCapacityUI(sortedLibrary.length);
         },
 
         _updateCapacityUI(count) {

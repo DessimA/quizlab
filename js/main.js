@@ -5,6 +5,13 @@
         EventDelegator.init();
         IconSystem.inject();
 
+        // Encapsulated state (Private to main.js)
+        const _pendingState = {
+            quiz: null,
+            savedId: null,
+            loadOptions: null // replaces pendingQuizLoad
+        };
+
         const _navigateQuiz = (engineAction) => {
             engineAction();
             QuizRenderer.renderQuestion();
@@ -19,7 +26,7 @@
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `${name}.json`;
+            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
             a.click();
         };
 
@@ -27,29 +34,24 @@
             const quiz = CreatorManager.buildQuizObject();
             if (!quiz) return;
             const shouldSave = document.getElementById('optSaveLibrary')?.checked;
-            let savedId = null;
+            
+            _pendingState.quiz = quiz;
+            _pendingState.savedId = null;
 
             if (shouldSave) {
                 const result = StorageManager.addToLibrary(quiz);
                 if (!result.success && result.reason === 'LIMIT_REACHED') {
-                    window.pendingSaveQuiz = quiz;
-                    const oldest = StorageManager.getLibrary().sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
+                    const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
                     document.getElementById('limitOldestTitle').textContent = oldest.data.nomeSimulado;
                     document.getElementById('limitOldestDate').textContent = `Adicionado em: ${new Date(oldest.meta.addedAt).toLocaleDateString('pt-BR')}`;
                     ModalManager.close('exportOptionsModal');
                     ModalManager.open('limitModal');
                     return;
                 }
-                savedId = result.id;
+                _pendingState.savedId = result.id;
             }
 
             ModalManager.close('exportOptionsModal');
-
-            const actionModal = document.getElementById('builderActionModal');
-            document.getElementById('btnActionLoad').onclick = () => {
-                ModalManager.close('builderActionModal');
-                ScreenManager.loadQuiz(quiz, savedId);
-            };
             ModalManager.open('builderActionModal');
         };
 
@@ -105,8 +107,7 @@
             'export-json': () => {
                 const quiz = CreatorManager.buildQuizObject();
                 if (!quiz) return;
-                window.pendingSaveQuiz = quiz;
-
+                
                 if (CreatorManager._editingId) {
                     ModalManager.confirm(
                         'Atualizar o simulado na biblioteca com as alterações?',
@@ -145,7 +146,7 @@
                 if (session && session.libraryId === item.id && session.mode === CONFIG.QUIZ_MODES.STUDY) {
                     const minutesAgo = Math.round((Date.now() - session.savedAt) / 60000);
                     ModalManager.confirm(
-                        `Sessão de Estudo em andamento para "${item.data.nomeSimulado}" (${minutesAgo} min atrás). Como deseja prosseguir?`,
+                        `Existe uma sessão de Estudo em andamento para "${item.data.nomeSimulado}" (${minutesAgo} min atrás). Como deseja prosseguir?`,
                         () => ScreenManager.resumeSession(session),
                         {
                             title: "RETOMAR PROGRESSO",
@@ -169,16 +170,16 @@
             },
 
             'confirm-quiz-options': () => {
-                const { data, libraryId } = window.pendingQuizLoad || {};
-                if (!data) return;
+                const options = _pendingState.loadOptions;
+                if (!options) return;
 
                 const mode = document.querySelector('input[name="quizMode"]:checked')?.value || CONFIG.QUIZ_MODES.STUDY;
                 const shuffleQuestions = document.getElementById('optShuffleQuestions')?.checked || false;
                 const shuffleOptions = document.getElementById('optShuffleOptions')?.checked || false;
 
                 ModalManager.close('quizOptionsModal');
-                ScreenManager.loadQuiz(data, libraryId, { mode, shuffleQuestions, shuffleOptions });
-                window.pendingQuizLoad = null;
+                ScreenManager.loadQuiz(options.data, options.libraryId, { mode, shuffleQuestions, shuffleOptions });
+                _pendingState.loadOptions = null;
             },
 
             'flag-question': () => {
@@ -218,33 +219,59 @@
                 btn.innerHTML = isHidden ? IconSystem.render('eyeOff', 'xs') : IconSystem.render('eye', 'xs');
                 btn.setAttribute('aria-label', isHidden ? 'Exibir painel de informações' : 'Ocultar painel de informações');
             },
+            
+            'toggle-compact': () => {
+                const bar = document.getElementById('quizInfoBar');
+                const btn = bar.querySelector('.toggle-compact-btn');
+                const isCompact = bar.classList.toggle('compact');
+                if (btn) btn.innerHTML = isCompact ? IconSystem.render('chevronDown', 'sm') : IconSystem.render('chevronUp', 'sm');
+            },
 
             'toggle-collapse':    (e, target) => document.getElementById(target.dataset.target)?.classList.toggle('collapsed'),
             'select-file-trigger': () => document.getElementById('fileInput').click(),
             'confirm-export':     () => _finalizeExport(),
+            
+            'action-load': () => {
+                ModalManager.close('builderActionModal');
+                if (_pendingState.quiz) {
+                    ScreenManager.loadQuiz(_pendingState.quiz, _pendingState.savedId);
+                    _pendingState.quiz = null;
+                    _pendingState.savedId = null;
+                }
+            },
 
             'limit-export': () => {
-                const oldest = StorageManager.getLibrary().sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
+                const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
                 _downloadJson(oldest.data, oldest.data.nomeSimulado);
                 StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(window.pendingSaveQuiz);
+                const result = StorageManager.addToLibrary(_pendingState.quiz);
                 ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, result.id);
+                ScreenManager.loadQuiz(_pendingState.quiz, result.id);
+                _pendingState.quiz = null;
             },
 
             'limit-replace': () => {
-                const oldest = StorageManager.getLibrary().sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
+                const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
                 StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(window.pendingSaveQuiz);
+                const result = StorageManager.addToLibrary(_pendingState.quiz);
                 ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, result.id);
+                ScreenManager.loadQuiz(_pendingState.quiz, result.id);
+                _pendingState.quiz = null;
             },
 
             'limit-cancel': () => {
                 ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, null);
+                ScreenManager.loadQuiz(_pendingState.quiz, null);
+                _pendingState.quiz = null;
             }
         });
+
+        // Redirect ScreenManager global calls to use our local state
+        const originalLoadOptions = ScreenManager.loadQuizOptions;
+        ScreenManager.loadQuizOptions = (data, libraryId) => {
+            _pendingState.loadOptions = { data, libraryId };
+            originalLoadOptions.call(ScreenManager, data, libraryId);
+        };
 
         window.addEventListener('quizlab:timer-expired', () => {
             const examBar = document.getElementById('examTimerBar');

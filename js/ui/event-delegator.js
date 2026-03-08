@@ -44,8 +44,9 @@
         },
 
         _handleDrop(e) {
-            // Drag logic will be specifically handled within CreatorManager if needed, 
-            // or here if kept global.
+            if (window.CreatorManager && typeof window.CreatorManager._onDrop === 'function') {
+                window.CreatorManager._onDrop(e);
+            }
         },
 
         registerMultiple(handlers) {
@@ -56,112 +57,7 @@
             this.handlers[name] = handler;
         },
 
-        handlers: {
-            'enter-app': () => {
-                ScreenManager.change('uploadScreen');
-                if (StorageManager.isFirstVisit()) {
-                    ModalManager.open('onboardingModal');
-                    StorageManager.markFirstVisit();
-                }
-            },
-            'go-home': () => {
-                const isBusy = QuizEngine.getState().quizData || document.getElementById('creatorScreen').offsetParent;
-                if (isBusy) {
-                    ModalManager.confirm("Sair agora? Progresso não salvo será perdido.", () => location.reload());
-                } else {
-                    location.reload();
-                }
-            },
-            'show-library': () => {
-                ScreenManager.change('libraryScreen');
-                LibraryManager.render();
-            },
-            'show-creator': () => {
-                CreatorManager.reset();
-                ScreenManager.change('creatorScreen');
-            },
-            'confirm-meta': () => CreatorManager.confirmMeta(),
-            'edit-meta': () => CreatorManager.editMeta(),
-            'add-question': () => CreatorManager.addQuestion(),
-            'toggle-collapse': (e, target) => {
-                const id = target.dataset.target;
-                document.getElementById(id).classList.toggle('collapsed');
-            },
-            'toggle-compact': () => {
-                const bar = document.getElementById('quizInfoBar');
-                const btn = bar.querySelector('.toggle-compact-btn');
-                const isCompact = bar.classList.toggle('compact');
-                btn.innerHTML = isCompact ? IconSystem.render('chevronDown', 'sm') : IconSystem.render('chevronUp', 'sm');
-            },
-            'select-file-trigger': () => document.getElementById('fileInput').click(),
-            'preview-json': () => CreatorManager.preview(),
-            'copy-clipboard': () => {
-                const text = document.getElementById('previewCode').textContent;
-                navigator.clipboard.writeText(text).then(() => {
-                    ToastSystem.show("Copiado para o clipboard!", "success");
-                });
-            },
-            'export-json': () => {
-                const quiz = CreatorManager.buildQuizObject();
-                if (!quiz) return;
-                window.pendingSaveQuiz = quiz;
-                ModalManager.open('exportOptionsModal');
-            },
-            'confirm-export': () => {
-                const quiz = window.pendingSaveQuiz;
-                if (!quiz) return;
-                
-                // Download
-                const blob = new Blob([JSON.stringify(quiz, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = quiz.nomeSimulado.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json";
-                a.click();
-
-                // Save to Library (if checked)
-                const shouldSave = document.getElementById('saveToLibCheckbox').checked;
-                let savedId = null;
-                if (shouldSave) {
-                    savedId = StorageManager.addToLibrary(quiz).id;
-                }
-
-                ModalManager.close('exportOptionsModal');
-                
-                // Decision Modal
-                const actionModal = document.getElementById('builderActionModal');
-                document.getElementById('btnActionLoad').onclick = () => {
-                    ModalManager.close('builderActionModal');
-                    ScreenManager.loadQuiz(quiz, savedId);
-                };
-                ModalManager.open('builderActionModal');
-            },
-            'limit-export': () => {
-                const oldest = StorageManager.getLibrary().sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
-                // Download oldest
-                const blob = new Blob([JSON.stringify(oldest.data, null, 2)], { type: 'application/json' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = oldest.data.nomeSimulado + ".json";
-                a.click();
-                
-                StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(window.pendingSaveQuiz);
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, result.id);
-            },
-            'limit-replace': () => {
-                const oldest = StorageManager.getLibrary().sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
-                StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(window.pendingSaveQuiz);
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, result.id);
-            },
-            'limit-cancel': () => {
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(window.pendingSaveQuiz, null);
-            }
-        }
+        handlers: {}
     };
 
     window.EventDelegator = EventDelegator;
