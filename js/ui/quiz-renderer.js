@@ -7,8 +7,8 @@
 
             container.innerHTML = '';
             container.appendChild(this._buildQuestionHeader(data));
-            data.question.alternativas.forEach(alt => {
-                container.appendChild(this._buildAlternative(alt, data));
+            data.question.alternativas.forEach((alt, index) => {
+                container.appendChild(this._buildAlternative(alt, data, index));
             });
 
             if (data.isAnswered) {
@@ -42,7 +42,7 @@
             return div;
         },
 
-        _buildAlternative(alt, data) {
+        _buildAlternative(alt, data, index = 0) {
             const { question, userAnswer, isAnswered, mode } = data;
             const inputType = question.tipo === CONFIG.QUESTION_TYPES.SINGLE ? 'radio' : 'checkbox';
             const isSelected = userAnswer && (Array.isArray(userAnswer) ? userAnswer.includes(alt.id) : userAnswer === alt.id);
@@ -80,9 +80,10 @@
                 input.dataset.id = alt.id;
             }
 
+            const letter = String.fromCharCode(65 + index); // 0→A, 1→B, 2→C...
             const text = document.createElement('span');
             text.className = 'alternative-text';
-            text.textContent = alt.texto;
+            text.textContent = `${letter}. ${alt.texto}`;
 
             const icon = document.createElement('div');
             icon.style.marginLeft = 'auto';
@@ -104,9 +105,15 @@
             div.className = `feedback-message ${correct ? 'correct' : 'incorrect'}`;
             div.setAttribute('role', 'status');
             div.setAttribute('aria-live', 'assertive');
+            
+            const correctLetters = data.question.respostasCorretas.map(correctId => {
+                const idx = data.question.alternativas.findIndex(a => a.id === correctId);
+                return idx >= 0 ? String.fromCharCode(65 + idx) : correctId.toUpperCase();
+            });
+
             div.innerHTML = `<div>${correct
                 ? 'RESPOSTA CORRETA'
-                : `RESPOSTA INCORRETA — CORRETO: <strong>${data.question.respostasCorretas.join(', ').toUpperCase()}</strong>`
+                : `RESPOSTA INCORRETA — CORRETO: <strong>${correctLetters.join(', ')}</strong>`
             }</div>`;
             return div;
         },
