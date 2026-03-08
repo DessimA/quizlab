@@ -1,6 +1,3 @@
-/**
- * FileHandler - Handles JSON file uploads and parsing
- */
 (function(window) {
     const FileHandler = {
         handle(file) {
@@ -11,12 +8,12 @@
 
             ScreenManager.showLoading('LENDO ARQUIVO...');
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
                     const validation = Validator.validateQuiz(data);
-                    
+
                     setTimeout(() => {
                         ScreenManager.hideLoading();
                         if (!validation.valid) {
@@ -34,25 +31,47 @@
         },
 
         _showErrors(errors) {
-            const errorHtml = `
-                <div class="error-container">
-                    <ul>${errors.map(err => `<li>${err}</li>`).join('')}</ul>
-                </div>`;
-            ModalManager.alert(errorHtml, "ERRO DE FORMATO DETECTADO");
+            const errorHtml = `<div class="error-container"><ul>${errors.map(err => `<li>${err}</li>`).join('')}</ul></div>`;
+            ModalManager.alert(errorHtml, 'ERRO DE FORMATO DETECTADO');
+        },
+
+        _findDuplicate(data) {
+            const lib = StorageManager.getLibrary();
+            const byName = lib.find(item => item.data.nomeSimulado === data.nomeSimulado);
+            if (!byName) return null;
+
+            const sameContent = byName.data.questoes.length === data.questoes.length &&
+                byName.data.questoes[0]?.id === data.questoes[0]?.id;
+
+            return { item: byName, sameContent };
         },
 
         _askToSave(data) {
-            const lib = StorageManager.getLibrary();
-            const exists = lib.find(item => item.data.nomeSimulado === data.nomeSimulado);
-            
-            if (exists) {
-                ScreenManager.loadQuiz(data, exists.id);
-            } else {
-                ModalManager.confirm(`Salvar "${data.nomeSimulado}" na biblioteca?`, () => {
-                    const libId = StorageManager.addToLibrary(data).id;
-                    ScreenManager.loadQuiz(data, libId);
-                });
+            const duplicate = this._findDuplicate(data);
+
+            if (!duplicate) {
+                const result = StorageManager.addToLibrary(data);
+                if (!result.success) {
+                    ModalManager.alert('Biblioteca cheia. Exclua um simulado para adicionar novos.');
+                    return;
+                }
+                ScreenManager.loadQuizOptions(data, result.id);
+                return;
             }
+
+            if (duplicate.sameContent) {
+                ScreenManager.loadQuizOptions(data, duplicate.item.id);
+                return;
+            }
+
+            ModalManager.confirm(
+                `"${data.nomeSimulado}" já existe mas com conteúdo diferente. Substituir o simulado salvo?`,
+                () => {
+                    StorageManager.replaceInLibrary(duplicate.item.id, data);
+                    ToastSystem.show('Simulado atualizado na biblioteca.');
+                    ScreenManager.loadQuizOptions(data, duplicate.item.id);
+                }
+            );
         }
     };
 

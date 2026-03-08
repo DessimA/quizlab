@@ -5,16 +5,24 @@
     const ModalManager = {
         open(id) {
             const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
+            if (el) {
+                el.classList.remove('hidden');
+                FocusTrap.activate(id);
+            }
         },
 
         close(id) {
             const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
+            if (el) {
+                el.classList.add('hidden');
+                FocusTrap.deactivate(id);
+            }
         },
 
         closeAll() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => {
+                this.close(m.id);
+            });
         },
 
         alert(message, title = "AVISO DO SISTEMA") {

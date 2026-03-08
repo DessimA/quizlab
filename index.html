@@ -27,13 +27,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 </head>
 <body>
 
     <!-- Landing Page -->
     <div id="landingPage" class="container fade-in">
         <header class="header">
-            <div class="header-brand" data-action="go-home" title="Ir para o início">
+            <div class="header-brand" data-action="go-home" title="Início">
                 <svg class="icon-svg icon-logo" viewBox="0 0 24 24" style="color:var(--primary-500)">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
@@ -42,71 +43,169 @@
                     <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <a href="docs.html" class="btn btn-ghost" title="Documentação">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
+                    <span data-icon="sun" data-size="sm"></span>
+                </button>
+                <a href="docs.html" class="btn btn-ghost" title="Documentação" aria-label="Abrir documentação">
                     <span data-icon="book" data-size="sm"></span>
+                    <span class="hide-mobile" style="font-size:0.8rem;margin-left:4px;">Docs</span>
                 </a>
-                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" class="btn btn-ghost" title="Contato">
+                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" title="Contato" aria-label="Contato">
                     <span data-icon="mail" data-size="sm"></span>
                 </a>
             </div>
         </header>
 
-        <section class="hero-section">
-            <h1 class="hero-title neon-text">Simulados Inteligentes</h1>
-            <p class="hero-desc">
-                Plataforma técnica para criação e prática de simulados via JSON.
-                <br><span style="color:var(--primary-500); font-weight:600;">Privacidade Local. Performance Máxima.</span>
+        <section class="hero-section" style="padding:var(--space-3xl) 0 var(--space-xl);">
+            <div class="hero-badge">
+                <span data-icon="school" data-size="xs" style="color:var(--primary-500);"></span>
+                <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--primary-500);letter-spacing:0.08em;">100% NO SEU NAVEGADOR</span>
+            </div>
+
+            <h1 class="hero-title neon-text" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:var(--space-md);">
+                Estude com Simulados<br>do Jeito Certo
+            </h1>
+
+            <p class="hero-desc" style="font-size:1rem;max-width:520px;margin:0 auto var(--space-xl);">
+                Crie, importe e pratique simulados completos com feedback imediato, histórico de desempenho e revisão detalhada. Tudo salvo localmente sem cadastro, sem servidor.
             </p>
-            <button class="btn btn-primary" data-action="enter-app" style="padding: 8px 32px;">
-                <span>Começar Agora</span>
-                <span data-icon="arrowRight" data-size="sm"></span>
-            </button>
+
+            <div style="display:flex;gap:var(--space-sm);justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-2xl);">
+                <button class="btn btn-primary" data-action="enter-app" style="min-width:180px;font-size:0.9rem;padding:14px 28px;">
+                    <span data-icon="play" data-size="sm"></span>
+                    Começar Agora
+                </button>
+                <a href="docs.html" class="btn btn-outline" style="min-width:140px;font-size:0.9rem;padding:14px 28px;">
+                    <span data-icon="book" data-size="sm"></span>
+                    Como Funciona
+                </a>
+            </div>
+
+            <div class="stat-strip">
+                <div class="stat-item">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Simulados salvos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Questões por simulado</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Cadastros necessários</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Privacidade local</div>
+                </div>
+            </div>
         </section>
 
-        <section class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="download" data-size="lg"></span>
+        <section style="margin-bottom:var(--space-2xl);">
+            <h2 style="text-align:center;font-size:var(--font-h2);color:var(--text-secondary);margin-bottom:var(--space-xl);font-weight:600;">
+                Pronto em 3 passos
+            </h2>
+            <div class="step-flow">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="upload_file" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Importe ou Crie</h3>
+                    </div>
+                    <p>Suba um arquivo de simulado ou use o criador integrado para montar suas questões do zero.</p>
                 </div>
-                <div>
-                    <h3>Arquitetura JSON</h3>
-                    <p>Total compatibilidade com esquemas de dados estruturados para portabilidade.</p>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="quiz" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Escolha o Modo</h3>
+                    </div>
+                    <p>Estude com feedback imediato em cada resposta, ou simule uma prova real sem dicas.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xs);">
+                        <span data-icon="history" data-size="sm" style="color:var(--primary-500);"></span>
+                        <h3>Acompanhe a Evolução</h3>
+                    </div>
+                    <p>Veja seu histórico de tentativas, média de acertos e revise as questões que errou.</p>
                 </div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="eye" data-size="lg"></span>
+        </section>
+
+        <section style="margin-bottom:var(--space-2xl);">
+            <h2 style="text-align:center;font-size:var(--font-h2);color:var(--text-secondary);margin-bottom:var(--space-xl);font-weight:600;">
+                Tudo que você precisa
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="shuffle" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Embaralhamento</h3>
+                        <p>Questões e alternativas em ordem aleatória a cada tentativa.</p>
+                    </div>
                 </div>
-                <div>
-                    <h3>Interface Otimizada</h3>
-                    <p>Design industrial focado em densidade de informação e ergonomia visual.</p>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="timer" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Modo Cronometrado</h3>
+                        <p>Defina um limite de tempo e simule a pressão de uma prova real.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <span data-icon="check" data-size="lg"></span>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="flag" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Marcar para Revisão</h3>
+                        <p>Sinalize questões de dúvida e volte a elas antes de finalizar.</p>
+                    </div>
                 </div>
-                <div>
-                    <h3>Segurança Client-Side</h3>
-                    <p>Processamento isolado no ambiente do usuário, garantindo sigilo absoluto.</p>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="book" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Biblioteca Local</h3>
+                        <p>Salve até 10 simulados no navegador para acessar sem fazer upload novamente.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="edit" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Criador Integrado</h3>
+                        <p>Monte simulados completos com questões de única ou múltipla escolha.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <span data-icon="download" data-size="md"></span>
+                    </div>
+                    <div>
+                        <h3>Exportação JSON</h3>
+                        <p>Salve seus simulados em arquivo e compartilhe com quem quiser.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <footer class="footer">
-            <img src="https://github.com/DessimA.png" alt="José Anderson" class="dev-profile-img">
-            <p style="margin-bottom: 20px;">
-                <strong style="color:var(--text-main)">José Anderson</strong>
-            </p>
-            <div style="display: flex; justify-content: center; gap: 12px;">
-                <a href="https://www.linkedin.com/in/dessim/" target="_blank" class="btn btn-ghost" title="LinkedIn">
+            <p>QUIZLAB • Feito por José Anderson</p>
+            <div style="display:flex;justify-content:center;gap:12px;margin-top:var(--space-sm);">
+                <a href="https://www.linkedin.com/in/dessim/" target="_blank" rel="noopener" class="btn btn-ghost" title="LinkedIn" aria-label="LinkedIn">
                     <span data-icon="linkedin" data-size="sm"></span>
                 </a>
-                <a href="https://github.com/DessimA" target="_blank" class="btn btn-ghost" title="GitHub">
+                <a href="https://github.com/DessimA" target="_blank" rel="noopener" class="btn btn-ghost" title="GitHub" aria-label="GitHub">
                     <span data-icon="github" data-size="sm"></span>
                 </a>
-                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" class="btn btn-ghost" title="Website">
+                <a href="https://jasc-dessima-dev.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" title="Website" aria-label="Website">
                     <span data-icon="externalLink" data-size="sm"></span>
                 </a>
             </div>
@@ -125,7 +224,12 @@
                     <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
                 </div>
             </div>
-            <div class="header-subtitle" id="headerSubtitle">App</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
+                    <span data-icon="sun" data-size="sm"></span>
+                </button>
+                <div class="header-subtitle" id="headerSubtitle">App</div>
+            </div>
         </header>
 
         <main class="content">
@@ -165,11 +269,18 @@
 
             <!-- Library Screen (Meus Simulados) -->
             <div id="libraryScreen" class="hidden fade-in">
-                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
-                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar">
+                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar" style="margin-top: -4px;">
                         <span data-icon="arrowLeft"></span>
                     </button>
-                    <div id="libraryCounter" class="header-subtitle" style="font-size: 0.9rem;">0/10 SALVOS</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width: 140px;">
+                        <span id="libraryCounter" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); letter-spacing:0.08em; white-space:nowrap;">
+                            CAPACIDADE &nbsp; <strong style="color:var(--text-main);">0/10</strong>
+                        </span>
+                        <div class="lib-capacity-track">
+                            <div class="lib-capacity-fill" id="libCapacityFill" style="width:0%"></div>
+                        </div>
+                    </div>
                 </div>
                 
                 <h2 class="neon-text" style="text-align: center; margin-bottom: 24px;">Biblioteca Local</h2>
@@ -187,9 +298,7 @@
                     </select>
                 </div>
                 
-                <div class="library-stats hidden" id="emptyLibraryMsg">
-                    Nenhum simulado salvo ainda.<br>Os simulados salvos ficam armazenados apenas neste navegador.
-                </div>
+                <div id="emptyLibraryMsg" class="hidden" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted);"></div>
 
                 <div id="libraryList" class="library-grid"></div>
             </div>
@@ -200,6 +309,11 @@
                     <button class="btn btn-ghost" data-action="enter-app" title="Voltar">
                         <span data-icon="arrowLeft"></span>
                     </button>
+                </div>
+
+                <div id="creatorEditNotice" class="hidden" 
+                     style="font-family:var(--font-mono);font-size:0.75rem;color:var(--primary-500);
+                            padding:var(--space-sm);border-bottom:1px solid var(--border-glass);margin-bottom:var(--space-md);">
                 </div>
                 
                 <div id="builderMetaSection" class="builder-card">
@@ -228,6 +342,10 @@
                         <div class="input-group">
                             <label class="input-label">Tags (separadas por vírgula) - Opcional</label>
                             <input type="text" id="builderTags" class="input-field" placeholder="ex: matemática, nível médio, ENEM">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Limite de Tempo (minutos) <span style="color:var(--text-muted);font-size:0.75rem;">opcional apenas no Modo Exame</span></label>
+                            <input type="number" id="builderTimer" class="input-field" placeholder="Ex: 60" min="1" max="300">
                         </div>
                         <button class="btn btn-primary" id="btnConfirmMeta" data-action="confirm-meta" style="width:100%" disabled>
                             <span data-icon="check"></span>
@@ -260,45 +378,68 @@
                 <div class="quiz-info-bar" id="quizInfoBar">
                     <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
                         <span class="badge" id="quizBadgeTitle" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">QUIZ</span>
-                        <div class="score-display">
-                            <div class="score-mini correct">
+                        <span id="modeIndicator" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--success);">ESTUDO</span>
+                        <span id="timerDisplay" style="font-family:var(--font-mono);font-size:0.9rem;font-weight:700;color:var(--primary-500);display:none;"></span>
+                        <div class="score-display" aria-label="Pontuação atual">
+                            <div class="score-mini correct" 
+                                 aria-live="polite" 
+                                 aria-atomic="true"
+                                 aria-label="Acertos">
                                 <span id="correctCount">0</span> ACERTOS
                             </div>
-                            <div class="score-mini incorrect">
+                            <div class="score-mini incorrect" 
+                                 aria-live="polite" 
+                                 aria-atomic="true"
+                                 aria-label="Erros">
                                 <span id="incorrectCount">0</span> ERROS
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-ghost toggle-visibility-btn" data-action="toggle-visibility" title="Ocultar/Exibir painel" style="width: 28px; height: 28px; padding: 0;">
-                        <span data-icon="eye" data-size="xs"></span>
+                    <button class="btn btn-ghost toggle-visibility-btn"
+                            data-action="toggle-visibility"
+                            aria-label="Ocultar painel de informações"
+                            aria-pressed="false">
+
+                        <span data-icon="eye" data-size="xs" aria-hidden="true"></span>
                     </button>
                 </div>
 
                 <div class="progress-section">
                     <div id="questionGrid" class="question-grid"></div>
-                    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+                    <div class="progress-track" 
+                         role="progressbar" 
+                         aria-label="Progresso do simulado"
+                         aria-valuemin="0" 
+                         aria-valuemax="100" 
+                         aria-valuenow="0">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
                 </div>
 
                 <div id="questionContainer"></div>
 
                 <div class="navigation">
-                    <button class="btn btn-secondary" id="prevBtn" data-action="prev-question" title="Anterior">
-                        <span data-icon="arrowLeft"></span>
+                    <button class="btn btn-secondary" id="prevBtn" 
+                            data-action="prev-question" 
+                            aria-label="Questão anterior">
+                        <span data-icon="arrowLeft" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-outline hidden" id="skipBtn" data-action="next-question">
                         <span>Pular</span>
-                        <span data-icon="arrowRight" data-size="xs"></span>
+                        <span data-icon="arrowRight" data-size="xs" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-primary hidden" id="confirmBtn" data-action="confirm-answer">
-                        <span data-icon="check"></span>
+                        <span data-icon="check" aria-hidden="true"></span>
                         <span>Confirmar</span>
                     </button>
-                    <button class="btn btn-primary" id="nextBtn" data-action="next-question">
+                    <button class="btn btn-primary" id="nextBtn" 
+                            data-action="next-question"
+                            aria-label="Próxima questão">
                         <span>Próxima</span>
-                        <span data-icon="arrowRight"></span>
+                        <span data-icon="arrowRight" aria-hidden="true"></span>
                     </button>
                     <button class="btn btn-primary hidden" id="finishBtn" data-action="finish-quiz">
-                        <span data-icon="check" data-size="sm"></span>
+                        <span data-icon="check" data-size="sm" aria-hidden="true"></span>
                         <span>Finalizar</span>
                     </button>
                 </div>
@@ -312,12 +453,12 @@
                 <div id="finalReviewList" style="margin-bottom: 40px;"></div>
                 
                 <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" data-action="back-to-quiz" title="Voltar ao Quiz">
-                        <span data-icon="arrowLeft"></span>
+                    <button class="btn btn-secondary" data-action="back-to-quiz" aria-label="Voltar ao Quiz">
+                        <span data-icon="arrowLeft" aria-hidden="true"></span>
                         <span>Voltar ao Quiz</span>
                     </button>
-                    <button class="btn btn-primary" data-action="finalize-process" title="Finalizar e ver resultado">
-                        <span data-icon="check"></span>
+                    <button class="btn btn-primary" data-action="finalize-process" aria-label="Finalizar e ver resultado">
+                        <span data-icon="check" aria-hidden="true"></span>
                         <span>Finalizar e Ver Resultado</span>
                     </button>
                 </div>
@@ -331,12 +472,12 @@
                 </div>
                 <div id="reviewContainer" style="margin-top: 24px;"></div>
                 <div style="display: flex; justify-content: center; gap: 12px; margin-top: 40px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" data-action="reset-quiz" title="Refazer Simulado Atual">
-                        <span data-icon="play"></span>
+                    <button class="btn btn-secondary" data-action="reset-quiz" aria-label="Refazer Simulado Atual">
+                        <span data-icon="play" aria-hidden="true"></span>
                         <span>Tentar Novamente</span>
                     </button>
-                    <button class="btn btn-primary" data-action="go-home" title="Voltar ao Início">
-                        <span data-icon="logo" data-size="sm"></span>
+                    <button class="btn btn-primary" data-action="go-home" aria-label="Voltar ao Início">
+                        <span data-icon="logo" data-size="sm" aria-hidden="true"></span>
                         <span>Início</span>
                     </button>
                 </div>
@@ -348,7 +489,7 @@
     <div id="exportOptionsModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="download" data-size="sm" style="color:var(--primary-500)"></span>
+                <span data-icon="download" data-size="sm" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">EXPORTAR SIMULADO</span>
             </div>
             <div class="modal-body">
@@ -371,7 +512,7 @@
     <div id="builderActionModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="check" data-size="md" style="color:var(--success)"></span>
+                <span data-icon="check" data-size="md" style="color:var(--success)" aria-hidden="true"></span>
                 <span class="modal-title" style="color:var(--success)">SUCESSO</span>
             </div>
             <div class="modal-body">
@@ -389,7 +530,7 @@
     <div id="previewModal" class="modal-overlay hidden">
         <div class="modal-card" style="max-width: 800px; width: 90%;">
             <div class="modal-header">
-                <span data-icon="eye" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="eye" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">PREVIEW JSON</span>
             </div>
             <div class="modal-body">
@@ -406,7 +547,7 @@
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="info" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="info" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span id="modalTitle" class="modal-title">AVISO DO SISTEMA</span>
             </div>
             <div class="modal-body">
@@ -423,7 +564,7 @@
     <div id="limitModal" class="modal-overlay hidden">
         <div class="modal-card" style="border-top-color: var(--error);">
             <div class="modal-header">
-                <span data-icon="alert" data-size="md" style="color:var(--error)"></span>
+                <span data-icon="alert" data-size="md" style="color:var(--error)" aria-hidden="true"></span>
                 <span class="modal-title" style="color:var(--error)">LIMITE DE ARMAZENAMENTO</span>
             </div>
             <div class="modal-body">
@@ -447,7 +588,7 @@
     <div id="onboardingModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <span data-icon="logo" data-size="md" style="color:var(--primary-500)"></span>
+                <span data-icon="logo" data-size="md" style="color:var(--primary-500)" aria-hidden="true"></span>
                 <span class="modal-title">BEM-VINDO AO QUIZLAB</span>
             </div>
             <div class="modal-body">
@@ -478,6 +619,50 @@
         </div>
     </div>
 
+    <!-- Quiz Options Modal -->
+    <div class="modal-overlay hidden" id="quizOptionsModal" role="dialog" aria-modal="true" aria-labelledby="quizOptionsTitle">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="modal-title" id="quizOptionsTitle">CONFIGURAR SIMULADO</span>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:var(--space-lg);">
+                    <div style="font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:var(--space-sm);">MODO</div>
+                    <label style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-sm);cursor:pointer;">
+                        <input type="radio" name="quizMode" value="study" checked> 
+                        <div>
+                            <div style="font-weight:700;color:var(--success);">Estudo</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);">Feedback imediato após cada resposta</div>
+                        </div>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:var(--space-md);cursor:pointer;">
+                        <input type="radio" name="quizMode" value="exam">
+                        <div>
+                            <div style="font-weight:700;color:var(--error);">Exame</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);">Sem feedback. Resultado só no final</div>
+                        </div>
+                    </label>
+                </div>
+                <div style="margin-bottom:var(--space-lg);">
+                    <div style="font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:var(--space-sm);">EMBARALHAMENTO</div>
+                    <label style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm);cursor:pointer;">
+                        <input type="checkbox" id="optShuffleQuestions">
+                        <span style="font-size:0.85rem;">Embaralhar ordem das questões</span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;">
+                        <input type="checkbox" id="optShuffleOptions">
+                        <span style="font-size:0.85rem;">Embaralhar alternativas</span>
+                    </label>
+                </div>
+                <div id="quizTimerInfo" class="hidden" style="font-size:0.8rem;color:var(--primary-500);padding:var(--space-sm);border:1px solid var(--primary-500);border-radius:var(--radius-sm); margin-top: 16px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button data-action="close-modal" data-target="quizOptionsModal" class="btn btn-secondary">Cancelar</button>
+                <button data-action="confirm-quiz-options" class="btn btn-primary">INICIAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container"></div>
 
@@ -494,6 +679,8 @@
     
     <!-- Components -->
     <script src="js/components/icon-system.js"></script>
+    <script src="js/components/theme-manager.js"></script>
+    <script src="js/components/focus-trap.js"></script>
     <script src="js/components/modal-manager.js"></script>
     <script src="js/components/toast-system.js"></script>
     
@@ -501,10 +688,12 @@
     <script src="js/features/quiz-engine.js"></script>
     <script src="js/features/library-manager.js"></script>
     <script src="js/features/creator-manager.js"></script>
+    <script src="js/features/review-manager.js"></script>
     <script src="js/features/file-handler.js"></script>
     
     <!-- UI -->
     <script src="js/ui/screen-manager.js"></script>
+    <script src="js/ui/quiz-renderer.js"></script>
     <script src="js/ui/event-delegator.js"></script>
     
     <!-- Main -->
