@@ -1,5 +1,6 @@
 (function() {
     window.addEventListener('load', () => {
+        ThemeManager.init();
         ToastSystem.init();
         EventDelegator.init();
         IconSystem.inject();
@@ -131,6 +132,7 @@
             },
             'delete-quiz': (e, target) => LibraryManager.delete(target.dataset.id),
             'search-library': () => LibraryManager.render(),
+            'toggle-theme': () => ThemeManager.toggle(),
 
             'close-modal': (e, target) => ModalManager.close(target.dataset.target),
             'modal-confirm': () => ModalManager.close('customModal'),
@@ -151,6 +153,8 @@
         });
 
         window.addEventListener('quizlab:timer-expired', () => {
+            const el = document.getElementById('timerDisplay');
+            if (el) el.style.display = 'none';
             ToastSystem.show('Tempo esgotado! Finalizando simulado...', 'error');
             setTimeout(() => ReviewManager.renderFinalReview(), 1000);
         });
@@ -162,6 +166,7 @@
             const m = Math.floor(r / 60).toString().padStart(2, '0');
             const s = (r % 60).toString().padStart(2, '0');
             el.textContent = `${m}:${s}`;
+            el.style.display = 'inline';
             el.classList.toggle('timer-warning', r <= 60);
         });
 

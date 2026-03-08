@@ -44,6 +44,9 @@
                 </div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
+                    <span data-icon="sun" data-size="sm"></span>
+                </button>
                 <a href="docs.html" class="btn btn-ghost" title="Documentação" aria-label="Abrir documentação">
                     <span data-icon="book" data-size="sm"></span>
                     <span class="hide-mobile" style="font-size:0.8rem;margin-left:4px;">Docs</span>
@@ -221,7 +224,12 @@
                     <span class="logo-abbr"><span class="q">Q</span><span class="l">L</span></span>
                 </div>
             </div>
-            <div class="header-subtitle" id="headerSubtitle">App</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
+                    <span data-icon="sun" data-size="sm"></span>
+                </button>
+                <div class="header-subtitle" id="headerSubtitle">App</div>
+            </div>
         </header>
 
         <main class="content">
@@ -261,11 +269,18 @@
 
             <!-- Library Screen (Meus Simulados) -->
             <div id="libraryScreen" class="hidden fade-in">
-                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
-                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar">
+                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar" style="margin-top: -4px;">
                         <span data-icon="arrowLeft"></span>
                     </button>
-                    <div id="libraryCounter" class="header-subtitle" style="font-size: 0.9rem;">0/10 SALVOS</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width: 140px;">
+                        <span id="libraryCounter" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); letter-spacing:0.08em; white-space:nowrap;">
+                            CAPACIDADE &nbsp; <strong style="color:var(--text-main);">0/10</strong>
+                        </span>
+                        <div class="lib-capacity-track">
+                            <div class="lib-capacity-fill" id="libCapacityFill" style="width:0%"></div>
+                        </div>
+                    </div>
                 </div>
                 
                 <h2 class="neon-text" style="text-align: center; margin-bottom: 24px;">Biblioteca Local</h2>
@@ -283,9 +298,7 @@
                     </select>
                 </div>
                 
-                <div class="library-stats hidden" id="emptyLibraryMsg">
-                    Nenhum simulado salvo ainda.<br>Os simulados salvos ficam armazenados apenas neste navegador.
-                </div>
+                <div id="emptyLibraryMsg" class="hidden" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted);"></div>
 
                 <div id="libraryList" class="library-grid"></div>
             </div>
@@ -666,6 +679,7 @@
     
     <!-- Components -->
     <script src="js/components/icon-system.js"></script>
+    <script src="js/components/theme-manager.js"></script>
     <script src="js/components/focus-trap.js"></script>
     <script src="js/components/modal-manager.js"></script>
     <script src="js/components/toast-system.js"></script>
