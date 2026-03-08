@@ -587,6 +587,29 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     min-width: 0;
 }
 
+/* Feature-card usado em contexto de documentação (troubleshooting.html):
+   sem ícone lateral, conteúdo empilhado verticalmente */
+.docs-section .feature-card {
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.docs-section .feature-card h3 {
+    margin-bottom: var(--space-xs);
+}
+
+.docs-section .feature-card p,
+.docs-section .feature-card li {
+    margin-bottom: var(--space-xs);
+    font-size: var(--font-body);
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.docs-section .feature-card ol {
+    padding-left: var(--space-lg);
+}
+
 .docs-sidebar {
     position: sticky;
     top: calc(var(--header-height) + var(--space-md));
