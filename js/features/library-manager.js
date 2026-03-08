@@ -1,78 +1,62 @@
 (function(window) {
     const LibraryManager = {
         render() {
-            const list = document.getElementById('libraryList');
-            const counter = document.getElementById('libraryCounter');
-            const emptyMsg = document.getElementById('emptyLibraryMsg');
-            const searchTerm = document.getElementById('librarySearch')?.value.toLowerCase() || '';
-            const sortBy = document.getElementById('librarySort')?.value || 'recent';
+            const container = document.getElementById('libraryList');
+            if (!container) return;
 
-            if (!list) return;
-            let lib = StorageManager.getLibrary();
+            const query = document.getElementById('librarySearch')?.value.toLowerCase().trim() || '';
+            let library = StorageManager.getLibrary();
 
-            const limitReached = lib.length >= CONFIG.LIMITS.MAX_LIBRARY_SLOTS;
-            const pct = (lib.length / CONFIG.LIMITS.MAX_LIBRARY_SLOTS) * 100;
-
-            if (counter) {
-                counter.innerHTML = `CAPACIDADE &nbsp; <strong style="color:var(--text-main);">${lib.length}/${CONFIG.LIMITS.MAX_LIBRARY_SLOTS}</strong>`;
-                counter.style.color = limitReached ? 'var(--error)' : '';
-            }
-
-            const fill = document.getElementById('libCapacityFill');
-            if (fill) {
-                fill.style.width = pct + '%';
-                fill.style.background = pct >= 90 ? 'var(--error)' : pct >= 60 ? 'var(--primary-500)' : 'var(--success)';
-            }
-
-            if (searchTerm) {
-                lib = lib.filter(item => {
-                    const title = item.data.nomeSimulado.toLowerCase();
-                    const desc = (item.data.descricao || '').toLowerCase();
+            if (query) {
+                library = library.filter(item => {
+                    const name = item.data.nomeSimulado?.toLowerCase() || '';
+                    const desc = item.data.descricao?.toLowerCase() || '';
                     const tags = (item.data.tags || []).join(' ').toLowerCase();
-                    return title.includes(searchTerm) || desc.includes(searchTerm) || tags.includes(searchTerm);
+                    return name.includes(query) || desc.includes(query) || tags.includes(query);
                 });
             }
 
-            lib.sort((a, b) => {
-                if (sortBy === 'recent') return b.meta.addedAt - a.meta.addedAt;
-                if (sortBy === 'oldest') return a.meta.addedAt - b.meta.addedAt;
-                if (sortBy === 'az') return a.data.nomeSimulado.localeCompare(b.data.nomeSimulado);
-                if (sortBy === 'questions') return b.meta.questionsCount - a.meta.questionsCount;
-                return 0;
-            });
+            container.innerHTML = '';
 
-            list.innerHTML = '';
-            if (lib.length === 0) {
-                if (emptyMsg) {
-                    emptyMsg.innerHTML = searchTerm 
-                        ? '<p style="text-align:center; padding:var(--space-xl); color:var(--text-muted);">Nenhum simulado encontrado para esta busca.</p>'
-                        : `
-                        <span data-icon="book" data-size="lg" style="display:block; margin:0 auto var(--space-md); opacity:0.3;"></span>
-                        <p style="font-size:0.9rem;">Nenhum simulado salvo ainda.</p>
-                        <p style="font-size:0.75rem; margin-top:4px;">Os dados ficam armazenados apenas neste navegador.</p>
-                        `;
-                    emptyMsg.classList.remove('hidden');
-                    if (!searchTerm) IconSystem.inject(emptyMsg);
-                }
-            } else {
-                emptyMsg.classList.add('hidden');
-                lib.forEach(item => this._renderCard(list, item));
-                IconSystem.inject(list);
+            if (library.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted); grid-column: 1 / -1;"><p>${query ? 'Nenhum resultado encontrado.' : 'Nenhum simulado salvo ainda.'}</p></div>`;
+                return;
+            }
+
+            const activeSession = StorageManager.getSession();
+            library.forEach(item => this.renderCard(item, container, activeSession));
+            
+            // Inject icons since we are replacing the whole innerHTML
+            if (window.IconSystem) IconSystem.inject(container);
+            
+            // Update capacity bar if elements exist
+            this._updateCapacityUI(library.length);
+        },
+
+        _updateCapacityUI(count) {
+            const counter = document.getElementById('libraryCounter');
+            const fill = document.getElementById('libCapacityFill');
+            if (counter) {
+                counter.innerHTML = `CAPACIDADE &nbsp; <strong style="color:var(--text-main);">${count}/${CONFIG.LIMITS.MAX_LIBRARY_SLOTS}</strong>`;
+            }
+            if (fill) {
+                const pct = (count / CONFIG.LIMITS.MAX_LIBRARY_SLOTS) * 100;
+                fill.style.width = pct + '%';
+                fill.style.background = pct >= 90 ? 'var(--error)' : pct >= 60 ? 'var(--primary-500)' : 'var(--success)';
             }
         },
 
-        _renderCard(container, item) {
+        renderCard(item, container, activeSession) {
             const date = new Date(item.meta.addedAt).toLocaleDateString('pt-BR');
+            const timesPlayed = item.meta.timesPlayed || 0;
             const lastPlayed = item.meta.lastPlayed
                 ? new Date(item.meta.lastPlayed).toLocaleDateString('pt-BR')
                 : 'Nunca';
-            const timesPlayed = item.meta.timesPlayed || 0;
-            const avgScore = item.meta.averageScore || 0;
-            
-            const scoreColor = avgScore >= 70 ? 'var(--success)' : avgScore >= 50 ? 'var(--primary-500)' : avgScore > 0 ? 'var(--error)' : 'var(--text-muted)';
-            const scoreText = avgScore > 0 ? `${avgScore}%` : '—';
-            
-            const tagsHtml = (item.data.tags || []).map(t => `<span class="badge">${t}</span>`).join('');
+
+            const avg = item.meta.averageScore || 0;
+            const scoreColor = avg >= 70 ? 'var(--success)' : avg >= 50 ? 'var(--primary-500)' : avg > 0 ? 'var(--error)' : 'var(--text-muted)';
+            const scoreText = timesPlayed > 0 ? `${avg}%` : '—';
+
             const timerBadge = item.data.tempoLimiteMinutos
                 ? `<span class="badge" style="color:var(--primary-500);">${item.data.tempoLimiteMinutos}min</span>`
                 : '';
@@ -82,12 +66,23 @@
                 ? `<div class="lib-history">
                     <span class="lib-history-label">HISTÓRICO RECENTE</span>
                     <div class="lib-history-bars">
-                        ${history.slice(-6).map(h => {
+                        ${history.slice(0, 6).map(h => {
                             const color = h.score >= 70 ? 'var(--success)' : h.score >= 50 ? 'var(--primary-500)' : 'var(--error)';
                             return `<div class="lib-history-bar" style="--bar-h:${h.score}%;--bar-color:${color};" title="${h.score}%"></div>`;
                         }).join('')}
                     </div>
                    </div>`
+                : '';
+
+            const tagsHtml = (item.data.tags || [])
+                .map(t => `<span class="badge">${t}</span>`)
+                .join('');
+
+            const hasActiveSession = activeSession && activeSession.libraryId === item.id;
+            const resumeBtn = hasActiveSession
+                ? `<button class="btn btn-secondary resume-btn" data-action="resume-quiz" data-id="${item.id}" title="Continuar de onde parou">
+                       <span data-icon="history"></span> Retomar
+                   </button>`
                 : '';
 
             const div = document.createElement('div');
@@ -105,9 +100,10 @@
                     ${item.data.descricao ? `<p class="lib-desc">${item.data.descricao}</p>` : ''}
                     <div class="lib-played">Jogado: ${timesPlayed}x &nbsp;|&nbsp; Último: ${lastPlayed}</div>
                     ${historyHtml}
-                    ${tagsHtml ? `<div class="lib-tags">${tagsHtml}</div>` : ''}
+                    ${tagsHtml ? `<div class="lib-tags" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;">${tagsHtml}</div>` : ''}
                 </div>
                 <div class="lib-actions">
+                    ${resumeBtn}
                     <button class="btn btn-primary" data-action="load-quiz" data-id="${item.id}"><span data-icon="play"></span> Iniciar</button>
                     <button class="btn btn-outline" data-action="edit-quiz" data-id="${item.id}" title="Editar"><span data-icon="edit"></span></button>
                     <button class="btn btn-outline" data-action="download-quiz" data-id="${item.id}" title="Exportar"><span data-icon="download"></span></button>

@@ -40,19 +40,39 @@
             this.open('customModal');
         },
 
-        confirm(message, onConfirm, title = "CONFIRMAÇÃO") {
+        confirm(message, onConfirm, onCancelOrOptions = null) {
             const modal = document.getElementById('customModal');
             if (!modal) return;
 
-            document.getElementById('modalTitle').textContent = title;
+            let onCancel = null;
+            let options = {
+                title: "CONFIRMAÇÃO",
+                confirmText: "CONFIRMAR",
+                cancelText: "CANCELAR"
+            };
+
+            if (typeof onCancelOrOptions === 'function') {
+                onCancel = onCancelOrOptions;
+            } else if (typeof onCancelOrOptions === 'string') {
+                options.title = onCancelOrOptions;
+            } else if (onCancelOrOptions && typeof onCancelOrOptions === 'object') {
+                options = { ...options, ...onCancelOrOptions };
+                onCancel = options.onCancel || null;
+            }
+
+            document.getElementById('modalTitle').textContent = options.title;
             document.getElementById('modalMessage').textContent = message;
             
             const cancelBtn = document.getElementById('modalBtnCancel');
             cancelBtn.classList.remove('hidden');
-            cancelBtn.onclick = () => this.close('customModal');
+            cancelBtn.textContent = options.cancelText;
+            cancelBtn.onclick = () => {
+                if (onCancel) onCancel();
+                this.close('customModal');
+            };
 
             const confirmBtn = document.getElementById('modalBtnConfirm');
-            confirmBtn.textContent = 'CONFIRMAR';
+            confirmBtn.textContent = options.confirmText;
             confirmBtn.onclick = () => {
                 onConfirm();
                 this.close('customModal');

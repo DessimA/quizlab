@@ -1,57 +1,46 @@
 (function(window) {
     const ScreenManager = {
-        currentScreen: 'landingPage',
+        currentScreen: null,
 
         change(screenId) {
-            const screens = Object.values(CONFIG.ELEMENTS);
-            const appContainer = document.getElementById('appContainer');
+            // Handle landingPage vs appContainer transition
+            const landing = document.getElementById('landingPage');
+            const app = document.getElementById('appContainer');
 
-            if (screenId === CONFIG.ELEMENTS.LANDING_PAGE) {
-                appContainer.classList.add('hidden');
-                document.getElementById(CONFIG.ELEMENTS.LANDING_PAGE).style.display = 'block';
+            if (screenId === 'landingPage') {
+                if (landing) landing.classList.remove('hidden');
+                if (app) app.classList.add('hidden');
+                this.currentScreen = 'landingPage';
+                return;
             } else {
-                document.getElementById(CONFIG.ELEMENTS.LANDING_PAGE).style.display = 'none';
-                appContainer.classList.remove('hidden');
-                screens.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el && id !== CONFIG.ELEMENTS.LANDING_PAGE) {
-                        el.classList.toggle('hidden', id !== screenId);
-                    }
-                });
+                if (landing) landing.classList.add('hidden');
+                if (app) app.classList.remove('hidden');
             }
-            this.currentScreen = screenId;
-            this._updateSubtitle();
-            this._manageFocus(screenId);
-        },
 
-        _manageFocus(screenId) {
-            requestAnimationFrame(() => {
-                const screen = document.getElementById(screenId);
-                if (!screen) return;
-                const heading = screen.querySelector('h1, h2');
-                if (heading) {
-                    heading.setAttribute('tabindex', '-1');
-                    heading.focus();
-                }
+            document.querySelectorAll('.screen, [class$="Screen"], [id$="Screen"]').forEach(el => {
+                el.classList.add('hidden');
             });
+
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+
+            this.currentScreen = screenId;
+
+            const quizBadge = document.getElementById('quizBadgeTitle');
+            const quizName = QuizEngine.getState()?.quizData?.nomeSimulado || 'App';
+            if (quizBadge && this.currentScreen === 'quizScreen') {
+                quizBadge.textContent = quizName;
+                quizBadge.title = quizName;
+            }
+
+            if (screenId !== CONFIG.ELEMENTS.QUIZ_SCREEN) {
+                const bar = document.getElementById('examTimerBar');
+                if (bar) bar.classList.add('hidden');
+            }
         },
 
-        _updateSubtitle() {
-            const sub = document.getElementById('headerSubtitle');
+        updateQuizBadge(quizName) {
             const quizBadge = document.getElementById('quizBadgeTitle');
-            if (!sub) return;
-
-            const quizName = QuizEngine.getState().quizData?.nomeSimulado || 'Quiz';
-            const titles = {
-                uploadScreen: 'Importar',
-                libraryScreen: 'Biblioteca',
-                creatorScreen: 'Criador',
-                quizScreen: quizName,
-                reviewScreen: 'Revisão',
-                resultScreen: 'Resultado'
-            };
-
-            sub.textContent = titles[this.currentScreen] || 'App';
             if (quizBadge && this.currentScreen === 'quizScreen') {
                 quizBadge.textContent = quizName;
                 quizBadge.title = quizName;
@@ -77,12 +66,10 @@
 
             const timerInfo = document.getElementById('quizTimerInfo');
             if (timerInfo) {
-                if (data.tempoLimiteMinutos) {
-                    timerInfo.textContent = `Este simulado tem limite de ${data.tempoLimiteMinutos} min. O timer ativa apenas no Modo Exame.`;
-                    timerInfo.classList.remove('hidden');
-                } else {
-                    timerInfo.classList.add('hidden');
-                }
+                // Cálculo proporcional: 2 min por questão
+                const calcMinutes = data.questoes.length * 2;
+                timerInfo.textContent = `Modo Exame: Tempo total de ${calcMinutes} min (${data.questoes.length} questões). O timer ativa apenas no Modo Exame.`;
+                timerInfo.classList.remove('hidden');
             }
 
             ModalManager.open('quizOptionsModal');
@@ -94,7 +81,26 @@
             setTimeout(() => {
                 this.change(CONFIG.ELEMENTS.QUIZ_SCREEN);
                 if (window.QuizRenderer) QuizRenderer.renderQuestion();
+                this._syncExamTimerBar();
             }, 300);
+        },
+
+        _syncExamTimerBar() {
+            const state = QuizEngine.getState();
+            const bar = document.getElementById('examTimerBar');
+            if (!bar) return;
+
+            const isExam = state.mode === CONFIG.QUIZ_MODES.EXAM && state.timerSeconds > 0;
+            bar.classList.toggle('hidden', !isExam);
+
+            if (isExam) {
+                const r = state.timerRemaining;
+                const m = Math.floor(r / 60).toString().padStart(2, '0');
+                const s = (r % 60).toString().padStart(2, '0');
+                const valEl = bar.querySelector('.exam-timer-value');
+                if (valEl) valEl.textContent = `${m}:${s}`;
+                bar.classList.remove('timer-warning');
+            }
         }
     };
 

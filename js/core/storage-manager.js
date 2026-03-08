@@ -65,6 +65,10 @@
         },
 
         removeFromLibrary(id) {
+            const session = this.getSession();
+            if (session && session.libraryId === id) {
+                this.clearSession();
+            }
             const library = this.getLibrary().filter(item => item.id !== id);
             return this.saveLibrary(library);
         },

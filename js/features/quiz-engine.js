@@ -43,8 +43,10 @@
 
             this.stopTimer();
 
-            const timerMin = quizData.tempoLimiteMinutos;
-            if (timerMin && mode === CONFIG.QUIZ_MODES.EXAM) {
+            // Modo Exame: 2 minutos por questão (proporcional a 130min/65 questões)
+            const timerMin = mode === CONFIG.QUIZ_MODES.EXAM ? (processedData.questoes.length * 2) : 0;
+            
+            if (timerMin > 0) {
                 this._state.timerSeconds = timerMin * 60;
                 this._state.timerRemaining = timerMin * 60;
                 this.startTimer();
@@ -56,7 +58,7 @@
 
         reset() {
             if (!this._state.quizData) return;
-            const { quizData, libraryId, mode, timerSeconds } = this._state;
+            const { quizData, libraryId, mode } = this._state;
 
             this._state.currentQuestion = 0;
             this._state.userAnswers = new Array(quizData.questoes.length).fill(null);
@@ -68,8 +70,11 @@
             this._state.flagged = [];
 
             this.stopTimer();
-            if (timerSeconds > 0 && mode === CONFIG.QUIZ_MODES.EXAM) {
-                this._state.timerRemaining = timerSeconds;
+            
+            const timerMin = mode === CONFIG.QUIZ_MODES.EXAM ? (quizData.questoes.length * 2) : 0;
+            if (timerMin > 0) {
+                this._state.timerSeconds = timerMin * 60;
+                this._state.timerRemaining = timerMin * 60;
                 this.startTimer();
             }
 
@@ -247,6 +252,8 @@
         },
 
         _saveSession() {
+            if (this._state.mode !== CONFIG.QUIZ_MODES.STUDY) return;
+            
             StorageManager.saveSession({
                 quizData: this._state.quizData,
                 libraryId: this._state.libraryId,

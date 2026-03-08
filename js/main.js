@@ -18,20 +18,6 @@
             },
             'enter-app': () => {
                 ScreenManager.change('uploadScreen');
-
-                const session = StorageManager.getSession();
-                if (session && session.quizData) {
-                    const minutesAgo = Math.round((Date.now() - session.savedAt) / 60000);
-                    ModalManager.confirm(
-                        `Sessão anterior encontrada: "${session.quizData.nomeSimulado}" (${minutesAgo} min atrás). Retomar de onde parou?`,
-                        () => {
-                            QuizEngine.restoreSession(session);
-                            ScreenManager.change(CONFIG.ELEMENTS.QUIZ_SCREEN);
-                            QuizRenderer.renderQuestion();
-                        }
-                    );
-                    return;
-                }
                 if (StorageManager.isFirstVisit()) {
                     ModalManager.open('onboardingModal');
                     StorageManager.markFirstVisit();
@@ -101,7 +87,39 @@
 
             'load-quiz': (e, target) => {
                 const item = StorageManager.getLibrary().find(i => i.id === target.dataset.id);
-                if (item) ScreenManager.loadQuizOptions(item.data, item.id);
+                if (!item) return;
+
+                const session = StorageManager.getSession();
+                if (session && session.libraryId === item.id && session.mode === CONFIG.QUIZ_MODES.STUDY) {
+                    ModalManager.confirm(
+                        `Existe uma sessão de Estudo em andamento para "${item.data.nomeSimulado}". Como deseja prosseguir?`,
+                        () => {
+                            QuizEngine.restoreSession(session);
+                            ScreenManager.change(CONFIG.ELEMENTS.QUIZ_SCREEN);
+                            QuizRenderer.renderQuestion();
+                            ScreenManager._syncExamTimerBar();
+                        },
+                        {
+                            title: "RETOMAR PROGRESSO",
+                            confirmText: "RETOMAR",
+                            cancelText: "NOVA TENTATIVA",
+                            onCancel: () => {
+                                StorageManager.clearSession();
+                                ScreenManager.loadQuizOptions(item.data, item.id);
+                            }
+                        }
+                    );
+                } else {
+                    ScreenManager.loadQuizOptions(item.data, item.id);
+                }
+            },
+            'resume-quiz': (e, target) => {
+                const session = StorageManager.getSession();
+                if (!session || session.libraryId !== target.dataset.id) return;
+                QuizEngine.restoreSession(session);
+                ScreenManager.change(CONFIG.ELEMENTS.QUIZ_SCREEN);
+                QuizRenderer.renderQuestion();
+                ScreenManager._syncExamTimerBar();
             },
             'confirm-quiz-options': () => {
                 const { data, libraryId } = window.pendingQuizLoad || {};
@@ -153,21 +171,34 @@
         });
 
         window.addEventListener('quizlab:timer-expired', () => {
-            const el = document.getElementById('timerDisplay');
-            if (el) el.style.display = 'none';
+            const inlineTimer = document.getElementById('timerDisplay');
+            if (inlineTimer) inlineTimer.style.display = 'none';
+            const examBar = document.getElementById('examTimerBar');
+            if (examBar) examBar.classList.add('hidden');
             ToastSystem.show('Tempo esgotado! Finalizando simulado...', 'error');
             setTimeout(() => ReviewManager.renderFinalReview(), 1000);
         });
 
         window.addEventListener('quizlab:timer-tick', (e) => {
-            const el = document.getElementById('timerDisplay');
-            if (!el) return;
             const r = e.detail.remaining;
             const m = Math.floor(r / 60).toString().padStart(2, '0');
             const s = (r % 60).toString().padStart(2, '0');
-            el.textContent = `${m}:${s}`;
-            el.style.display = 'inline';
-            el.classList.toggle('timer-warning', r <= 60);
+            const timeStr = `${m}:${s}`;
+            const isWarning = r <= 60;
+
+            const inlineTimer = document.getElementById('timerDisplay');
+            if (inlineTimer) {
+                inlineTimer.textContent = timeStr;
+                inlineTimer.style.display = 'inline';
+                inlineTimer.classList.toggle('timer-warning', isWarning);
+            }
+
+            const examBar = document.getElementById('examTimerBar');
+            if (examBar) {
+                const valEl = examBar.querySelector('.exam-timer-value');
+                if (valEl) valEl.textContent = timeStr;
+                examBar.classList.toggle('timer-warning', isWarning);
+            }
         });
 
 
