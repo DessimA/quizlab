@@ -44,20 +44,24 @@
                     </h2>
                     
                     <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
-                        <h3 style="color:var(--error)">Erro: "Arquivo não é JSON válido"</h3>
-                        <p><strong>Causa Provável:</strong> O arquivo contém erros de sintaxe ou a extensão não é .json.</p>
-                        <p><strong>Solução:</strong></p>
-                        <ol>
-                            <li>Abra o arquivo no Bloco de Notas ou VS Code.</li>
-                            <li>Verifique se começa com <code>{</code> e termina com <code>}</code>.</li>
-                            <li>Cole o conteúdo no site <a href="https://jsonlint.com" target="_blank" style="color:var(--primary-500)">JSONLint</a> para validar.</li>
-                        </ol>
+                        <div>
+                            <h3 style="color:var(--error)">Erro: "Arquivo não é JSON válido"</h3>
+                            <p><strong>Causa Provável:</strong> O arquivo contém erros de sintaxe ou a extensão não é .json.</p>
+                            <p><strong>Solução:</strong></p>
+                            <ol>
+                                <li>Abra o arquivo no Bloco de Notas ou VS Code.</li>
+                                <li>Verifique se começa com <code>{</code> e termina com <code>}</code>.</li>
+                                <li>Cole o conteúdo no site <a href="https://jsonlint.com" target="_blank" style="color:var(--primary-500)">JSONLint</a> para validar.</li>
+                            </ol>
+                        </div>
                     </div>
 
                     <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
-                        <h3 style="color:var(--error)">Erro: "Campo Obrigatório Ausente"</h3>
-                        <p><strong>Causa Provável:</strong> O JSON não possui o campo <code>nomeSimulado</code> ou <code>questoes</code>.</p>
-                        <p><strong>Solução:</strong> Baixe o <a href="exemplo_basico.json" style="color:var(--primary-500)">Arquivo de Exemplo</a> e compare a estrutura.</p>
+                        <div>
+                            <h3 style="color:var(--error)">Erro: "Campo Obrigatório Ausente"</h3>
+                            <p><strong>Causa Provável:</strong> O JSON não possui o campo <code>nomeSimulado</code> ou <code>questoes</code>.</p>
+                            <p><strong>Solução:</strong> Baixe o <a href="exemplo_basico.json" style="color:var(--primary-500)">Arquivo de Exemplo</a> e compare a estrutura.</p>
+                        </div>
                     </div>
                 </section>
 
@@ -68,15 +72,19 @@
                     </h2>
                     
                     <div class="feature-card" style="margin-bottom:16px">
-                        <h3>Botão "Confirmar" não habilita</h3>
-                        <p><strong>Causa:</strong> Em questões de múltipla escolha, você selecionou mais ou menos opções do que o exigido.</p>
-                        <p><strong>Solução:</strong> Leia atentamente o aviso "(SELECIONE EXATAMENTE X)". Se pedir 2, marque apenas 2.</p>
+                        <div>
+                            <h3>Botão "Confirmar" não habilita</h3>
+                            <p><strong>Causa:</strong> Em questões de múltipla escolha, você selecionou mais ou menos opções do que o exigido.</p>
+                            <p><strong>Solução:</strong> Leia atentamente o aviso "(SELECIONE EXATAMENTE X)". Se pedir 2, marque apenas 2.</p>
+                        </div>
                     </div>
 
                     <div class="feature-card" style="margin-bottom:16px">
-                        <h3>Travou ou Tela Branca</h3>
-                        <p><strong>Causa:</strong> Erro raro de memória ou script.</p>
-                        <p><strong>Solução:</strong> Recarregue a página (F5). Infelizmente o progresso daquele simulado será perdido, mas o sistema voltará ao normal.</p>
+                        <div>
+                            <h3>Travou ou Tela Branca</h3>
+                            <p><strong>Causa:</strong> Erro raro de memória ou script.</p>
+                            <p><strong>Solução:</strong> Recarregue a página (F5). Infelizmente o progresso daquele simulado será perdido, mas o sistema voltará ao normal.</p>
+                        </div>
                     </div>
                 </section>
 
@@ -87,14 +95,18 @@
                     </h2>
                     
                     <div class="feature-card" style="margin-bottom:16px">
-                        <h3>Simulados sumiram</h3>
-                        <p><strong>Causa:</strong> Limpeza de cache do navegador ou uso de aba anônima.</p>
-                        <p><strong>Prevenção:</strong> Sempre exporte seus simulados importantes para o computador (Botão Download na biblioteca).</p>
+                        <div>
+                            <h3>Simulados sumiram</h3>
+                            <p><strong>Causa:</strong> Limpeza de cache do navegador ou uso de aba anônima.</p>
+                            <p><strong>Prevenção:</strong> Sempre exporte seus simulados importantes para o computador (Botão Download na biblioteca).</p>
+                        </div>
                     </div>
                     
                     <div class="feature-card" style="margin-bottom:16px">
-                        <h3>Não salva mais nada (Limite Atingido)</h3>
-                        <p><strong>Solução:</strong> O limite é de 10 simulados. Exclua os antigos para liberar espaço. O sistema avisará quando chegar no limite.</p>
+                        <div>
+                            <h3>Não salva mais nada (Limite Atingido)</h3>
+                            <p><strong>Solução:</strong> O limite é de 10 simulados. Exclua os antigos para liberar espaço. O sistema avisará quando chegar no limite.</p>
+                        </div>
                     </div>
                 </section>
 
