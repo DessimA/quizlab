@@ -1,4 +1,4 @@
-name: Deploy — GitHub Pages
+name: Production — CI
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  deploy:
-    name: Publicar no GitHub Pages
+  test:
+    name: Executar Testes em Produção
     runs-on: ubuntu-latest
     needs: []
 
@@ -20,5 +20,5 @@ jobs:
         with:
           node-version: 22
 
-      - name: Rodar testes antes do deploy
+      - name: Rodar testes de produção
         run: npm test
