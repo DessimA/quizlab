@@ -105,13 +105,12 @@
             btn.dataset.action = 'jump-to-question';
             btn.dataset.index = i;
 
-            const text = q.enunciado.length > 120 ? q.enunciado.substring(0, 120) + '...' : q.enunciado;
             btn.innerHTML = `
                 <div class="review-card-header">
                     <span style="font-family:var(--font-mono);font-size:0.75rem;">Q.${String(i + 1).padStart(2, '0')}</span>
                     <span class="badge" style="background:rgba(255,215,0,0.1);color:#ffd700;border-color:#ffd700;">PENDENTE</span>
                 </div>
-                <div class="review-card-body">${text}</div>`;
+                <div class="review-card-body">${Utils.truncate(q.enunciado)}</div>`;
             return btn;
         },
 
@@ -120,7 +119,6 @@
             div.className = 'review-card';
             const isFlagged = QuizEngine.isFlagged(i);
             const flagIcon = isFlagged ? IconSystem.render('flag', 'xs', 'color:var(--error);vertical-align:middle;margin-left:4px;') : '';
-            const text = q.enunciado.length > 120 ? q.enunciado.substring(0, 120) + '...' : q.enunciado;
             div.innerHTML = `
                 <div class="review-card-header">
                     <span style="font-family:var(--font-mono);font-size:0.75rem;display:flex;align-items:center;">
@@ -128,7 +126,7 @@
                     </span>
                     <span class="badge ${statusInfo.cls}">${statusInfo.text}</span>
                 </div>
-                <div class="review-card-body">${text}</div>`;
+                <div class="review-card-body">${Utils.truncate(q.enunciado)}</div>`;
             return div;
         }
     };

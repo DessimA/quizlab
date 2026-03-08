@@ -1,9 +1,11 @@
-const CACHE_NAME = 'quizlab-v1';
+self.importScripts('js/core/version.js');
+const CACHE_NAME = `quizlab-v${self.APP_VERSION || '1'}`;
 
 const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/styles.css',
+    '/js/core/version.js',
     '/js/core/config.js',
     '/js/core/storage-manager.js',
     '/js/core/validator.js',
