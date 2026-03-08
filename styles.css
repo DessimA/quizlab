@@ -108,6 +108,7 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     max-width: 900px;
     margin: 0 auto;
     padding-bottom: var(--space-2xl);
+    min-width: 0;
 }
 
 /* Header */
@@ -579,6 +580,11 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-xl);
+    min-width: 0;
+}
+
+.docs-layout > * {
+    min-width: 0;
 }
 
 .docs-sidebar {
@@ -780,6 +786,38 @@ pre {
     /* Docs: sidebar escondida em mobile */
     .docs-sidebar {
         display: none;
+    }
+
+    /* ── DOCS: corrige overflow mobile em docs.html e troubleshooting.html ── */
+
+    .docs-content {
+        padding: var(--space-md) !important; /* substitui o padding: 24px inline */
+    }
+
+    pre {
+        max-width: 100%;
+        min-width: 0;
+        word-break: break-all;   /* quebra strings longas dentro do bloco de código */
+    }
+
+    code {
+        word-break: break-word;
+    }
+
+    .docs-section h2 {
+        flex-wrap: wrap;         /* impede ícone + texto de estourar em telas < 360px */
+        word-break: break-word;
+    }
+
+    .feature-card {
+        overflow-x: hidden;      /* cartões de erro em troubleshooting não extrapolam */
+        min-width: 0;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;        /* tabela de specs em docs.html rola horizontalmente */
+        white-space: nowrap;     /* mantém colunas legíveis em vez de quebrar texto */
     }
 }
 
