@@ -1,6 +1,6 @@
 # QuizLab
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.3.0-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/status-production-success?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20CSS3%20%7C%20HTML5-yellow?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-blueviolet?style=flat-square)
@@ -8,7 +8,7 @@
 
 > **Autor:** José Anderson ([@DessimA](https://github.com/DessimA))  
 > **LinkedIn:** [/in/dessim](https://www.linkedin.com/in/dessim/)  
-> **Website:** [meus-links-olive.vercel.app](https://meus-links-olive.vercel.app/)
+> **Website:** [jasc-dessima-dev.vercel.app](https://jasc-dessima-dev.vercel.app/)
 
 ---
 
@@ -59,7 +59,7 @@ graph TD
 
     Main -- "init / reset / confirm" --> Engine[QuizEngine]
     Main -- "wizard / export" --> Creator[CreatorManager]
-    Main -- "CRUD / search" --> Lib[LibraryManager]
+    Main -- "CRUD / search / bulk" --> Lib[LibraryManager]
     Main -- "change screen" --> Screen[ScreenManager]
 
     Engine -- "getState()" --> Screen
@@ -67,10 +67,10 @@ graph TD
     Engine -- "saveStatsToLibrary()" --> Storage[StorageManager]
 
     Creator -- "validateQuiz()" --> Validator[Validator]
-    Lib -- "get / set" --> Storage
+    Lib -- "get / set / canStore()" --> Storage
 
     Main -- "show()" --> Toast[ToastSystem]
-    Main -- "confirm() / alert()" --> Modal[ModalManager]
+    Main -- "confirm() / alert() / custom()" --> Modal[ModalManager]
 
     Storage <--> LS[(LocalStorage)]
 ```
@@ -113,11 +113,11 @@ quizlab/
 │   ├── features/
 │   │   ├── quiz-engine.js         # Estado do quiz, lógica de resposta e timer
 │   │   ├── creator-manager.js     # Wizard de criação e drag & drop
-│   │   ├── library-manager.js     # Renderização e busca da biblioteca
+│   │   ├── library-manager.js     # Renderização, busca, seleção e exclusão em massa
 │   │   ├── review-manager.js      # Tela de revisão e resultado final
-│   │   └── file-handler.js        # Leitura, parse e deduplicação de JSON importado
+│   │   └── file-handler.js        # Leitura, parse e importação de um ou múltiplos JSONs
 │   └── ui/
-│       ├── screen-manager.js      # Troca de telas e sincronização do timer bar
+│       ├── screen-manager.js      # Troca de telas, timer bar e retomada de sessão
 │       ├── quiz-renderer.js       # Renderização das questões no DOM
 │       └── event-delegator.js     # Listener único e roteamento por data-action
 │
@@ -128,7 +128,8 @@ quizlab/
 │   ├── unit/
 │   │   ├── quiz-engine.test.js
 │   │   ├── validator.test.js
-│   │   └── storage-manager.test.js
+│   │   ├── storage-manager.test.js
+│   │   └── file-handler.test.js
 │   └── integration/
 │       └── quiz-flow.test.js
 │
@@ -148,19 +149,39 @@ Define a constante `APP_VERSION` como fonte única de verdade da versão da apli
 ### `config.js`
 Centraliza todas as constantes, enums e funções utilitárias puras da aplicação.
 ```javascript
-CONFIG.STORAGE        // chaves do localStorage
-CONFIG.LIMITS         // slots, tamanhos, histórico
-CONFIG.TIMINGS        // autosave (30s), toast (4s), delay (500ms), timer (120s/questão)
-CONFIG.QUESTION_TYPES // 'unica' | 'multipla'
-CONFIG.QUIZ_MODES     // 'study' | 'exam'
-CONFIG.ELEMENTS       // IDs das telas no DOM
+CONFIG.STORAGE               // chaves do localStorage
+CONFIG.LIMITS                // quotas de armazenamento, histórico
+CONFIG.TIMINGS               // autosave (30s), toast (4s), delay (500ms), timer (120s/questão)
+CONFIG.QUESTION_TYPES        // 'unica' | 'multipla'
+CONFIG.QUIZ_MODES            // 'study' | 'exam'
+CONFIG.ELEMENTS              // IDs das telas no DOM
 
-Utils.formatTime(seconds)   // formata MM:SS
-Utils.truncate(text)        // corta com reticências
+Utils.formatTime(seconds)    // formata MM:SS
+Utils.truncate(text)         // corta com reticências
+Utils.formatBytes(bytes)     // formata bytes em KB / MB legível
 ```
+
+**Limites de armazenamento relevantes:**
+
+| Constante | Valor | Descrição |
+|:---|:---|:---|
+| `STORAGE_SAFE_QUOTA_BYTES` | 4 MB | Quota fixa medida no `localStorage` |
+| `STORAGE_WARN_THRESHOLD` | 0.70 | Barra amarela a partir de 70% de uso |
+| `STORAGE_BLOCK_THRESHOLD` | 0.85 | Bloqueio de novas importações a partir de 85% |
+| `MAX_HISTORY_ENTRIES` | 10 | Partidas mantidas no histórico por simulado |
 
 ### `storage-manager.js`
 *Facade* para o `localStorage`. Todas as operações de leitura e escrita passam por aqui, centralizando a serialização JSON e o tratamento de erros. Também é o único ponto responsável por garantir consistência entre os dados da biblioteca e da sessão ativa (ex.: ao excluir um quiz, a sessão órfã é limpa antes).
+
+Métodos relevantes além do CRUD básico:
+
+- `getById(id)` atalho para `getLibrary().find()`, evita repetição nos consumidores.
+- `replaceInLibrary(id, data)` substitui conteúdo e atualiza `questionsCount` em uma única escrita.
+- `updateLibraryMeta(id, updates)` merge parcial dos metadados sem tocar nas questões.
+- `removeManyFromLibrary(ids)` exclui um array de IDs em uma única escrita, limpando sessão órfã se necessário.
+- `updateQuizStats(id, stats)` registra resultado, acumula histórico (limitado a `MAX_HISTORY_ENTRIES`) e recalcula média.
+- `getStorageStats()` **síncrono**. Mede o uso real do `localStorage` via `Blob.size` por chave. Retorna `{ usage, quota, percent }`.
+- `canStore(data)` **síncrono**. Projeta o uso pós-adição e bloqueia se `>= STORAGE_BLOCK_THRESHOLD`. Retorna `{ allowed, reason?, stats }`.
 
 ### `validator.js`
 Valida estruturas de dados em dois contextos:
@@ -171,61 +192,59 @@ Valida estruturas de dados em dois contextos:
 ### `quiz-engine.js`
 O "cérebro" da aplicação. Não toca no DOM. Mantém e expõe o estado completo do quiz em andamento.
 
-**Estado (`_state`):**
-```javascript
-{
-    quizData: Object,           // JSON carregado (com questões possivelmente embaralhadas)
-    libraryId: String|null,     // ID na biblioteca, se salvo
-    mode: 'study' | 'exam',
-    currentQuestion: Number,    // índice atual (base 0)
-    userAnswers: Array,         // String | String[] | null por questão
-    questionAnswered: Array,    // Boolean[] true após confirmar
-    visitedQuestions: Array,    // Boolean[] true ao navegar para a questão
-    correctCount: Number,
-    incorrectCount: Number,
-    flagged: Number[],          // índices das questões marcadas
-    timerSeconds: Number,       // tempo total do exame em segundos
-    timerRemaining: Number      // tempo restante
-}
-```
+Responsabilidades principais: inicializar e restaurar sessão, selecionar alternativas (única/múltipla), confirmar respostas, navegar entre questões, marcar questões com flag, controlar o timer via `setInterval` e emitir eventos customizados (`quizlab:timer-tick`, `quizlab:timer-expired`).
 
-**Status por questão** (`getQuestionStatus(index)`):
-
-| Status | Condição |
-|:---|:---|
-| `pending` | nunca visitada |
-| `skipped` | visitada, não respondida |
-| `correct` | respondida corretamente |
-| `incorrect` | respondida incorretamente |
-
-**Timer (Modo Exame):** calculado como `questões × 120 segundos`. Dispara o evento `quizlab:timer-tick` a cada segundo e `quizlab:timer-expired` ao zerar, encerrando o quiz automaticamente.
-
-**Sessão:** o estado completo é serializado no `localStorage` após cada ação do usuário, mas **somente no Modo Estudo**. No Modo Exame não há persistência de sessão.
+O timer não manipula o DOM diretamente a responsabilidade de atualizar a interface pertence à camada de UI via eventos, mantendo o *Single Responsibility Principle* (SRP).
 
 ### `creator-manager.js`
-Gerencia o Wizard de criação em dois estágios:
-
-1. **Meta** título (obrigatório), descrição, tags e tempo limite opcional.
-2. **Questões** adição, remoção, reordenação via *drag & drop* nativo e validação em tempo real de cada card.
-
-Suporta edição de simulados existentes da biblioteca (`loadForEdit`). Ao exportar, oferece opção de salvar na biblioteca ou apenas baixar o arquivo JSON. Salva rascunho automaticamente a cada 30 segundos via `autosave`.
+Gerencia o wizard de criação e edição de simulados. Responsável por construir dinamicamente os cards de questão no DOM, reordenar por *drag & drop*, validar cada card em tempo real, serializar o objeto final via `buildQuizObject()` e acionar preview e exportação.
 
 ### `library-manager.js`
-Renderiza a grade de simulados salvos com suporte a busca textual (nome, descrição, tags) e ordenação (recente, mais antigo, A-Z, quantidade de questões). Exibe métricas por card: média de acertos, número de vezes jogado, último acesso e histórico visual de desempenho (barras das últimas 6 partidas).
+Renderiza e gerencia a tela de biblioteca. Além do CRUD e busca, suporta:
 
-Se houver uma sessão de estudo salva para um simulado, o card exibe o botão **Retomar** ao lado do botão **Iniciar**.
+- **Modo seleção em massa** ativado via `toggleSelectionMode()`. Em modo ativo, os cards exibem checkboxes e a toolbar `#libBulkToolbar` é revelada.
+- **Exclusão em massa** `bulkDelete()` chama `StorageManager.removeManyFromLibrary(ids)` em uma única operação.
+- **Indicador de armazenamento** `_updateCapacityUI()` consulta `getStorageStats()` e atualiza o indicador circular SVG (`#storageIndicator`) com cores progressivas: neutro → amarelo (≥ 70%) → vermelho (≥ 85%).
+
+### `review-manager.js`
+Gerencia a tela de revisão pré-finalização e a tela de resultado. Na tela de resultado, renderiza o gabarito completo com status por questão (acerto, erro, pulou, não viu), seção de questões marcadas com flag e histórico de tentativas anteriores (exibido apenas quando há pelo menos 2 registros no histórico).
 
 ### `file-handler.js`
-Lê arquivos `.json` via `FileReader`, faz o parse e valida com `Validator.validateQuiz`. Se válido, verifica duplicatas por nome e hash de conteúdo antes de salvar na biblioteca. Trata três cenários: novo simulado, simulado com mesmo nome e mesmo conteúdo (reaproveita o ID existente) e simulado com mesmo nome mas conteúdo diferente (oferece substituição).
+Responsável por toda a pipeline de importação de arquivos JSON:
+
+- `handleMultiple(files)` ponto de entrada público. Aceita `FileList` ou `Array<File>`, filtra extensões `.json`, lê todos em paralelo via `Promise.all` e direciona para o fluxo correto.
+- `_handleSingle(result)` fluxo de arquivo único. Chama `_askToSave()` com tratamento interativo de conflito (mesmo nome, conteúdo diferente).
+- `_handleBatch(results)` fluxo de múltiplos arquivos. Classifica cada resultado em `saved`, `skipped` (idêntico), `conflicts` (mesmo nome, conteúdo diferente) ou `failed`. Conflitos no batch não são resolvidos automaticamente o usuário deve importar o arquivo individualmente.
+- `_showBatchReport(report)` exibe resumo via `ModalManager.custom()`. Se ao menos um arquivo foi salvo, o botão principal navega para a biblioteca.
 
 ### `screen-manager.js`
-Controla a visibilidade das telas via classes CSS. Expõe métodos de alto nível como `loadQuiz(data, id, options)` e `resumeSession(session)` que encapsulam a sequência de inicializar o engine, trocar de tela e sincronizar o timer bar do modo exame.
+Controla a troca de telas ocultando e revelando elementos no DOM. Além da troca básica:
 
-### `event-delegator.js`
-Registra três listeners no `document` (`click`, `input`, `change`) e um listener para *drag & drop* do criador. Ao capturar um evento, sobe a árvore DOM buscando o atributo `data-action`, `data-oninput` ou `data-onchange` e executa o handler correspondente registrado via `register()` ou `registerMultiple()`.
+- `loadQuiz(data, libraryId, options)` inicializa o engine e navega para `quizScreen`.
+- `resumeSession(session)` restaura sessão salva e navega diretamente para `quizScreen`.
+- `_syncExamTimerBar()` exibe ou oculta a barra de timer dedicada do Modo Exame (`#examTimerBar`), sincronizando com o estado do engine.
+- `showLoading(text)` / `hideLoading()` controla o overlay de carregamento global.
 
 ### `quiz-renderer.js`
 Constrói o HTML da questão atual a partir do estado do `QuizEngine` e injeta no DOM. Renderiza alternativas com estado visual correto (selecionada, correta, incorreta, travada), barra de progresso, grid de navegação, badges de status e o botão de finalizar (somente na última questão respondida).
+
+### `event-delegator.js`
+Registra um único listener por tipo de evento no `document`. Ao capturar um evento, sobe a árvore DOM buscando o atributo `data-action`, `data-oninput` ou `data-onchange` e executa o handler correspondente registrado via `register()` ou `registerMultiple()`.
+
+### `icon-system.js`
+Injeção de ícones SVG inline a partir de um dicionário interno. Usa `document.fonts.load()` para aguardar o carregamento da fonte de ícones antes de renderizar, evitando a *race condition* que causava ícones em branco em conexões lentas.
+
+### `toast-system.js`
+Notificações flutuantes com auto-dismiss (4s), tipos `info`, `success` e `error`.
+
+### `modal-manager.js`
+Gerencia sobreposições de confirmação (`confirm`), alerta (`alert`) e conteúdo dinâmico (`custom`). O método `custom({ title, body, confirmText, cancelText, onConfirm })` reutiliza o `#customModal` existente no HTML, configurando dinamicamente o conteúdo e o callback do botão de confirmação. Suporta múltiplos modais identificados por ID.
+
+### `focus-trap.js`
+Ao abrir um modal, prende o foco dentro dele para compatibilidade com navegação por teclado.
+
+### `theme-manager.js`
+Alterna `data-theme` no `<html>`, persiste no `localStorage` e atualiza o ícone e `aria-label` do botão de toggle dinamicamente.
 
 ---
 
@@ -236,7 +255,9 @@ flowchart TD
 
     Upload[Upload Screen] -->|Importar JSON| Validate{Validar JSON}
     Validate -->|Inválido| Upload
-    Validate -->|Válido| Options
+    Validate -->|Único válido| Options
+    Validate -->|Múltiplos válidos| Batch[Batch Report Modal]
+    Batch --> Library
 
     Upload -->|Acessar Biblioteca| Library[Library Screen]
     Upload -->|Criar Simulado| Creator[Creator Screen]
@@ -244,6 +265,7 @@ flowchart TD
     Library -->|Iniciar| Options[Quiz Options Modal]
     Library -->|Retomar sessão salva| Quiz
     Library -->|Editar| Creator
+    Library -->|Excluir em massa| Library
 
     Creator -->|Exportar / Salvar| Library
 
@@ -266,8 +288,8 @@ flowchart TD
 | `uploadScreen` | Hub principal: importar, biblioteca, criar |
 | `quizScreen` | Resolução das questões |
 | `reviewScreen` | Revisão de questões pendentes antes de finalizar |
-| `resultScreen` | Resultado final com estatísticas |
-| `libraryScreen` | Grade de simulados salvos |
+| `resultScreen` | Resultado final com estatísticas e histórico |
+| `libraryScreen` | Grade de simulados salvos com seleção em massa |
 | `creatorScreen` | Wizard de criação e edição |
 
 ---
@@ -275,115 +297,101 @@ flowchart TD
 ## Regras de Negócio
 
 ### Importação de JSON
+
 - Somente arquivos `.json` são aceitos.
 - O arquivo passa pela validação completa de schema antes de qualquer outra ação.
-- Se o simulado já existe na biblioteca com o mesmo nome e mesmo conteúdo (verificado via hash dos IDs das questões), o arquivo importado reutiliza o ID existente sem duplicar.
-- Se o nome coincide mas o conteúdo difere, o usuário é consultado para substituir ou não.
-- Se a biblioteca estiver cheia (10 slots), a importação é bloqueada com mensagem de erro.
+- Se o simulado já existe na biblioteca com o mesmo nome e mesmo conteúdo (verificado via hash dos IDs das questões), o arquivo importado é ignorado silenciosamente.
+- Se o nome coincide mas o conteúdo difere, o usuário é consultado para substituir ou não (no fluxo de arquivo único). Em importação em massa, conflitos são reportados e devem ser resolvidos individualmente.
+- A importação é bloqueada quando o uso do `localStorage` atinge 85% da quota segura de 4 MB. O usuário recebe feedback visual pelo indicador circular antes de atingir o limite.
 
 ### Biblioteca
-- Capacidade máxima de **10 simulados**.
+
+- Capacidade determinada dinamicamente pela quota do `localStorage` (quota segura: **4 MB**).
+- Indicador circular SVG no cabeçalho da tela exibe o percentual de uso em tempo real.
+- Modo seleção em massa permite selecionar múltiplos cards e excluí-los em uma única operação.
 - Cada item armazena metadados de desempenho: média de acertos, número de partidas, data do último acesso e histórico das últimas **10 partidas**.
 - A média de acertos é recalculada a partir do histórico completo a cada partida finalizada.
-- Ao excluir um simulado, a sessão ativa associada a ele é removida automaticamente do `localStorage` antes da exclusão do item.
+- Ao excluir um simulado (individual ou em massa), a sessão ativa associada é removida automaticamente do `localStorage` antes da exclusão.
 
 ### Modo de Jogo
+
 Ao iniciar um simulado, o usuário escolhe:
 
 - **Modo Estudo** feedback visual imediato após confirmar cada resposta (alternativa correta/incorreta destacada). O progresso é salvo automaticamente no `localStorage` após cada ação.
-- **Modo Exame** sem feedback durante o quiz. O resultado só é exibido ao final. O timer é obrigatório e não pode ser desabilitado. O progresso **não é salvo** no modo exame.
+- **Modo Exame** sem feedback durante a resolução. Timer decrescente exibido em barra dedicada (`#examTimerBar`) com animação de pulso nos últimos 60 segundos. Resultado exibido somente ao finalizar ou quando o tempo esgotar.
 
-O usuário também pode optar por embaralhar a ordem das questões e/ou a ordem das alternativas de cada questão de forma independente.
+### Embaralhamento
 
-### Timer (Modo Exame)
-- Tempo calculado: `número de questões × 120 segundos`.
-- Uma barra de timer dedicada (`#examTimerBar`) exibe o tempo restante, posicionada fora do painel colapsável para nunca ser ocultada.
-- Quando restam **60 segundos ou menos**, o timer entra em estado de alerta visual com animação de pulso e cor de erro.
-- Ao zerar, o evento `quizlab:timer-expired` é disparado, o quiz é encerrado automaticamente e o resultado é exibido.
+Independente do modo, o usuário pode optar por embaralhar a ordem das questões, a ordem das alternativas, ou ambas. O embaralhamento é aplicado na inicialização via algoritmo Fisher-Yates.
 
-### Seleção e Confirmação de Respostas
-- **Questão de única escolha (`unica`):** somente uma alternativa pode estar selecionada por vez. Selecionar outra substitui a anterior.
-- **Questão de múltipla escolha (`multipla`):** o usuário pode selecionar até o número exato de respostas corretas definido no JSON. Ao atingir o limite, novas seleções são ignoradas. Selecionar uma alternativa já marcada a desmarca (toggle).
-- O botão **Confirmar** fica desabilitado até que ao menos uma alternativa esteja selecionada.
-- Após confirmar, a questão fica **travada**: nenhuma alternativa pode ser alterada.
+### Timer
 
-### Marcação de Questões (Flag)
-- O usuário pode marcar qualquer questão com uma flag durante o quiz.
-- A flag funciona como toggle: marcar duas vezes desmarca.
-- Questões marcadas aparecem com indicação visual na grade de navegação.
-- As flags são incluídas nas estatísticas finais e na sessão salva.
+O timer é calculado automaticamente: `questões × 120 segundos`. O `QuizEngine` gerencia o intervalo e emite eventos customizados (`quizlab:timer-tick`, `quizlab:timer-expired`) sem tocar no DOM. A camada de UI consome esses eventos para atualizar `#timerDisplay` e `#examTimerBar`.
 
-### Finalização e Revisão
-- O botão **Finalizar** só é renderizado no DOM quando o usuário está na **última questão** e ela foi **respondida e confirmada**.
-- Ao clicar em Finalizar, o sistema exibe a **Tela de Revisão**, listando todas as questões não confirmadas com badge "PENDENTE". O usuário pode navegar de volta a qualquer questão pendente antes de concluir definitivamente.
-- Ao confirmar a finalização, as estatísticas são salvas na biblioteca (se o simulado estiver salvo) e a sessão é limpa.
+### Retomada de Sessão
 
-### Criador de Simulados
-- O título do simulado é **obrigatório** para avançar do estágio Meta para o estágio Questões.
-- O enunciado de cada questão deve ter no mínimo **5 caracteres** e no máximo **500**.
-- Cada questão deve ter no mínimo **2 alternativas**.
-- Para questão de única escolha, exatamente **1 alternativa** deve ser marcada como correta.
-- Para questão de múltipla escolha, ao menos **2 alternativas** devem ser marcadas como corretas.
-- O botão de exportar fica desabilitado enquanto qualquer questão estiver inválida.
-- O rascunho é salvo automaticamente a cada **30 segundos** no `localStorage`.
-- A ordem das questões pode ser reordenada via **drag & drop** nativo. Ao soltar, os números são renumerados automaticamente.
+Se o usuário fechar o navegador durante um Modo Estudo, o progresso salvo é detectado ao reabrir a biblioteca. Um modal oferece a opção de retomar ou descartar a sessão anterior.
 
-### Sessão de Progresso
-- A sessão é salva somente no **Modo Estudo**, a cada ação do usuário (seleção, confirmação, navegação, flag).
-- Na tela da biblioteca, o card do simulado com sessão ativa exibe o botão **Retomar**.
-- Ao clicar em **Iniciar** (não Retomar) em um simulado com sessão ativa, o usuário é perguntado se deseja retomar ou iniciar uma nova tentativa.
-- Iniciar nova tentativa limpa a sessão antes de abrir o modal de opções.
+### Rascunho do Criador
+
+O estado do criador é salvo automaticamente no `localStorage` a cada 30 segundos (e também com `Ctrl+S`). O rascunho é restaurado na próxima abertura do criador.
 
 ---
 
 ## Requisitos Funcionais
 
-**RF01 Importar simulado via JSON**
-O sistema deve aceitar arquivos `.json`, validar sua estrutura e adicioná-los à biblioteca automaticamente.
+**RF01 Importação de JSON único**
+O sistema deve aceitar um arquivo `.json` via seleção ou drag & drop, validá-lo e oferecer a opção de salvar na biblioteca.
 
-**RF02 Criar simulado via interface**
-O sistema deve oferecer um Wizard em dois estágios (meta e questões) para criação de simulados sem necessidade de editar JSON manualmente.
+**RF02 Importação em massa**
+O sistema deve aceitar múltiplos arquivos `.json` simultaneamente, processar cada um individualmente e exibir um relatório de resultado (salvos, ignorados, conflitos, falhas).
 
-**RF03 Editar simulado existente**
-O sistema deve permitir carregar qualquer simulado da biblioteca no criador para edição, preservando o ID original ao salvar.
+**RF03 Validação de schema**
+O sistema deve validar a estrutura do JSON antes de qualquer operação de importação ou exportação, retornando a lista de erros em caso de falha.
 
-**RF04 Exportar simulado como arquivo JSON**
-O sistema deve permitir baixar qualquer simulado da biblioteca como arquivo `.json` compatível com o protocolo de importação.
+**RF04 Biblioteca de simulados**
+O sistema deve permitir salvar, listar, buscar, editar, excluir individualmente e excluir em massa simulados armazenados localmente.
 
-**RF05 Biblioteca de simulados**
-O sistema deve armazenar, listar, buscar, ordenar e excluir simulados salvos. Deve exibir métricas de desempenho por simulado.
+**RF05 Indicador de armazenamento**
+O sistema deve exibir em tempo real o percentual de uso do `localStorage`, com alertas visuais progressivos ao atingir 70% (amarelo) e 85% (vermelho), bloqueando novas importações ao atingir o limite.
 
-**RF06 Modo Estudo**
-O sistema deve exibir feedback visual imediato (correto/incorreto) após a confirmação de cada resposta e salvar o progresso automaticamente.
+**RF06 Criador de simulados**
+O sistema deve permitir criar e editar simulados com questões de única e múltipla escolha, reordenar questões por drag & drop, salvar rascunho automaticamente e exportar o resultado em JSON.
 
-**RF07 Modo Exame**
+**RF07 Modo Estudo**
+O sistema deve executar o quiz com feedback visual imediato após cada resposta confirmada e salvar o progresso automaticamente para retomada futura.
+
+**RF08 Modo Exame**
 O sistema deve executar o quiz sem feedback, com timer decrescente, e exibir o resultado somente ao final ou quando o tempo esgotar.
 
-**RF08 Questões de única e múltipla escolha**
+**RF09 Questões de única e múltipla escolha**
 O sistema deve suportar questões com exatamente uma resposta correta e questões com múltiplas respostas corretas, com comportamento de seleção adequado a cada tipo.
 
-**RF09 Embaralhamento**
+**RF10 Embaralhamento**
 O sistema deve permitir embaralhar a ordem das questões e/ou a ordem das alternativas de forma independente antes de iniciar o quiz.
 
-**RF10 Marcação de questões (flag)**
+**RF11 Marcação de questões (flag)**
 O sistema deve permitir marcar e desmarcar questões durante o quiz para referência futura.
 
-**RF11 Navegação livre entre questões**
+**RF12 Navegação livre entre questões**
 O sistema deve permitir navegar para qualquer questão visitada anteriormente via grade de progresso.
 
-**RF12 Revisão antes de finalizar**
+**RF13 Revisão antes de finalizar**
 O sistema deve exibir uma tela de revisão listando questões não confirmadas antes de permitir a finalização definitiva.
 
-**RF13 Retomar sessão salva**
+**RF14 Retomar sessão salva**
 O sistema deve detectar e oferecer a retomada de progresso salvo de sessões anteriores no Modo Estudo.
 
-**RF14 Tema claro e escuro**
+**RF15 Histórico de desempenho**
+O sistema deve exibir o histórico das últimas 10 partidas na tela de resultado quando o simulado estiver salvo na biblioteca.
+
+**RF16 Tema claro e escuro**
 O sistema deve oferecer alternância entre tema escuro (padrão) e claro, com persistência da preferência.
 
-**RF15 Onboarding de primeira visita**
+**RF17 Onboarding de primeira visita**
 O sistema deve exibir um modal de boas-vindas na primeira vez que o usuário acessa a aplicação.
 
-**RF16 Rascunho automático**
+**RF18 Rascunho automático**
 O sistema deve salvar automaticamente o estado do criador a cada 30 segundos enquanto o usuário edita.
 
 ---
@@ -399,95 +407,81 @@ Após o primeiro carregamento, a aplicação deve funcionar sem conexão com a i
 **RNF03 Persistência Client-Side**
 Todos os dados (biblioteca, sessão, rascunho, preferências) são armazenados no `localStorage` do navegador. Não há comunicação com servidor.
 
-**RNF04 Responsividade**
+**RNF04 Guard Dinâmico de Cota**
+O sistema deve medir o uso real do `localStorage` (quota segura: 4 MB) via `Blob.size` por chave, sem depender de APIs de estimativa do browser. O bloqueio de armazenamento deve ser ativado quando o uso projetado pós-adição atingir 85% da quota.
+
+**RNF05 Responsividade**
 A interface deve funcionar corretamente em telas mobile (< 480px), tablet (768px–1023px) e desktop (≥ 1024px), com layouts adaptados para cada breakpoint.
 
-**RNF05 Performance de Eventos**
+**RNF06 Performance de Eventos**
 Todos os eventos de clique, input e change devem ser capturados por um único listener por tipo no `document` (Event Delegation), evitando múltiplos listeners em elementos dinâmicos.
 
-**RNF06 Integridade de Estado**
+**RNF07 Integridade de Estado**
 O `QuizEngine` não deve manipular o DOM diretamente. O `StorageManager` deve ser o único ponto de acesso ao `localStorage`. Cada módulo deve ter responsabilidade única e bem definida (SRP).
 
-**RNF07 Acessibilidade**
+**RNF08 Acessibilidade**
 Modais devem implementar *focus trap* para manter a navegação por teclado dentro do modal enquanto aberto. Botões de toggle de tema devem ter `aria-label` atualizado dinamicamente.
-
-**RNF08 Limite de Armazenamento**
-A biblioteca é limitada a 10 simulados e o histórico de partidas a 10 entradas por simulado, prevenindo crescimento ilimitado do `localStorage`.
-
-**RNF09 Tempo Mínimo de Loading**
-Operações de leitura de arquivo devem exibir um overlay de carregamento por no mínimo 500ms, evitando flash de conteúdo em arquivos pequenos.
-
-**RNF10 Testes Automatizados**
-Toda lógica de negócio dos módulos `QuizEngine`, `Validator` e `StorageManager` deve ser coberta por testes unitários. Fluxos completos de quiz devem ser cobertos por testes de integração. Os testes usam o runner nativo do Node.js (sem dependências externas).
-
-**RNF11 Versionamento do Código**
-A versão da aplicação deve ser definida em um único arquivo (`version.js`) e referenciada pelos demais pontos que precisam dela (`sw.js`, badges).
 
 ---
 
 ## Protocolo JSON
 
-O sistema valida estritamente qualquer arquivo importado. Campos marcados como obrigatórios causam falha de validação com mensagem descritiva.
+Formato esperado para importação e exportação:
 ```json
 {
-  "nomeSimulado": "String obrigatório",
-  "descricao": "String opcional",
-  "tags": ["array", "de", "strings", "opcional"],
-  "tempoLimiteMinutos": 30,
+  "nomeSimulado": "string (obrigatório)",
+  "descricao": "string (opcional)",
+  "tags": ["string"],
+  "tempoLimiteMinutos": 60,
   "questoes": [
     {
-      "id": "qualquer valor usado internamente como hash",
-      "enunciado": "String obrigatório, mínimo 5 chars",
-      "tipo": "unica | multipla",
+      "id": "string | number (obrigatório)",
+      "enunciado": "string (obrigatório)",
+      "tipo": "unica | multipla (obrigatório)",
       "alternativas": [
-        { "id": "a", "texto": "Texto da alternativa" },
-        { "id": "b", "texto": "Texto da alternativa" }
+        { "id": "string (obrigatório)", "texto": "string (obrigatório)" }
       ],
-      "respostasCorretas": ["a"]
+      "respostasCorretas": ["id_da_alternativa"]
     }
   ]
 }
 ```
 
-**Regras de validação do schema:**
+**Regras de validação aplicadas pelo `Validator`:**
 
-- `nomeSimulado` deve ser uma string não vazia.
-- `questoes` deve ser um array com ao menos 1 item.
-- Cada questão deve ter `enunciado` não vazio, `tipo` igual a `'unica'` ou `'multipla'`, e ao menos 2 alternativas.
-- `respostasCorretas` deve ser um array não vazio, e cada ID referenciado deve existir em `alternativas`.
+- `nomeSimulado`, `questoes` são obrigatórios.
+- Cada questão deve ter `id`, `enunciado`, `tipo`, `alternativas` (mínimo 2) e `respostasCorretas` (mínimo 1).
+- Para `tipo: "unica"`, `respostasCorretas` deve conter exatamente 1 elemento.
+- Todos os IDs em `respostasCorretas` devem existir no array `alternativas` da questão.
+- `tempoLimiteMinutos` é opcional; se ausente, o timer do Modo Exame é calculado automaticamente (`questões × 2 minutos`).
 
 ---
 
 ## Persistência de Dados
 
-| Chave | Tipo | Descrição |
-|:---|:---|:---|
-| `quizlab_library` | `Array<Object>` | Simulados salvos com dados e metadados |
-| `quizlab_session` | `Object` | Progresso de sessão em andamento (apenas Modo Estudo) |
-| `quizlab_draft` | `Object` | Rascunho do criador (autosave) |
-| `quizlab_first_visit` | `'true'` | Flag de controle do onboarding |
-| `quizlab_theme` | `'dark' \| 'light'` | Preferência de tema |
+Todas as chaves do `localStorage` são centralizadas em `CONFIG.STORAGE`:
 
-**Estrutura de um item na biblioteca:**
-```javascript
+| Chave | Conteúdo |
+|:---|:---|
+| `quizlab_library` | Array de simulados com metadados |
+| `quizlab_session` | Estado da sessão ativa (Modo Estudo) |
+| `quizlab_draft` | Rascunho do criador |
+| `quizlab_theme` | Preferência de tema (`dark` / `light`) |
+| `quizlab_first_visit` | Flag de primeira visita |
+
+**Estrutura de metadados por item da biblioteca:**
+```json
 {
-    id: "quiz_1700000000000",
-    data: { /* JSON completo do simulado */ },
-    meta: {
-        addedAt: Number,          // timestamp de adição
-        questionsCount: Number,   // cache do total de questões
-        timesPlayed: Number,
-        lastPlayed: Number,       // timestamp
-        averageScore: Number,     // 0-100, recalculado a cada partida
-        history: [                // últimas 10 partidas
-            {
-                playedAt: Number,
-                score: Number,    // percentual de acertos
-                correct: Number,
-                total: Number
-            }
-        ]
-    }
+  "id": "uuid",
+  "data": { ... },
+  "meta": {
+    "timesPlayed": 5,
+    "lastPlayed": 1700000000000,
+    "averageScore": 72,
+    "history": [
+      { "playedAt": 1700000000000, "score": 80, "correct": 8, "total": 10 }
+    ]
+  }
 }
 ```
 
@@ -495,27 +489,24 @@ O sistema valida estritamente qualquer arquivo importado. Campos marcados como o
 
 ## Design System
 
-A aplicação usa variáveis CSS no `:root` para todas as cores, espaçamentos, tipografia e sombras. O visual segue a estética **Glassmorphism** com fundo escuro translúcido, bordas sutis e cor primária neon.
+O design system é definido inteiramente em variáveis CSS no `:root` de `styles.css`. Nenhum valor de cor, espaçamento ou tipografia deve ser hardcoded nos módulos.
 
-### Cores semânticas
+Variáveis principais:
 
-| Variável | Valor (dark) | Uso |
-|:---|:---|:---|
-| `--primary-500` | `#c4ff00` | Ações primárias, foco, seleção, neon |
-| `--success` | `#00ff9d` | Resposta correta, badge "Respondida" |
-| `--error` | `#ff0055` | Resposta incorreta, timer em alerta |
-| `--bg-glass` | `rgba(15,15,15,0.92)` | Fundo de cards e modais |
-| `--border-glass` | `rgba(255,255,255,0.08)` | Bordas dos componentes |
+- **Cores:** `--primary-500`, `--success`, `--error`, `--text-primary`, `--text-secondary`, `--text-muted`
+- **Superfícies:** `--bg-glass`, `--surface-container`, `--border-glass`
+- **Tipografia:** `--font-mono`, `--font-body`, `--font-h1`, `--font-tiny`
+- **Espaçamento:** `--space-xs` → `--space-2xl`
+- **Forma:** `--radius-sm`, `--radius-md`, `--radius-full`
 
-O tema claro sobrescreve as variáveis via seletor `[data-theme="light"]`, sem duplicar nenhuma regra de layout.
+**Componentes de armazenamento:**
 
-### Componentes de UI
-
-- **IconSystem** injeta SVGs inline via `data-icon` attribute, evitando requisições externas de imagem. Usa `document.fonts.load()` para aguardar o carregamento da fonte de ícones antes de renderizar.
-- **ToastSystem** notificações flutuantes com auto-dismiss (4s), tipos `info`, `success` e `error`.
-- **ModalManager** gerencia sobreposições de confirmação (`confirm`), alerta (`alert`) e custom. Suporta múltiplos modais identificados por ID.
-- **FocusTrap** ao abrir um modal, prende o foco dentro dele para compatibilidade com navegação por teclado.
-- **ThemeManager** alterna `data-theme` no `<html>`, persiste no `localStorage` e atualiza o ícone e `aria-label` do botão de toggle dinamicamente.
+- `.storage-indicator` wrapper do indicador circular SVG na biblioteca.
+- `.storage-circle-fill` arco SVG animado que representa o percentual de uso.
+- `.lib-capacity-fill.warn` barra amarela ao atingir 70%.
+- `.lib-capacity-fill.danger` barra vermelha ao atingir 85%.
+- `.lib-bulk-toolbar` toolbar de ações em massa (oculta por padrão, visível em modo seleção).
+- `.library-card.is-selected` estado visual de card selecionado.
 
 ---
 
@@ -523,32 +514,32 @@ O tema claro sobrescreve as variáveis via seletor `[data-theme="light"]`, sem d
 
 O projeto usa o **runner nativo do Node.js** (`node:test`) sem nenhuma dependência externa.
 ```bash
-npm test              # todos os testes
-npm run test:unit     # apenas unitários
+npm test                  # todos os testes
+npm run test:unit         # apenas unitários
 npm run test:integration  # apenas integração
 ```
 
 **Cobertura:**
 
-- `quiz-engine.test.js` — init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
-- `validator.test.js` — casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
-- `storage-manager.test.js` — CRUD da biblioteca, replaceInLibrary, updateLibraryMeta, removeManyFromLibrary, session, draft, histórico com limite, getStorageStats fallback, canStore com threshold simulado.
-- `file-handler.test.js` — _findDuplicate, _handleSingle (válido/inválido), _handleBatch (salvos, skipped, conflito, armazenamento cheio, redirect para biblioteca), handleMultiple (filtro de extensão).
-- `quiz-flow.test.js` — fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
+- `quiz-engine.test.js` init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
+- `validator.test.js` casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
+- `storage-manager.test.js` CRUD da biblioteca, replaceInLibrary, updateLibraryMeta, removeManyFromLibrary, session, draft, histórico com limite, getStorageStats com quota fixa de 4 MB, canStore com threshold simulado via `localStorage.setItem` direto.
+- `file-handler.test.js` `_findDuplicate`, `_handleSingle` (válido/inválido), `_handleBatch` (salvos, skipped, conflito, armazenamento cheio, redirect para biblioteca), `handleMultiple` (filtro de extensão).
+- `quiz-flow.test.js` fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
 
-Os testes rodam em Node.js >= 21 sem DOM real. O ambiente é simulado via polyfills em `tests/setup/environment.js` e os módulos IIFE são carregados via `tests/setup/loader.js`.
+Os testes rodam em Node.js >= 21 sem DOM real. O ambiente é simulado via polyfills em `tests/setup/environment.js` (inclui `global.navigator = { storage: null }` para forçar o caminho de fallback síncrono do `getStorageStats`) e os módulos IIFE são carregados via `tests/setup/loader.js`.
 
 ---
 
 ## CI/CD
 
-**`ci.yml`** Executa em Pull Requests para `main` e `develop` e em pushes para `develop`:
+**`ci.yml`** executa em Pull Requests para `main` e `develop` e em pushes para `develop`:
 1. Checkout do código
 2. Setup Node.js 22
 3. `npm run test:unit`
 4. `npm run test:integration`
 
-**`deploy.yml`** Executa em push para `main` (produção):
+**`deploy.yml`** executa em push para `main` (produção):
 1. Checkout do código
 2. Setup Node.js 22
 3. `npm test` (suite completa)
@@ -561,4 +552,4 @@ Leia o **[CONTRIBUTING.md](CONTRIBUTING.md)** para entender os padrões de arqui
 
 ---
 
-*Documentação gerada com base na versão v1.2.0.*
+*Documentação gerada com base na versão v1.3.0.*
