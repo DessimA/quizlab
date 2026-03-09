@@ -89,6 +89,11 @@
             },
 
             'show-library': () => { ScreenManager.change('libraryScreen'); LibraryManager.render(); },
+            'go-to-library-review': () => {
+                ScreenManager.change('libraryScreen');
+                LibraryManager.render();
+                LibraryManager.switchTab('revisao');
+            },
             'show-creator': () => { CreatorManager.reset(); ScreenManager.change('creatorScreen'); },
 
             'confirm-meta': () => CreatorManager.confirmMeta(),

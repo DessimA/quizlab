@@ -114,7 +114,8 @@ quizlab/
 │   │   ├── quiz-engine.js         # Estado do quiz, lógica de resposta e timer
 │   │   ├── creator-manager.js     # Wizard de criação e drag & drop
 │   │   ├── library-manager.js     # Renderização, busca, seleção e exclusão em massa
-│   │   ├── review-manager.js      # Tela de revisão e resultado final
+│   │   ├── review-manager.js      # Tela de revisão, resultado final e rastreamento de erros
+│   │   ├── review-quiz-builder.js # Montagem do quiz temporário de revisão
 │   │   └── file-handler.js        # Leitura, parse e importação de um ou múltiplos JSONs
 │   └── ui/
 │       ├── screen-manager.js      # Troca de telas, timer bar e retomada de sessão
@@ -169,6 +170,7 @@ Utils.formatBytes(bytes)     // formata bytes em KB / MB legível
 | `STORAGE_WARN_THRESHOLD` | 0.70 | Barra amarela a partir de 70% de uso |
 | `STORAGE_BLOCK_THRESHOLD` | 0.85 | Bloqueio de novas importações a partir de 85% |
 | `MAX_HISTORY_ENTRIES` | 10 | Partidas mantidas no histórico por simulado |
+| `MAX_WRONG_PER_QUIZ` | 65 | Máx. de questões erradas rastreadas por simulado |
 
 ### `storage-manager.js`
 *Facade* para o `localStorage`. Todas as operações de leitura e escrita passam por aqui, centralizando a serialização JSON e o tratamento de erros. Também é o único ponto responsável por garantir consistência entre os dados da biblioteca e da sessão ativa (ex.: ao excluir um quiz, a sessão órfã é limpa antes).
@@ -180,6 +182,8 @@ Métodos relevantes além do CRUD básico:
 - `updateLibraryMeta(id, updates)` merge parcial dos metadados sem tocar nas questões.
 - `removeManyFromLibrary(ids)` exclui um array de IDs em uma única escrita, limpando sessão órfã se necessário.
 - `updateQuizStats(id, stats)` registra resultado, acumula histórico (limitado a `MAX_HISTORY_ENTRIES`) e recalcula média.
+- `saveWrongQuestions(id, list)` thin wrapper em `updateLibraryMeta` para persistir `wrongQuestions` sem expor a estrutura interna nos consumidores.
+- `getAggregatedWrong(quizIds?)` agrega `wrongQuestions` de todos ou de IDs selecionados, deduplicando por chave `sourceQuizId + questao.id`. Retorna array plano pronto para uso.
 - `getStorageStats()` **síncrono**. Mede o uso real do `localStorage` via `Blob.size` por chave. Retorna `{ usage, quota, percent }`.
 - `canStore(data)` **síncrono**. Projeta o uso pós-adição e bloqueia se `>= STORAGE_BLOCK_THRESHOLD`. Retorna `{ allowed, reason?, stats }`.
 
@@ -205,9 +209,12 @@ Renderiza e gerencia a tela de biblioteca. Além do CRUD e busca, suporta:
 - **Modo seleção em massa** ativado via `toggleSelectionMode()`. Em modo ativo, os cards exibem checkboxes e a toolbar `#libBulkToolbar` é revelada.
 - **Exclusão em massa** `bulkDelete()` chama `StorageManager.removeManyFromLibrary(ids)` em uma única operação.
 - **Indicador de armazenamento** `_updateCapacityUI()` consulta `getStorageStats()` e atualiza o indicador circular SVG (`#storageIndicator`) com cores progressivas: neutro → amarelo (≥ 70%) → vermelho (≥ 85%).
+- **Sistema de abas** `switchTab(tab)` alterna entre "Simulados" e "Revisão", ajustando a visibilidade dos controles e disparando `renderReviewPanel()`.
+- **Painel de Revisão** `renderReviewPanel()` lista simulados com contagem de erros, slider de quantidade e botão para iniciar o simulado de revisão temporário.
+- **Badge de erros** `_updateWrongBadge()` atualiza o contador na aba Revisão em tempo real após cada partida finalizada.
 
 ### `review-manager.js`
-Gerencia a tela de revisão pré-finalização e a tela de resultado. Na tela de resultado, renderiza o gabarito completo com status por questão (acerto, erro, pulou, não viu), seção de questões marcadas com flag e histórico de tentativas anteriores (exibido apenas quando há pelo menos 2 registros no histórico).
+Gerencia a tela de revisão pré-finalização e a tela de resultado. Na tela de resultado, renderiza o gabarito completo com status por questão (acerto, erro, pulou, não viu), seção de questões marcadas com flag e histórico de tentativas anteriores. Tambem persiste o banco de erros via `_extractAndSaveWrongQuestions()`, que diferencia entre quiz normal (atualiza o próprio simulado) e quiz de revisão temporário (atualiza cada simulado de origem via `_reviewSources`).
 
 ### `file-handler.js`
 Responsável por toda a pipeline de importação de arquivos JSON:
@@ -336,6 +343,13 @@ Se o usuário fechar o navegador durante um Modo Estudo, o progresso salvo é de
 
 O estado do criador é salvo automaticamente no `localStorage` a cada 30 segundos (e também com `Ctrl+S`). O rascunho é restaurado na próxima abertura do criador.
 
+### Rastreamento de Erros
+
+- O rastreamento ocorre apenas para simulados salvos na Biblioteca Local. Quizzes abertos diretamente de arquivo não registram erros.
+- Ao finalizar uma partida, questões incorretas são persistidas em `meta.wrongQuestions` de cada item da biblioteca. Questões acertadas são removidas do banco.
+- O limite é de **65 questões por simulado** (`MAX_WRONG_PER_QUIZ`). Ao atingir o limite, as questões com menor `errorCount` são descartadas.
+- O quiz de revisão é temporário: não possui `libraryId` e não é salvo na biblioteca. A identificação da origem de cada questão usa `_reviewSources` embutido no objeto quiz.
+
 ---
 
 ## Requisitos Funcionais
@@ -393,6 +407,24 @@ O sistema deve exibir um modal de boas-vindas na primeira vez que o usuário ace
 
 **RF18 Rascunho automático**
 O sistema deve salvar automaticamente o estado do criador a cada 30 segundos enquanto o usuário edita.
+
+**RF19 Rastreamento de erros**
+O sistema deve registrar automaticamente as questões respondidas incorretamente ao finalizar cada partida de um simulado salvo na Biblioteca Local.
+
+**RF20 Aba Revisão na Biblioteca**
+A biblioteca deve exibir uma aba "Revisão" com badge numérico mostrando o total de questões com erro disponíveis em todos os simulados.
+
+**RF21 Listagem de fontes de revisão**
+A aba Revisão deve listar cada simulado com o respectivo número de erros registrados, permitindo seleção individual das fontes.
+
+**RF22 Controle de quantidade**
+O usuário deve poder selecionar via slider quantas questões quer incluir no simulado de revisão, respeitando o total disponível nas fontes selecionadas.
+
+**RF23 Quiz de revisão temporário**
+O sistema deve gerar um simulado temporário (sem persistência na biblioteca) composto pelas questões erradas selecionadas, embaralhadas e cortadas na quantidade escolhida.
+
+**RF24 Atualização pós-revisão**
+Ao finalizar um simulado de revisão, o sistema deve remover do banco de erros as questões acertadas, atualizando cada simulado de origem individualmente.
 
 ---
 
@@ -480,6 +512,9 @@ Todas as chaves do `localStorage` são centralizadas em `CONFIG.STORAGE`:
     "averageScore": 72,
     "history": [
       { "playedAt": 1700000000000, "score": 80, "correct": 8, "total": 10 }
+    ],
+    "wrongQuestions": [
+      { "sourceQuizId": "uuid", "sourceQuizName": "string", "questao": { ... }, "errorCount": 1 }
     ]
   }
 }
@@ -523,7 +558,7 @@ npm run test:integration  # apenas integração
 
 - `quiz-engine.test.js` init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
 - `validator.test.js` casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
-- `storage-manager.test.js` CRUD da biblioteca, replaceInLibrary, updateLibraryMeta, removeManyFromLibrary, session, draft, histórico com limite, getStorageStats com quota fixa de 4 MB, canStore com threshold simulado via `localStorage.setItem` direto.
+- `storage-manager.test.js` CRUD da biblioteca, replaceInLibrary, updateLibraryMeta, removeManyFromLibrary, session, draft, histórico com limite, getStorageStats com quota fixa de 4 MB, canStore com threshold simulado via `localStorage.setItem` direto, saveWrongQuestions e getAggregatedWrong.
 - `file-handler.test.js` `_findDuplicate`, `_handleSingle` (válido/inválido), `_handleBatch` (salvos, skipped, conflito, armazenamento cheio, redirect para biblioteca), `handleMultiple` (filtro de extensão).
 - `quiz-flow.test.js` fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
 

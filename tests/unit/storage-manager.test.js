@@ -225,3 +225,45 @@ describe('StorageManager — canStore()', () => {
         localStorage.removeItem('__fill__');
     });
 });
+
+describe('StorageManager — saveWrongQuestions() e getAggregatedWrong()', () => {
+    it('persiste wrongQuestions via updateLibraryMeta', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const list = [{ sourceQuizId: id, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 1 }];
+        StorageManager.saveWrongQuestions(id, list);
+        const item = StorageManager.getLibrary().find(i => i.id === id);
+        assert.equal(item.meta.wrongQuestions.length, 1);
+    });
+
+    it('getAggregatedWrong retorna todas as questões sem duplicatas', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const list = [
+            { sourceQuizId: id, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 1 },
+            { sourceQuizId: id, sourceQuizName: 'X', questao: { id: 2 }, errorCount: 2 }
+        ];
+        StorageManager.saveWrongQuestions(id, list);
+        const result = StorageManager.getAggregatedWrong();
+        assert.equal(result.length, 2);
+    });
+
+    it('getAggregatedWrong filtra por quizIds quando fornecido', () => {
+        const { id: id1 } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const { id: id2 } = StorageManager.addToLibrary({ ...SAMPLE_QUIZ, nomeSimulado: 'Q2' });
+        StorageManager.saveWrongQuestions(id1, [{ sourceQuizId: id1, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 1 }]);
+        StorageManager.saveWrongQuestions(id2, [{ sourceQuizId: id2, sourceQuizName: 'Y', questao: { id: 2 }, errorCount: 1 }]);
+        const result = StorageManager.getAggregatedWrong([id1]);
+        assert.equal(result.length, 1);
+        assert.equal(result[0].sourceQuizId, id1);
+    });
+
+    it('getAggregatedWrong deduplica por sourceQuizId + questao.id', () => {
+        const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
+        const list = [
+            { sourceQuizId: id, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 1 },
+            { sourceQuizId: id, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 2 }
+        ];
+        StorageManager.saveWrongQuestions(id, list);
+        const result = StorageManager.getAggregatedWrong();
+        assert.equal(result.length, 1);
+    });
+});

@@ -18,6 +18,7 @@ const STATIC_ASSETS = [
     '/js/features/library-manager.js',
     '/js/features/creator-manager.js',
     '/js/features/review-manager.js',
+    '/js/features/review-quiz-builder.js',
     '/js/features/file-handler.js',
     '/js/ui/screen-manager.js',
     '/js/ui/quiz-renderer.js',

@@ -59,6 +59,16 @@
 
             this._renderHistory(rev);
             ScreenManager.change(CONFIG.ELEMENTS.RESULT_SCREEN);
+
+            if (QuizEngine.getState().quizData?._reviewSources) {
+                const backBtn = document.createElement('button');
+                backBtn.className = 'btn btn-outline';
+                backBtn.setAttribute('data-action', 'go-to-library-review');
+                backBtn.innerHTML = `<span data-icon="book" data-size="sm"></span> Ver Revisão`;
+                document.querySelector('#resultScreen [style*="justify-content: center"]')
+                    ?.appendChild(backBtn);
+                if (window.IconSystem) IconSystem.inject(backBtn.parentElement);
+            }
         },
 
         _extractAndSaveWrongQuestions() {

@@ -8,6 +8,8 @@
         _activeTab: 'simulados',
         _reviewSelection: new Set(),
         _reviewQty: 0,
+        _reviewInitialized: false,
+        _lastWrongTotal: 0,
 
         render() {
             const container = document.getElementById('libraryList');
@@ -49,6 +51,15 @@
             this._syncSelectionUI();
             this._updateCapacityUI();
             this._updateWrongBadge();
+
+            const currentTotal = StorageManager.getLibrary()
+                .reduce((sum, i) => sum + (i.meta.wrongQuestions?.length || 0), 0);
+
+            if (currentTotal !== this._lastWrongTotal) {
+                this._reviewInitialized = false;
+                this._lastWrongTotal = currentTotal;
+            }
+
             if (this._activeTab === 'revisao') this.renderReviewPanel();
         },
 
@@ -104,6 +115,13 @@
 
             const avgColor = avg >= 70 ? 'var(--success)' : avg >= 40 ? 'var(--warning)' : avg > 0 ? 'var(--error)' : 'var(--text-muted)';
 
+            const wrongCount = item.meta.wrongQuestions?.length || 0;
+            const wrongBadgeHtml = wrongCount > 0
+                ? `<span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:0.7rem;color:var(--error);font-weight:700;" title="${wrongCount} questão(ões) com erro registrado">
+                    <span data-icon="x" data-size="xs"></span> ${wrongCount} para revisão
+                  </span>`
+                : '';
+
             div.innerHTML = `
                 ${checkboxHtml}
                 <div class="lib-card-header">
@@ -113,6 +131,7 @@
                 <div class="lib-stats-row">
                     <span>${item.meta.questionsCount} questões</span>
                     <span style="color:${avgColor};">${avg > 0 ? avg + '% média' : '—'}</span>
+                    ${wrongBadgeHtml}
                 </div>
                 ${item.data.descricao ? `<p class="lib-desc">${item.data.descricao}</p>` : ''}
                 <div class="lib-played">Jogado: ${timesPlayed}x &nbsp;|&nbsp; Último: ${lastPlayed}</div>
@@ -132,9 +151,6 @@
             const percentText = document.getElementById('storagePercentText');
 
             if (fillCircle) {
-                // No SVG com r=15.9155, o comprimento do arco é exatamente 100.
-                // stroke-dashoffset = 100 significa 0% preenchido.
-                // stroke-dashoffset = 0 significa 100% preenchido.
                 const offset = 100 - clampedPct;
                 fillCircle.style.strokeDashoffset = offset;
                 
@@ -192,12 +208,13 @@
             const library = StorageManager.getLibrary();
             const total = library.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
 
-            if (this._reviewSelection.size === 0) {
+            if (!this._reviewInitialized) {
                 library.forEach(item => {
                     if ((item.meta.wrongQuestions?.length || 0) > 0) {
                         this._reviewSelection.add(item.id);
                     }
                 });
+                this._reviewInitialized = true;
             }
 
             const selectedTotal = this._getSelectedWrongCount();
@@ -217,6 +234,14 @@
         },
 
         _buildEmptyReviewHTML() {
+            const hasSimulados = StorageManager.getLibrary().length > 0;
+            const message = hasSimulados
+                ? 'Complete um simulado salvo na biblioteca para começar a rastrear erros.'
+                : 'Adicione simulados à biblioteca e jogue para começar a rastrear seus erros.';
+            const ctaHtml = !hasSimulados
+                ? `<button class="btn btn-outline" data-action="enter-app" style="margin-top:var(--space-md);">Ir para o início</button>`
+                : '';
+
             return `
                 <div class="review-info-notice" style="margin-bottom: var(--space-lg);">
                     <span data-icon="info" data-size="sm"></span>
@@ -224,9 +249,8 @@
                 </div>
                 <div class="empty-state" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted); grid-column: 1 / -1;">
                     <p>Nenhuma questão com erro registrada ainda.</p>
-                    <p style="margin-top:var(--space-sm); font-size:0.8rem;">
-                        Complete um simulado salvo na biblioteca para começar a rastrear seus erros.
-                    </p>
+                    <p style="margin-top:var(--space-sm); font-size:0.8rem;">${message}</p>
+                    ${ctaHtml}
                 </div>`;
         },
 
