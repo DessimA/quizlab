@@ -55,8 +55,8 @@
             if (isAnswered) {
                 cls += ' disabled';
                 if (!isExam) {
-                    if (isCorrect) { cls += ' correct'; ariaLabel += ' — resposta correta'; }
-                    else if (isSelected) { cls += ' incorrect'; ariaLabel += ' — resposta incorreta'; }
+                    if (isCorrect) { cls += ' correct'; ariaLabel += ' resposta correta'; }
+                    else if (isSelected) { cls += ' incorrect'; ariaLabel += ' resposta incorreta'; }
                 } else if (isSelected) {
                     cls += ' selected';
                 }
@@ -113,7 +113,7 @@
 
             div.innerHTML = `<div>${correct
                 ? 'RESPOSTA CORRETA'
-                : `RESPOSTA INCORRETA — CORRETO: <strong>${correctLetters.join(', ')}</strong>`
+                : `RESPOSTA INCORRETA CORRETO: <strong>${correctLetters.join(', ')}</strong>`
             }</div>`;
             return div;
         },

@@ -13,7 +13,7 @@
             });
 
             return {
-                nomeSimulado: `Revisão — ${selected.length} questão${selected.length !== 1 ? 'ões' : ''}`,
+                nomeSimulado: `Revisão ${selected.length} questão${selected.length !== 1 ? 'ões' : ''}`,
                 descricao: 'Simulado de revisão gerado automaticamente a partir de questões respondidas incorretamente.',
                 tags: ['revisao'],
                 questoes: selected.map(wq => wq.questao),
