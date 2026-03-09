@@ -49,3 +49,13 @@ global.Blob = class {
         this.size = parts.reduce((acc, part) => acc + String(part).length, 0);
     }
 };
+
+global.FileReader = class FileReader {
+    readAsText() {
+        process.nextTick(() => {
+            if (this.onload) {
+                this.onload({ target: { result: '' } });
+            }
+        });
+    }
+};
