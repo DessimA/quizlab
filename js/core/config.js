@@ -57,6 +57,17 @@
             if (bytes < 1024) return `${bytes} B`;
             if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
             return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        },
+
+        scoreColor(score) {
+            if (score >= 70) return 'var(--success)';
+            if (score >= 40) return 'var(--warning)';
+            if (score > 0)   return 'var(--error)';
+            return 'var(--text-muted)';
+        },
+
+        plural(count, word, suffix = 's') {
+            return `${count} ${word}${count !== 1 ? suffix : ''}`;
         }
     };
 
