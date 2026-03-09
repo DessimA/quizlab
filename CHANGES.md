@@ -207,3 +207,82 @@ duplicatas e conflitos.
 ### `tests/unit/file-handler.test.js` — novo
   Cobre `_findDuplicate`, `_handleBatch` com cenários de: múltiplos novos,
   duplicata idêntica, conflito de conteúdo e arquivo inválido.
+
+---
+
+# Auditoria de Testes e Correção de Polyfills
+
+## Problemas encontrados
+
+### 1. `environment.js` — ReferenceError em navigator
+`getStorageStats()` acessa `navigator.storage?.estimate`. Em Node.js `navigator`
+não é global, causando `ReferenceError` em todos os testes que carregam
+`storage-manager.js` indiretamente. Adicionado `global.navigator = { storage: null }`
+ao polyfill. O valor `null` força o caminho de fallback (baseado em `Blob.size`),
+tornando os testes determinísticos sem dependência de browser API.
+
+### 2. `storage-manager.test.js` — sintaxe ESM em projeto CJS
+O arquivo usava `import` / `import assert from` enquanto todos os demais arquivos
+de teste e o `loader.js` usam `require`. Reescrito com `require` para consistência.
+
+## Cobertura adicionada
+
+### `storage-manager.test.js`
+- `replaceInLibrary()` — substituição de conteúdo, atualização de questionsCount,
+  falha para ID inexistente.
+- `updateLibraryMeta()` — atualização parcial, falha para ID inexistente.
+- `updateQuizStats()` — primeira tentativa, média acumulada, limite de histórico.
+- `getStorageStats()` — retorno válido no fallback, `percent > 0` após addToLibrary.
+- `canStore()` — permitido abaixo do threshold; bloqueado quando `navigator.storage`
+  simula uso acima de `STORAGE_BLOCK_THRESHOLD`.
+
+### `file-handler.test.js`
+- `_handleSingle` — arquivo válido novo abre `loadQuizOptions`; inválido exibe
+  alerta sem salvar.
+- `_handleBatch` — `canStore` retornando `false` registra como `failed` sem salvar;
+  redireciona para biblioteca quando `saved.length > 0`; não redireciona quando
+  nenhum foi salvo.
+- `file-handler.test.js` — alerta quando todos os arquivos são extensão não-`.json`.
+
+---
+
+# Correção do Guard de Cota — localStorage como fonte real de medição
+
+## Problema
+
+`navigator.storage.estimate()` retorna a **quota de origem** do browser, que
+engloba IndexedDB, Cache API, Service Worker e localStorage juntos. O browser
+calcula esse valor com base no espaço livre em disco (~60% do total), resultando
+em números como 136 GB em dispositivos com muito espaço livre. O valor não reflete
+o limite real do `localStorage`, que é ~5 MB por origem em todos os browsers.
+
+## Solução
+
+Removida a dependência de `navigator.storage.estimate()`. A medição agora é feita
+diretamente no `localStorage` via iteração sobre `Object.keys()` com `Blob.size`
+por chave, somando o uso real em bytes de todos os itens armazenados.
+
+A quota é fixada em **4 MB** via `CONFIG.LIMITS.STORAGE_SAFE_QUOTA_BYTES`,
+deixando 1 MB de margem abaixo do limite de 5 MB dos browsers. Com ~50 KB por
+simulado médio, isso permite aproximadamente 80 simulados antes de atingir o aviso.
+
+## Impacto nos thresholds
+
+Os valores `STORAGE_WARN_THRESHOLD: 0.70` e `STORAGE_BLOCK_THRESHOLD: 0.85`
+continuam válidos como percentuais da nova quota fixa:
+
+| Evento | Threshold | Bytes absolutos |
+|--------|-----------|-----------------|
+| Barra amarela | 70% | ~2.8 MB usados |
+| Barra vermelha + bloqueio | 85% | ~3.4 MB usados |
+
+## Mudanças por arquivo
+
+- `config.js` — adicionado `STORAGE_SAFE_QUOTA_BYTES: 4 * 1024 * 1024`.
+- `storage-manager.js` — `getStorageStats()` e `canStore()` tornaram-se
+  **síncronos**. Adicionado `_measureLocalStorageUsage()` privado.
+- `file-handler.js` — removidos `await` de `canStore()`.
+- `main.js` — removido `await` de `canStore()` em `_finalizeExport`.
+- `storage-manager.test.js` — testes de `canStore` reescritos sem mock de
+  `navigator.storage`; usam `localStorage.setItem` direto para simular threshold.
+- `file-handler.test.js` — idem, removido mock de `navigator.storage`.

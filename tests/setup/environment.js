@@ -14,3 +14,7 @@ global.document = {
     createElement() { return {}; },
     getElementById() { return null; }
 };
+
+global.navigator = {
+    storage: null
+};

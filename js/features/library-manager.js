@@ -68,7 +68,7 @@
 
             const hasSession = activeSession?.libraryId === item.id;
             const resumeBtn = hasSession
-                ? `<button class="btn btn-outline" data-action="resume-quiz" data-id="${item.id}" title="Retomar" style="flex:none;width:auto;padding:0 var(--space-sm);font-size:0.7rem;">RETOMAR</button>`
+                ? `<button class="btn btn-outline" data-action="resume-quiz" data-id="${item.id}" title="Retomar"><span data-icon="history"></span></button>`
                 : '';
 
             const isSelected = this._selection.active && this._selection.ids.has(item.id);
@@ -118,28 +118,28 @@
         },
 
         _updateCapacityUI() {
-            StorageManager.getStorageStats().then(stats => {
-                const count = StorageManager.getLibrary().length;
-                const pct = Math.round(stats.percent * 100);
+            const stats = StorageManager.getStorageStats();
+            const pct = Math.round(stats.percent * 100);
+            const clampedPct = Math.min(100, Math.max(0, pct));
 
-                const fill = document.getElementById('libCapacityFill');
-                const info = document.getElementById('libStorageInfo');
+            const fillCircle = document.getElementById('storageCircleFill');
+            const percentText = document.getElementById('storagePercentText');
 
-                if (fill) {
-                    fill.style.width = pct + '%';
-                    fill.classList.remove('warn', 'danger');
-                    if (pct >= 85) fill.classList.add('danger');
-                    else if (pct >= 70) fill.classList.add('warn');
-                }
+            if (fillCircle) {
+                // No SVG com r=15.9155, o comprimento do arco é exatamente 100.
+                // stroke-dashoffset = 100 significa 0% preenchido.
+                // stroke-dashoffset = 0 significa 100% preenchido.
+                const offset = 100 - clampedPct;
+                fillCircle.style.strokeDashoffset = offset;
+                
+                fillCircle.classList.remove('warn', 'danger');
+                if (pct >= 85) fillCircle.classList.add('danger');
+                else if (pct >= 70) fillCircle.classList.add('warn');
+            }
 
-                if (info) {
-                    const color = pct >= 85 ? 'var(--error)' : pct >= 70 ? 'var(--warning)' : 'var(--text-muted)';
-                    info.innerHTML = `
-                        <span>${count} simulado${count !== 1 ? 's' : ''}</span>
-                        <span style="color:${color};">${Utils.formatBytes(stats.usage)} / ${Utils.formatBytes(stats.quota)} (${pct}%)</span>
-                    `;
-                }
-            });
+            if (percentText) {
+                percentText.textContent = `${clampedPct}%`;
+            }
         },
 
         _syncSelectionUI() {

@@ -74,7 +74,7 @@
                     continue;
                 }
 
-                const check = await StorageManager.canStore(result.data);
+                const check = StorageManager.canStore(result.data);
                 if (!check.allowed) {
                     report.failed.push({ name: result.file, errors: ['Armazenamento cheio.'] });
                     continue;
@@ -134,7 +134,7 @@
             const duplicate = this._findDuplicate(data);
 
             if (!duplicate) {
-                const check = await StorageManager.canStore(data);
+                const check = StorageManager.canStore(data);
                 if (!check.allowed) {
                     ModalManager.alert('Armazenamento local cheio. Acesse a Biblioteca e exclua simulados para liberar espaço.');
                     return;

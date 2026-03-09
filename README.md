@@ -530,10 +530,11 @@ npm run test:integration  # apenas integração
 
 **Cobertura:**
 
-- `quiz-engine.test.js` init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
-- `validator.test.js` casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
-- `storage-manager.test.js` CRUD da biblioteca, session, draft, histórico com limite, primeira visita.
-- `quiz-flow.test.js` fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
+- `quiz-engine.test.js` — init, select (única/múltipla), confirm, navigate, flag, reset, getQuestionStatus, shuffling.
+- `validator.test.js` — casos válidos, campos obrigatórios ausentes, tipos inválidos, alternativas, respostas corretas.
+- `storage-manager.test.js` — CRUD da biblioteca, replaceInLibrary, updateLibraryMeta, removeManyFromLibrary, session, draft, histórico com limite, getStorageStats fallback, canStore com threshold simulado.
+- `file-handler.test.js` — _findDuplicate, _handleSingle (válido/inválido), _handleBatch (salvos, skipped, conflito, armazenamento cheio, redirect para biblioteca), handleMultiple (filtro de extensão).
+- `quiz-flow.test.js` — fluxo completo: adicionar à biblioteca → iniciar → responder → salvar stats → acumulação de média.
 
 Os testes rodam em Node.js >= 21 sem DOM real. O ambiente é simulado via polyfills em `tests/setup/environment.js` e os módulos IIFE são carregados via `tests/setup/loader.js`.
 

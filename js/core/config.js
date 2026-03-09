@@ -7,6 +7,7 @@
             SESSION_KEY: 'quizlab_session'
         },
         LIMITS: {
+            STORAGE_SAFE_QUOTA_BYTES: 4 * 1024 * 1024,
             STORAGE_WARN_THRESHOLD: 0.70,
             STORAGE_BLOCK_THRESHOLD: 0.85,
             ENUNCIADO_MIN_LENGTH: 5,

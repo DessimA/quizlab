@@ -124,23 +124,22 @@
             return this.saveLibrary(library);
         },
 
-        async getStorageStats() {
-            const FALLBACK_QUOTA = 5 * 1024 * 1024;
-            if (!navigator.storage?.estimate) {
-                const raw = localStorage.getItem(CONFIG.STORAGE.LIBRARY_KEY) || '';
-                const usage = new Blob([raw]).size;
-                return { usage, quota: FALLBACK_QUOTA, percent: usage / FALLBACK_QUOTA };
+        _measureLocalStorageUsage() {
+            let total = 0;
+            for (const key of Object.keys(localStorage)) {
+                total += new Blob([localStorage.getItem(key) || '']).size;
             }
-            try {
-                const { usage, quota } = await navigator.storage.estimate();
-                return { usage, quota, percent: usage / quota };
-            } catch {
-                return { usage: 0, quota: FALLBACK_QUOTA, percent: 0 };
-            }
+            return total;
         },
 
-        async canStore(data) {
-            const stats = await this.getStorageStats();
+        getStorageStats() {
+            const quota = CONFIG.LIMITS.STORAGE_SAFE_QUOTA_BYTES;
+            const usage = this._measureLocalStorageUsage();
+            return { usage, quota, percent: usage / quota };
+        },
+
+        canStore(data) {
+            const stats = this.getStorageStats();
             const dataSize = new Blob([JSON.stringify(data)]).size;
             const projectedPercent = (stats.usage + dataSize) / stats.quota;
             if (projectedPercent >= CONFIG.LIMITS.STORAGE_BLOCK_THRESHOLD) {

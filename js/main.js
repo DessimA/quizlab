@@ -39,7 +39,7 @@
             _pendingState.savedId = null;
 
             if (shouldSave) {
-                const check = await StorageManager.canStore(quiz);
+                const check = StorageManager.canStore(quiz);
                 if (!check.allowed) {
                     ModalManager.close('exportOptionsModal');
                     ModalManager.alert('Armazenamento local cheio. Acesse a Biblioteca e exclua simulados para liberar espaço.');

@@ -274,24 +274,25 @@
                     <button class="btn btn-ghost" data-action="enter-app" title="Voltar">
                         <span data-icon="arrowLeft"></span>
                     </button>
-                    <button class="btn btn-ghost" id="btnToggleSelection" data-action="toggle-selection-mode">
-                        <span data-icon="check" data-size="sm"></span>
-                        <span class="btn-label" style="margin-left:4px; font-size:0.8rem;">Selecionar</span>
-                    </button>
+                    
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <!-- Indicador Circular de Armazenamento -->
+                        <div id="storageIndicator" class="storage-indicator" title="Espaço utilizado no localStorage">
+                            <svg class="storage-circle" viewBox="0 0 36 36">
+                                <circle class="storage-circle-bg" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="storage-circle-fill" id="storageCircleFill" cx="18" cy="18" r="15.9155" stroke-dasharray="100" stroke-dashoffset="100"></circle>
+                                <text class="storage-circle-text" id="storagePercentText" x="18" y="20.5">0%</text>
+                            </svg>
+                        </div>
+
+                        <button class="btn btn-ghost" id="btnToggleSelection" data-action="toggle-selection-mode">
+                            <span data-icon="check" data-size="sm"></span>
+                            <span class="btn-label" style="margin-left:4px; font-size:0.8rem;">Selecionar</span>
+                        </button>
+                    </div>
                 </div>
                 
                 <h2 class="neon-text" style="text-align: center; margin-bottom: 16px;">Biblioteca Local</h2>
-
-                <!-- Barra de status de armazenamento -->
-                <div class="lib-storage-status" style="margin-bottom: 20px;">
-                    <div id="libStorageInfo" class="lib-storage-info">
-                        <span>0 simulados</span>
-                        <span>—</span>
-                    </div>
-                    <div class="lib-capacity-track" style="height: 5px; margin-top: 6px;">
-                        <div class="lib-capacity-fill" id="libCapacityFill" style="width: 0%"></div>
-                    </div>
-                </div>
 
                 <!-- Toolbar de seleção em massa (oculta por padrão) -->
                 <div id="libBulkToolbar" class="lib-bulk-toolbar hidden" style="margin-bottom: 16px;">
