@@ -15,13 +15,14 @@
             const container = document.getElementById('libraryList');
             if (!container) return;
 
+            const library = StorageManager.getLibrary();
             const query = document.getElementById('librarySearch')?.value.toLowerCase().trim() || '';
             const sortBy = document.getElementById('librarySort')?.value || 'recent';
 
-            let library = StorageManager.getLibrary();
+            let filtered = library;
 
             if (query) {
-                library = library.filter(item => {
+                filtered = library.filter(item => {
                     const name = item.data.nomeSimulado?.toLowerCase() || '';
                     const desc = item.data.descricao?.toLowerCase() || '';
                     const tags = (item.data.tags || []).join(' ').toLowerCase();
@@ -29,7 +30,7 @@
                 });
             }
 
-            const sortedLibrary = [...library].sort((a, b) => {
+            const sortedLibrary = [...filtered].sort((a, b) => {
                 switch (sortBy) {
                     case 'oldest':   return a.meta.addedAt - b.meta.addedAt;
                     case 'az':       return (a.data.nomeSimulado || '').localeCompare(b.data.nomeSimulado || '');
@@ -50,17 +51,16 @@
 
             this._syncSelectionUI();
             this._updateCapacityUI();
-            this._updateWrongBadge();
+            this._updateWrongBadge(library);
 
-            const currentTotal = StorageManager.getLibrary()
-                .reduce((sum, i) => sum + (i.meta.wrongQuestions?.length || 0), 0);
+            const currentTotal = library.reduce((sum, i) => sum + (i.meta.wrongQuestions?.length || 0), 0);
 
             if (currentTotal !== this._lastWrongTotal) {
                 this._reviewInitialized = false;
                 this._lastWrongTotal = currentTotal;
             }
 
-            if (this._activeTab === 'revisao') this.renderReviewPanel();
+            if (this._activeTab === 'revisao') this.renderReviewPanel(library);
         },
 
         renderCard(item, container, activeSession) {
@@ -71,7 +71,7 @@
             const avg = item.meta.averageScore || 0;
 
             const historyBars = (item.meta.history || []).slice(0, 6).map(h => {
-                const color = h.score >= 70 ? 'var(--success)' : h.score >= 40 ? 'var(--warning)' : 'var(--error)';
+                const color = Utils.scoreColor(h.score);
                 return `<div class="lib-history-bar" style="--bar-h:${Math.max(10, h.score)}%; --bar-color:${color};" title="${h.score}%"></div>`;
             }).join('');
 
@@ -113,7 +113,7 @@
                     <button class="btn btn-ghost btn-delete" data-action="delete-quiz" data-id="${item.id}" title="Excluir"><span data-icon="trash"></span></button>
                    </div>`;
 
-            const avgColor = avg >= 70 ? 'var(--success)' : avg >= 40 ? 'var(--warning)' : avg > 0 ? 'var(--error)' : 'var(--text-muted)';
+            const avgColor = Utils.scoreColor(avg);
 
             const wrongCount = item.meta.wrongQuestions?.length || 0;
             const wrongBadgeHtml = wrongCount > 0
@@ -201,15 +201,15 @@
             if (isRevisao) this.renderReviewPanel();
         },
 
-        renderReviewPanel() {
+        renderReviewPanel(library) {
             const panel = document.getElementById('libReviewPanel');
             if (!panel) return;
 
-            const library = StorageManager.getLibrary();
-            const total = library.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
+            const lib = library || StorageManager.getLibrary();
+            const total = lib.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
 
             if (!this._reviewInitialized) {
-                library.forEach(item => {
+                lib.forEach(item => {
                     if ((item.meta.wrongQuestions?.length || 0) > 0) {
                         this._reviewSelection.add(item.id);
                     }
@@ -217,7 +217,7 @@
                 this._reviewInitialized = true;
             }
 
-            const selectedTotal = this._getSelectedWrongCount();
+            const selectedTotal = this._getSelectedWrongCount(lib);
 
             if (!this._reviewQty || this._reviewQty > selectedTotal) {
                 this._reviewQty = selectedTotal;
@@ -227,14 +227,15 @@
             }
 
             panel.innerHTML = total === 0
-                ? this._buildEmptyReviewHTML()
-                : this._buildReviewPanelHTML(library, selectedTotal);
+                ? this._buildEmptyReviewHTML(lib)
+                : this._buildReviewPanelHTML(lib, selectedTotal);
 
             if (window.IconSystem) IconSystem.inject(panel);
         },
 
-        _buildEmptyReviewHTML() {
-            const hasSimulados = StorageManager.getLibrary().length > 0;
+        _buildEmptyReviewHTML(library) {
+            const lib = library || StorageManager.getLibrary();
+            const hasSimulados = lib.length > 0;
             const message = hasSimulados
                 ? 'Complete um simulado salvo na biblioteca para começar a rastrear erros.'
                 : 'Adicione simulados à biblioteca e jogue para começar a rastrear seus erros.';
@@ -336,16 +337,16 @@
             return this._reviewQty;
         },
 
-        _getSelectedWrongCount() {
-            const library = StorageManager.getLibrary();
-            return library
+        _getSelectedWrongCount(library) {
+            const lib = library || StorageManager.getLibrary();
+            return lib
                 .filter(item => this._reviewSelection.has(item.id))
                 .reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
         },
 
-        _updateWrongBadge() {
-            const library = StorageManager.getLibrary();
-            const total = library.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
+        _updateWrongBadge(library) {
+            const lib = library || StorageManager.getLibrary();
+            const total = lib.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
             const badge = document.getElementById('wrongBadge');
             if (!badge) return;
 
@@ -358,7 +359,7 @@
             const el = document.getElementById('libSelectionCount');
             const btn = document.getElementById('libDeleteSelectedBtn');
             const label = document.getElementById('libDeleteSelectedLabel');
-            if (el) el.textContent = `${count} selecionado${count !== 1 ? 's' : ''}`;
+            if (el) el.textContent = Utils.plural(count, 'selecionado');
             if (btn) btn.disabled = count === 0;
             if (label) label.textContent = count > 0 ? `Excluir (${count})` : 'Excluir';
         },
@@ -408,13 +409,13 @@
             const count = this._selection.ids.size;
             if (count === 0) return;
             ModalManager.confirm(
-                `Excluir ${count} simulado${count !== 1 ? 's' : ''} permanentemente? Esta ação não pode ser desfeita.`,
+                `Excluir ${Utils.plural(count, 'simulado')} permanentemente? Esta ação não pode ser desfeita.`,
                 () => {
                     StorageManager.removeManyFromLibrary([...this._selection.ids]);
                     this._selection.ids.clear();
                     this._selection.active = false;
                     this.render();
-                    ToastSystem.show(`${count} simulado${count !== 1 ? 's' : ''} excluído${count !== 1 ? 's' : ''}.`);
+                    ToastSystem.show(`${Utils.plural(count, 'simulado')} excluído${count !== 1 ? 's' : ''}.`);
                 }
             );
         },
