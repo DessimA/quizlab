@@ -507,7 +507,7 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
 .lib-history-bar { flex: 1; max-width: 20px; height: var(--bar-h, 50%); background: var(--bar-color, var(--primary-500)); border-radius: 2px 2px 0 0; transition: opacity 0.2s; opacity: 0.85; }
 .lib-history-bar:hover { opacity: 1; }
 
-.lib-actions { display: flex; align-items: center; gap: var(--space-xs); margin-top: var(--space-lg); }
+.lib-actions { display: flex; align-items: center; gap: var(--space-xs); margin-top: auto; padding-top: var(--space-sm); }
 .lib-actions .btn { flex: none; width: 40px; min-height: 40px; padding: 0; font-size: 0.75rem; }
 .lib-actions .btn:first-child { flex: 1; width: auto; padding: 0 var(--space-sm); }
 .lib-actions .btn-delete { color: var(--error) !important; border-left: 1px solid var(--border-glass); margin-left: 2px; padding-left: var(--space-sm) !important; border-radius: 0 var(--radius-full) var(--radius-full) 0 !important; }
