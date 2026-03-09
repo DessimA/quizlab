@@ -178,6 +178,32 @@
 
         markFirstVisit() {
             localStorage.setItem(CONFIG.STORAGE.FIRST_VISIT_KEY, 'true');
+        },
+
+        saveWrongQuestions(libraryId, wrongQuestions) {
+            this.updateLibraryMeta(libraryId, { wrongQuestions });
+        },
+
+        getAggregatedWrong(quizIds) {
+            const library = this.getLibrary();
+            const items = quizIds
+                ? library.filter(i => quizIds.includes(i.id))
+                : library;
+
+            const seen = new Set();
+            const result = [];
+
+            items.forEach(item => {
+                (item.meta.wrongQuestions || []).forEach(wq => {
+                    const key = `${wq.sourceQuizId}__${wq.questao.id}`;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        result.push(wq);
+                    }
+                });
+            });
+
+            return result;
         }
     };
 

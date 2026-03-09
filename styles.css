@@ -741,6 +741,157 @@ select.input-field option {
 .docs-section p, .docs-section li { font-size: var(--font-body); margin-bottom: var(--space-sm); line-height: 1.7; color: var(--text-secondary); }
 pre { background: var(--surface-container); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: var(--space-md); font-size: 0.78rem; margin-bottom: var(--space-md); overflow-x: auto; }
 
+/* ── Library Tabs ──────────────────────────────────────── */
+.lib-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: 0;
+}
+
+.lib-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    bottom: -1px;
+}
+
+.lib-tab:hover {
+    color: var(--text-secondary);
+}
+
+.lib-tab.active {
+    color: var(--primary-500);
+    border-bottom-color: var(--primary-500);
+}
+
+/* ── Wrong Badge (na aba Revisão) ──────────────────────── */
+.lib-wrong-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--error);
+    color: #fff;
+    border-radius: var(--radius-full);
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ── Review Panel ──────────────────────────────────────── */
+.review-info-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+    border-left: 3px solid var(--primary-500);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.review-quiz-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.review-quiz-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.review-quiz-row:not(.disabled):hover {
+    border-color: var(--primary-500);
+}
+
+.review-quiz-row.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.review-quiz-row input[type="checkbox"] {
+    accent-color: var(--primary-500);
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.review-quiz-name {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.review-quiz-count {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.review-quiz-count.has-errors {
+    color: var(--error);
+    font-weight: 700;
+}
+
+/* ── Review Quantity Slider ────────────────────────────── */
+.review-qty-section {
+    margin-bottom: var(--space-lg);
+}
+
+.review-qty-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.review-qty-value {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-500);
+}
+
+.review-qty-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
 /* Responsive Unified System */
 @media (max-width: 480px) {
     .hero-title { font-size: 1.5rem; }

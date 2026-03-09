@@ -28,6 +28,7 @@
         },
 
         finalizeProcess() {
+            this._extractAndSaveWrongQuestions();
             const stats = QuizEngine.getStats();
             QuizEngine.saveStatsToLibrary();
             QuizEngine.stopTimer();
@@ -58,6 +59,88 @@
 
             this._renderHistory(rev);
             ScreenManager.change(CONFIG.ELEMENTS.RESULT_SCREEN);
+        },
+
+        _extractAndSaveWrongQuestions() {
+            const state = QuizEngine.getState();
+            const quizData = state.quizData;
+
+            if (state.libraryId) {
+                this._updateWrongForQuiz(state.libraryId, quizData, state);
+                return;
+            }
+
+            if (quizData._reviewSources) {
+                this._updateWrongFromReview(quizData, state);
+            }
+        },
+
+        _updateWrongForQuiz(libraryId, quizData, state) {
+            const item = StorageManager.getById(libraryId);
+            if (!item) return;
+
+            const existingMap = new Map(
+                (item.meta.wrongQuestions || []).map(wq => [String(wq.questao.id), wq])
+            );
+
+            quizData.questoes.forEach((q, i) => {
+                if (!state.questionAnswered[i]) return;
+
+                const key = String(q.id);
+                if (QuizEngine.checkAnswer(i)) {
+                    existingMap.delete(key);
+                } else {
+                    const prev = existingMap.get(key);
+                    existingMap.set(key, {
+                        sourceQuizId: libraryId,
+                        sourceQuizName: quizData.nomeSimulado,
+                        questao: q,
+                        errorCount: prev ? prev.errorCount + 1 : 1
+                    });
+                }
+            });
+
+            StorageManager.saveWrongQuestions(libraryId, _capWrongList([...existingMap.values()]));
+        },
+
+        _updateWrongFromReview(quizData, state) {
+            const bySource = {};
+
+            quizData.questoes.forEach((q, i) => {
+                if (!state.questionAnswered[i]) return;
+
+                const sourceQuizId = quizData._reviewSources[String(q.id)];
+                if (!sourceQuizId) return;
+
+                if (!bySource[sourceQuizId]) bySource[sourceQuizId] = [];
+                bySource[sourceQuizId].push({ questao: q, isCorrect: QuizEngine.checkAnswer(i) });
+            });
+
+            Object.entries(bySource).forEach(([sourceQuizId, entries]) => {
+                const item = StorageManager.getById(sourceQuizId);
+                if (!item) return;
+
+                const existingMap = new Map(
+                    (item.meta.wrongQuestions || []).map(wq => [String(wq.questao.id), wq])
+                );
+
+                entries.forEach(({ questao, isCorrect }) => {
+                    const key = String(questao.id);
+                    if (isCorrect) {
+                        existingMap.delete(key);
+                    } else {
+                        const prev = existingMap.get(key);
+                        existingMap.set(key, {
+                            sourceQuizId,
+                            sourceQuizName: item.data.nomeSimulado,
+                            questao,
+                            errorCount: prev ? prev.errorCount + 1 : 1
+                        });
+                    }
+                });
+
+                StorageManager.saveWrongQuestions(sourceQuizId, _capWrongList([...existingMap.values()]));
+            });
         },
 
         _buildFlaggedSection(flaggedIndexes) {
@@ -171,6 +254,13 @@
                 </div>`;
         }
     };
+
+    function _capWrongList(list) {
+        if (list.length <= CONFIG.LIMITS.MAX_WRONG_PER_QUIZ) return list;
+        return list
+            .sort((a, b) => b.errorCount - a.errorCount)
+            .slice(0, CONFIG.LIMITS.MAX_WRONG_PER_QUIZ);
+    }
 
     window.ReviewManager = ReviewManager;
 })(window);

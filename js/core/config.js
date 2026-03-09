@@ -13,7 +13,8 @@
             ENUNCIADO_MIN_LENGTH: 5,
             RECOMMENDED_MAX_QUESTIONS: 500,
             MAX_HISTORY_ENTRIES: 10,
-            ENUNCIADO_PREVIEW_LENGTH: 120
+            ENUNCIADO_PREVIEW_LENGTH: 120,
+            MAX_WRONG_PER_QUIZ: 65
         },
         TIMINGS: {
             AUTOSAVE_INTERVAL: 30000,

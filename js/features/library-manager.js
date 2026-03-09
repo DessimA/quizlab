@@ -5,6 +5,10 @@
             ids: new Set()
         },
 
+        _activeTab: 'simulados',
+        _reviewSelection: new Set(),
+        _reviewQty: 0,
+
         render() {
             const container = document.getElementById('libraryList');
             if (!container) return;
@@ -44,6 +48,8 @@
 
             this._syncSelectionUI();
             this._updateCapacityUI();
+            this._updateWrongBadge();
+            if (this._activeTab === 'revisao') this.renderReviewPanel();
         },
 
         renderCard(item, container, activeSession) {
@@ -145,12 +151,182 @@
         _syncSelectionUI() {
             const btn = document.getElementById('btnToggleSelection');
             const toolbar = document.getElementById('libBulkToolbar');
+
+            if (this._activeTab === 'revisao') {
+                btn?.classList.add('hidden');
+                toolbar?.classList.add('hidden');
+                return;
+            }
+
             if (btn) {
+                btn.classList.remove('hidden');
                 const label = btn.querySelector('.btn-label');
                 if (label) label.textContent = this._selection.active ? 'Cancelar' : 'Selecionar';
             }
             if (toolbar) toolbar.classList.toggle('hidden', !this._selection.active);
             this._updateSelectionCount();
+        },
+
+        switchTab(tab) {
+            this._activeTab = tab;
+            const isRevisao = tab === 'revisao';
+
+            document.querySelectorAll('.lib-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+
+            document.getElementById('libSimuladosControls')?.classList.toggle('hidden', isRevisao);
+            document.getElementById('libraryList')?.classList.toggle('hidden', isRevisao);
+            document.getElementById('emptyLibraryMsg')?.classList.toggle('hidden', true);
+            document.getElementById('libReviewPanel')?.classList.toggle('hidden', !isRevisao);
+
+            this._syncSelectionUI();
+
+            if (isRevisao) this.renderReviewPanel();
+        },
+
+        renderReviewPanel() {
+            const panel = document.getElementById('libReviewPanel');
+            if (!panel) return;
+
+            const library = StorageManager.getLibrary();
+            const total = library.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
+
+            if (this._reviewSelection.size === 0) {
+                library.forEach(item => {
+                    if ((item.meta.wrongQuestions?.length || 0) > 0) {
+                        this._reviewSelection.add(item.id);
+                    }
+                });
+            }
+
+            const selectedTotal = this._getSelectedWrongCount();
+
+            if (!this._reviewQty || this._reviewQty > selectedTotal) {
+                this._reviewQty = selectedTotal;
+            }
+            if (this._reviewQty < 1 && selectedTotal > 0) {
+                this._reviewQty = 1;
+            }
+
+            panel.innerHTML = total === 0
+                ? this._buildEmptyReviewHTML()
+                : this._buildReviewPanelHTML(library, selectedTotal);
+
+            if (window.IconSystem) IconSystem.inject(panel);
+        },
+
+        _buildEmptyReviewHTML() {
+            return `
+                <div class="review-info-notice" style="margin-bottom: var(--space-lg);">
+                    <span data-icon="info" data-size="sm"></span>
+                    <span>O rastreamento de erros funciona apenas para simulados salvos na Biblioteca Local.</span>
+                </div>
+                <div class="empty-state" style="text-align:center; padding:var(--space-2xl); color:var(--text-muted); grid-column: 1 / -1;">
+                    <p>Nenhuma questão com erro registrada ainda.</p>
+                    <p style="margin-top:var(--space-sm); font-size:0.8rem;">
+                        Complete um simulado salvo na biblioteca para começar a rastrear seus erros.
+                    </p>
+                </div>`;
+        },
+
+        _buildReviewPanelHTML(library, selectedTotal) {
+            const rowsHTML = library.map(item => {
+                const count = item.meta.wrongQuestions?.length || 0;
+                const isSelected = this._reviewSelection.has(item.id);
+                const isDisabled = count === 0;
+
+                return `
+                    <label class="review-quiz-row${isDisabled ? ' disabled' : ''}">
+                        <input type="checkbox"
+                               data-action="review-source-toggle"
+                               data-id="${item.id}"
+                               ${isSelected ? 'checked' : ''}
+                               ${isDisabled ? 'disabled' : ''}>
+                        <span class="review-quiz-name">${item.data.nomeSimulado}</span>
+                        <span class="review-quiz-count${count > 0 ? ' has-errors' : ''}">
+                            ${count > 0 ? `${count} ✗` : '—'}
+                        </span>
+                    </label>`;
+            }).join('');
+
+            const sliderAndButtonHTML = selectedTotal > 0 ? `
+                <div class="review-qty-section">
+                    <div class="review-qty-header">
+                        <span>Questões no simulado de revisão</span>
+                        <span id="reviewQtyDisplay" class="review-qty-value">${this._reviewQty}</span>
+                    </div>
+                    <input type="range"
+                           id="reviewQtySlider"
+                           data-oninput="review-qty-change"
+                           min="1"
+                           max="${selectedTotal}"
+                           value="${this._reviewQty}"
+                           style="width:100%; cursor:pointer;">
+                    <div class="review-qty-labels">
+                        <span>1</span>
+                        <span>${selectedTotal} disponíveis</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top:var(--space-sm);" data-action="start-review-quiz">
+                    <span data-icon="play" data-size="sm"></span>
+                    Iniciar Revisão
+                </button>` : `
+                <p style="text-align:center; color:var(--text-muted); padding:var(--space-md); font-size:0.85rem;">
+                    Selecione ao menos um simulado com erros para iniciar a revisão.
+                </p>`;
+
+            return `
+                <div class="review-info-notice" style="margin-bottom: var(--space-lg);">
+                    <span data-icon="info" data-size="sm"></span>
+                    <span>O rastreamento de erros funciona apenas para simulados salvos na Biblioteca Local.</span>
+                </div>
+                <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
+                    SIMULADOS
+                </div>
+                <div class="review-quiz-list" style="margin-bottom:var(--space-lg);">${rowsHTML}</div>
+                ${sliderAndButtonHTML}`;
+        },
+
+        toggleReviewSource(id, checked) {
+            if (checked) {
+                this._reviewSelection.add(id);
+            } else {
+                this._reviewSelection.delete(id);
+            }
+            this.renderReviewPanel();
+        },
+
+        updateReviewQty(qty) {
+            this._reviewQty = qty;
+            const display = document.getElementById('reviewQtyDisplay');
+            if (display) display.textContent = qty;
+        },
+
+        getSelectedForReview() {
+            const validIds = new Set(StorageManager.getLibrary().map(i => i.id));
+            return [...this._reviewSelection].filter(id => validIds.has(id));
+        },
+
+        getReviewQuantity() {
+            return this._reviewQty;
+        },
+
+        _getSelectedWrongCount() {
+            const library = StorageManager.getLibrary();
+            return library
+                .filter(item => this._reviewSelection.has(item.id))
+                .reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
+        },
+
+        _updateWrongBadge() {
+            const library = StorageManager.getLibrary();
+            const total = library.reduce((sum, item) => sum + (item.meta.wrongQuestions?.length || 0), 0);
+            const badge = document.getElementById('wrongBadge');
+            if (!badge) return;
+
+            badge.textContent = total;
+            badge.classList.toggle('hidden', total === 0);
         },
 
         _updateSelectionCount() {
