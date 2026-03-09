@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
 </head>
 <body>
 
@@ -36,27 +35,29 @@
     </header>
 
     <div class="container fade-in">
-        <main class="content">
-            <h1 class="neon-text" style="margin-bottom: 8px; text-align: center; color:var(--error); font-size: var(--font-h1);">SOLUÇÃO DE PROBLEMAS</h1>
-            <p style="text-align:center; margin-bottom:24px; color:var(--text-secondary); font-size: var(--font-body);">Diagnóstico e resolução para erros comuns</p>
+        <main class="content" style="max-width:800px;">
+            <h1 class="neon-text" style="margin-bottom:8px; text-align:center; color:var(--error); font-size:var(--font-h1);">SOLUÇÃO DE PROBLEMAS</h1>
+            <p style="text-align:center; margin-bottom:24px; color:var(--text-secondary); font-size:var(--font-body);">Diagnóstico e resolução para comportamentos inesperados</p>
 
-            <div class="docs-content" style="padding: 24px;">
-                
+            <div class="docs-content" style="padding:24px;">
+
+                <!-- UPLOAD E ARQUIVO -->
                 <section class="docs-section">
                     <h2>
                         <span data-icon="upload_file" data-size="md"></span>
                         Problemas de Upload e Arquivo
                     </h2>
-                    
+
                     <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
                         <div>
                             <h3 style="color:var(--error)">Erro: "Arquivo não é JSON válido"</h3>
-                            <p><strong>Causa Provável:</strong> O arquivo contém erros de sintaxe ou a extensão não é .json.</p>
+                            <p><strong>Causa provável:</strong> O arquivo contém erros de sintaxe ou a extensão não é .json.</p>
                             <p><strong>Solução:</strong></p>
-                            <ol>
+                            <ol style="margin-left:var(--space-md);line-height:2;color:var(--text-secondary)">
                                 <li>Abra o arquivo no Bloco de Notas ou VS Code.</li>
                                 <li>Verifique se começa com <code>{</code> e termina com <code>}</code>.</li>
-                                <li>Cole o conteúdo no site <a href="https://jsonlint.com" target="_blank" style="color:var(--primary-500)">JSONLint</a> para validar.</li>
+                                <li>Procure vírgulas sobrando antes de <code>}</code> ou <code>]</code>.</li>
+                                <li>Cole o conteúdo no <a href="https://jsonlint.com" target="_blank" style="color:var(--primary-500)">JSONLint</a> para validar a sintaxe.</li>
                             </ol>
                         </div>
                     </div>
@@ -64,62 +65,208 @@
                     <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
                         <div>
                             <h3 style="color:var(--error)">Erro: "Campo Obrigatório Ausente"</h3>
-                            <p><strong>Causa Provável:</strong> O JSON não possui o campo <code>nomeSimulado</code> ou <code>questoes</code>.</p>
-                            <p><strong>Solução:</strong> Baixe o <a href="exemplo_basico.json" style="color:var(--primary-500)">Arquivo de Exemplo</a> e compare a estrutura.</p>
+                            <p><strong>Causa provável:</strong> O JSON não possui o campo <code>nomeSimulado</code> ou <code>questoes</code>, ou uma questão está faltando <code>id</code>, <code>tipo</code>, <code>alternativas</code> ou <code>respostasCorretas</code>.</p>
+                            <p><strong>Solução:</strong> Baixe o <a href="exemplo_basico.json" style="color:var(--primary-500)">Arquivo de Exemplo</a> e compare campo a campo com o seu.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px; border-color:var(--error-bg)">
+                        <div>
+                            <h3 style="color:var(--error)">Erro: "ID de resposta não encontrado nas alternativas"</h3>
+                            <p><strong>Causa provável:</strong> Um valor em <code>respostasCorretas</code> não corresponde a nenhum <code>id</code> dentro do array <code>alternativas</code> daquela questão. IDs são case-sensitive: <code>"A"</code> e <code>"a"</code> são diferentes.</p>
+                            <p><strong>Solução:</strong> Certifique-se de que cada valor em <code>respostasCorretas</code> existe exatamente (mesma capitalização) como <code>id</code> em <code>alternativas</code>.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Conflito de conteúdo em importação em massa</h3>
+                            <p><strong>Causa:</strong> Você importou múltiplos arquivos e um deles tem o mesmo nome de um simulado já salvo, mas com conteúdo diferente. Em lote, o sistema não substitui automaticamente.</p>
+                            <p><strong>Solução:</strong> Importe o arquivo conflitante <strong>individualmente</strong> (um único arquivo por vez). O sistema irá perguntar se você deseja substituir o simulado existente.</p>
                         </div>
                     </div>
                 </section>
 
+                <!-- DURANTE O QUIZ -->
                 <section class="docs-section">
                     <h2>
                         <span data-icon="quiz" data-size="md"></span>
                         Problemas Durante o Quiz
                     </h2>
-                    
-                    <div class="feature-card" style="margin-bottom:16px">
+
+                    <div class="feature-card" style="margin-bottom:16px;">
                         <div>
                             <h3>Botão "Confirmar" não habilita</h3>
                             <p><strong>Causa:</strong> Em questões de múltipla escolha, você selecionou mais ou menos opções do que o exigido.</p>
-                            <p><strong>Solução:</strong> Leia atentamente o aviso "(SELECIONE EXATAMENTE X)". Se pedir 2, marque apenas 2.</p>
+                            <p><strong>Solução:</strong> Leia o aviso "(SELECIONE EXATAMENTE X)" exibido abaixo do enunciado. Desmarque alternativas extras se tiver selecionado mais do que o necessário.</p>
                         </div>
                     </div>
 
-                    <div class="feature-card" style="margin-bottom:16px">
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Timer do Modo Exame não apareceu</h3>
+                            <p><strong>Causa mais comum:</strong> O simulado foi iniciado no Modo Estudo, não no Modo Exame. O timer só é exibido no Modo Exame.</p>
+                            <p><strong>Causa secundária:</strong> O simulado não tem o campo <code>tempoLimiteMinutos</code> no JSON e o cálculo automático (questões × 2 minutos) produziu um valor muito alto o timer existe, mas você ainda não o viu decrescer de forma perceptível.</p>
+                            <p><strong>Solução:</strong> Reinicie o simulado selecionando explicitamente "Modo Exame" nas opções de início. Para definir um tempo personalizado, adicione <code>"tempoLimiteMinutos": 60</code> ao JSON e reimporte.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Sessão salva não aparece para retomar</h3>
+                            <p><strong>Causa:</strong> A sessão salva só é oferecida no Modo Estudo. Sessões do Modo Exame não são persistidas. Além disso, se o simulado salvo na sessão tiver sido excluído da biblioteca, a sessão é descartada automaticamente.</p>
+                            <p><strong>Solução:</strong> O botão "Retomar" aparece apenas no card do simulado correspondente na biblioteca, não na tela inicial. Acesse a Biblioteca e procure o card com o indicador de sessão salva.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
                         <div>
                             <h3>Travou ou Tela Branca</h3>
-                            <p><strong>Causa:</strong> Erro raro de memória ou script.</p>
-                            <p><strong>Solução:</strong> Recarregue a página (F5). Infelizmente o progresso daquele simulado será perdido, mas o sistema voltará ao normal.</p>
+                            <p><strong>Causa:</strong> Erro raro de script, geralmente após atualização de versão com Service Worker em cache.</p>
+                            <p><strong>Solução passo a passo:</strong></p>
+                            <ol style="margin-left:var(--space-md);line-height:2;color:var(--text-secondary)">
+                                <li>Pressione <code>Ctrl+Shift+R</code> (Windows/Linux) ou <code>Cmd+Shift+R</code> (Mac) para forçar recarga ignorando o cache.</li>
+                                <li>Se persistir, abra as Ferramentas do Desenvolvedor (F12) → aba "Application" → "Service Workers" → clique em "Unregister".</li>
+                                <li>Recarregue a página normalmente (F5).</li>
+                            </ol>
+                            <p>O progresso do simulado em curso será perdido, mas os dados da biblioteca permanecem intactos.</p>
                         </div>
                     </div>
                 </section>
 
+                <!-- BIBLIOTECA -->
                 <section class="docs-section">
                     <h2>
                         <span data-icon="book" data-size="md"></span>
                         Problemas na Biblioteca
                     </h2>
-                    
-                    <div class="feature-card" style="margin-bottom:16px">
+
+                    <div class="feature-card" style="margin-bottom:16px;">
                         <div>
                             <h3>Simulados sumiram</h3>
-                            <p><strong>Causa:</strong> Limpeza de cache do navegador ou uso de aba anônima.</p>
-                            <p><strong>Prevenção:</strong> Sempre exporte seus simulados importantes para o computador (Botão Download na biblioteca).</p>
+                            <p><strong>Causa mais comum:</strong> Limpeza de cache do navegador, uso de aba anônima, ou troca de navegador/dispositivo.</p>
+                            <p><strong>Prevenção:</strong> Sempre exporte simulados importantes pelo botão de download (ícone de seta para baixo) no card da biblioteca. O arquivo .json pode ser reimportado a qualquer momento.</p>
                         </div>
                     </div>
-                    
-                    <div class="feature-card" style="margin-bottom:16px">
+
+                    <div class="feature-card" style="margin-bottom:16px;">
                         <div>
-                            <h3>Não salva mais nada (Limite Atingido)</h3>
-                            <p><strong>Solução:</strong> O limite é de 10 simulados. Exclua os antigos para liberar espaço. O sistema avisará quando chegar no limite.</p>
+                            <h3>Não consegue salvar novo simulado (armazenamento cheio)</h3>
+                            <p><strong>Causa:</strong> O uso do localStorage atingiu 85% da quota segura de 4 MB. O indicador circular no topo da tela ficará vermelho.</p>
+                            <p><strong>Solução:</strong> Exclua simulados que não usa mais (individualmente ou em massa via modo de seleção). Após liberar espaço, o indicador voltará ao normal e novas importações serão permitidas.</p>
+                            <div class="tip-box" style="margin-top:8px;">
+                                <strong>Referência:</strong> Um simulado médio ocupa aproximadamente 50 KB. Com a quota de 4 MB você pode armazenar cerca de 80 simulados de tamanho médio antes de atingir o aviso.
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Indicador de armazenamento travado em 0% ou valor incorreto</h3>
+                            <p><strong>Causa:</strong> O cálculo usa <code>Blob.size</code> para medir cada chave do localStorage. Em navegadores muito antigos que não suportam a API <code>Blob</code>, o fallback pode retornar valores inconsistentes.</p>
+                            <p><strong>Solução:</strong> Atualize seu navegador para a versão mais recente. O QuizLab é otimizado para navegadores modernos (Chrome 90+, Firefox 88+, Safari 14+).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- REVISÃO DE ERROS -->
+                <section class="docs-section">
+                    <h2>
+                        <span data-icon="flag" data-size="md"></span>
+                        Problemas na Revisão de Erros
+                    </h2>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Aba Revisão aparece vazia mesmo após errar questões</h3>
+                            <p><strong>Causa mais comum:</strong> O simulado foi jogado sem estar salvo na biblioteca. O rastreamento de erros funciona <strong>exclusivamente para simulados da Biblioteca Local</strong>. Simulados abertos diretamente de arquivo sem salvar não registram erros.</p>
+                            <p><strong>Solução:</strong> Salve o simulado na biblioteca (pelo modal de opções ou pelo criador) e jogue a partir dela. Ao finalizar, os erros serão registrados automaticamente.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Quiz de revisão não aparece no histórico da biblioteca</h3>
+                            <p><strong>Comportamento esperado:</strong> O simulado de revisão é temporário por design. Ele não é salvo na biblioteca e, portanto, não aparece no histórico de tentativas. Os resultados são distribuídos de volta para cada simulado de origem individualmente.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Slider de quantidade da revisão resetou sozinho</h3>
+                            <p><strong>Comportamento esperado:</strong> Ao desmarcar uma fonte de simulado, o total de questões disponíveis diminui. Se a quantidade selecionada no slider for maior que o novo total, ela é ajustada automaticamente para o máximo disponível. Isso é intencional para evitar iniciar uma revisão com mais questões do que existem.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Erros não diminuíram após acertar na revisão</h3>
+                            <p><strong>Causa:</strong> Para uma questão ser removida do banco de erros, ela precisa ser <strong>respondida e confirmada</strong> durante o quiz de revisão. Questões puladas (sem resposta confirmada) não são contabilizadas e permanecem no banco.</p>
+                            <p><strong>Solução:</strong> Certifique-se de confirmar a resposta em cada questão durante a revisão, mesmo que você não saiba a resposta assim o sistema registra o resultado corretamente.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ÍCONES E VISUAL -->
+                <section class="docs-section">
+                    <h2>
+                        <span data-icon="info" data-size="md"></span>
+                        Problemas Visuais e de Interface
+                    </h2>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Ícones aparecem em branco ou como quadrados</h3>
+                            <p><strong>Causa:</strong> A fonte de ícones (Material Symbols) ainda não terminou de carregar quando a interface foi renderizada. Isso ocorre em conexões lentas ou no primeiro carregamento (antes do Service Worker cachear os assets).</p>
+                            <p><strong>Solução:</strong> Aguarde alguns segundos e recarregue a página (F5). Após o primeiro carregamento completo, os ícones serão servidos do cache em todas as visitas seguintes, sem depender da velocidade da conexão.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Interface parece desatualizada após uma atualização do QuizLab</h3>
+                            <p><strong>Causa:</strong> O Service Worker está servindo arquivos da versão anterior do cache. Isso pode acontecer se o navegador não executou o ciclo de atualização do worker corretamente.</p>
+                            <p><strong>Solução:</strong></p>
+                            <ol style="margin-left:var(--space-md);line-height:2;color:var(--text-secondary)">
+                                <li>Pressione <code>Ctrl+Shift+R</code> para forçar recarga sem cache.</li>
+                                <li>Se o problema persistir: F12 → Application → Service Workers → "Unregister" → recarregue.</li>
+                                <li>Alternativamente: F12 → Network → marque "Disable cache" → recarregue uma vez.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="margin-bottom:16px;">
+                        <div>
+                            <h3>Tema claro/escuro não persiste entre sessões</h3>
+                            <p><strong>Causa:</strong> A preferência de tema é salva no localStorage. Se o cache foi limpo ou a aba é anônima, a preferência é perdida e o tema padrão (escuro) é usado.</p>
+                            <p><strong>Solução:</strong> Selecione o tema desejado pelo botão de sol/lua no cabeçalho. Em sessões normais (não anônimas), a preferência será mantida.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LINKS -->
+                <section class="docs-section">
+                    <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;margin-top:var(--space-md);">
+                        <a href="docs.html" class="btn btn-outline" style="flex:1;justify-content:center;min-width:180px;">
+                            <span data-icon="book" data-size="sm"></span>
+                            Ver Documentação Completa
+                        </a>
+                        <a href="index.html" class="btn btn-primary" style="flex:1;justify-content:center;min-width:180px;">
+                            <span data-icon="play" data-size="sm"></span>
+                            Voltar ao QuizLab
+                        </a>
                     </div>
                 </section>
 
             </div>
         </main>
+
+        <footer class="footer">
+            <p>QUIZLAB • v1.3.0</p>
+        </footer>
     </div>
 
-    <!-- Core -->
+    <script src="js/core/version.js"></script>
     <script src="js/core/config.js"></script>
     <script src="js/components/icon-system.js"></script>
     <script src="js/components/theme-manager.js"></script>

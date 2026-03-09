@@ -20,11 +20,11 @@ Service Worker que intercepta todas as requisições da aplicação.
 - `activate`: remove caches de versões antigas (troque `CACHE_NAME` para forçar atualização).
 - `fetch`: intercepta e aplica a estratégia correta.
 
-## icon-system.js — método inject()
+## icon-system.js método inject()
 
 **Problema anterior:** `document.fonts.check()` é síncrono.
 Se chamado antes da fonte terminar de carregar (race condition comum em conexões lentas),
-retorna `false` e força o fallback SVG — que não existe para `menu_book`, `mail`, `shuffle`, etc.
+retorna `false` e força o fallback SVG que não existe para `menu_book`, `mail`, `shuffle`, etc.
 Resultado: ícones em branco.
 
 **Correção:** usa `document.fonts.load()`, que retorna uma Promise e espera a fonte estar
