@@ -158,6 +158,7 @@ CONFIG.QUIZ_MODES            // 'study' | 'exam'
 CONFIG.ELEMENTS              // IDs das telas no DOM
 
 Utils.formatTime(seconds)    // formata MM:SS
+Utils.plural(count, word)    // pluraliza palavra com sufixo 's' baseado na contagem
 Utils.truncate(text)         // corta com reticências
 Utils.formatBytes(bytes)     // formata bytes em KB / MB legível
 ```
@@ -215,6 +216,9 @@ Renderiza e gerencia a tela de biblioteca. Além do CRUD e busca, suporta:
 
 ### `review-manager.js`
 Gerencia a tela de revisão pré-finalização e a tela de resultado. Na tela de resultado, renderiza o gabarito completo com status por questão (acerto, erro, pulou, não viu), seção de questões marcadas com flag e histórico de tentativas anteriores. Tambem persiste o banco de erros via `_extractAndSaveWrongQuestions()`, que diferencia entre quiz normal (atualiza o próprio simulado) e quiz de revisão temporário (atualiza cada simulado de origem via `_reviewSources`).
+
+### `review-quiz-builder.js`
+Monta o objeto de quiz temporário usado na sessão de revisão de erros. Recebe o array agregado de `wrongQuestions` (via `StorageManager.getAggregatedWrong()`), aplica o limite de quantidade definido pelo slider (`LibraryManager.getReviewQuantity()`), embaralha e constrói um objeto de quiz no formato padrão com `_reviewSources` injetado. O campo `_reviewSources` é usado pelo `ReviewManager` para identificar que o resultado deve ser distribuído de volta para cada simulado de origem, e não persistido como um simulado único.
 
 ### `file-handler.js`
 Responsável por toda a pipeline de importação de arquivos JSON:
@@ -349,6 +353,32 @@ O estado do criador é salvo automaticamente no `localStorage` a cada 30 segundo
 - Ao finalizar uma partida, questões incorretas são persistidas em `meta.wrongQuestions` de cada item da biblioteca. Questões acertadas são removidas do banco.
 - O limite é de **65 questões por simulado** (`MAX_WRONG_PER_QUIZ`). Ao atingir o limite, as questões com menor `errorCount` são descartadas.
 - O quiz de revisão é temporário: não possui `libraryId` e não é salvo na biblioteca. A identificação da origem de cada questão usa `_reviewSources` embutido no objeto quiz.
+
+**Fluxo de Revisão de Erros:**
+
+```mermaid
+sequenceDiagram
+    participant LM as LibraryManager
+    participant SM as StorageManager
+    participant RQB as ReviewQuizBuilder
+    participant SC as ScreenManager
+    participant QE as QuizEngine
+    participant RM as ReviewManager
+
+    LM->>SM: getAggregatedWrong(selectedIds)
+    SM-->>LM: wrongQuestions[]
+    LM->>RQB: build(wrongQuestions, qty)
+    RQB-->>LM: quizObj com _reviewSources
+    LM->>SC: loadQuiz(quizObj, null, options)
+    SC->>QE: init(quizObj)
+    Note over QE: Sessão temporária (sem libraryId)
+    QE-->>SC: state pronto
+    SC->>SC: change(quizScreen)
+
+    Note over RM: Ao finalizar...
+    RM->>RM: _extractAndSaveWrongQuestions()
+    RM->>SM: updateLibraryMeta(sourceId, ...) × N origens
+```
 
 ---
 

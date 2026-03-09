@@ -65,6 +65,10 @@ Antes de enviar seu PR:
 - [ ] O simulado funciona do início ao fim sem erros no console?
 - [ ] A responsividade foi testada (Mobile vs Desktop)?
 - [ ] Novos ícones foram adicionados ao `IconSystem` (se necessário)?
+- [ ] **Testes:** Foram adicionados testes unitários para novos métodos públicos no core/features?
+- [ ] **Utils:** Verificou se a funcionalidade já existe em `Utils` (ex: `Utils.plural`) para evitar duplicidade?
+- [ ] **Eventos:** Garantiu que nenhum `addEventListener` direto foi adicionado em funções de renderização?
+- [ ] **CI:** Todos os testes existentes (`npm test`) passam localmente?
 
 ---
 
