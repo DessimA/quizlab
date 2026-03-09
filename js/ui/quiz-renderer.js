@@ -123,6 +123,8 @@
             const state = QuizEngine.getState();
             if (!grid) return;
 
+            const isExam = state.mode === CONFIG.QUIZ_MODES.EXAM;
+
             grid.innerHTML = '';
             grid.setAttribute('role', 'list');
             grid.setAttribute('aria-label', 'Navegação entre questões');
@@ -136,8 +138,6 @@
                 item.className = 'grid-item';
                 item.setAttribute('role', 'listitem');
                 item.type = 'button';
-
-                const isExam = QuizEngine.getState().mode === CONFIG.QUIZ_MODES.EXAM;
 
                 if (isCurrent) item.classList.add('current');
                 if (status === 'correct') item.classList.add(isExam ? 'visited' : 'answered-correct');
