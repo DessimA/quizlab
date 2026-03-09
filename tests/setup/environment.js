@@ -14,6 +14,9 @@ const _localStorageMethods = {
     },
     clear() {
         Object.keys(_store).forEach(k => delete _store[k]);
+    },
+    get length() {
+        return Object.keys(_store).length;
     }
 };
 
