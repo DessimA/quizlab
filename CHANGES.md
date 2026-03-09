@@ -153,3 +153,57 @@ Adicionados: `.lib-storage-status`, `.lib-storage-info`, `.lib-capacity-fill.war
 - Removida suite `addToLibrary() com limite` (baseada em slots fixos).
 - Adicionadas suites para `removeManyFromLibrary()` e smoke tests para
   `getStorageStats()` e `canStore()`.
+
+---
+
+# Importação em Massa e Auditoria do Guard de Cota
+
+## Motivação
+
+O `FileHandler` só processava um arquivo por vez. Com a remoção do limite fixo
+de 10 simulados, tornou-se necessário permitir que o usuário importe múltiplos
+arquivos `.json` de uma só vez, com tratamento individualizado de erros,
+duplicatas e conflitos.
+
+---
+
+## Mudanças por Arquivo
+
+### `file-handler.js`
+- `handle(file)` mantido como fachada que delega para `handleMultiple([file])`.
+- `handleMultiple(files)` — novo método público. Recebe `FileList` ou `Array<File>`.
+  Filtra extensões `.json`, lê todos em paralelo via `Promise.all + _readFile`,
+  e após o delay mínimo de loading decide entre fluxo single (1 arquivo) ou batch
+  (múltiplos), preservando o comportamento original no caso de arquivo único.
+- `_readFile(file)` — extrai a leitura de `FileReader` para uma `Promise`
+  que resolve em `{ file, data, valid, errors }`.
+- `_handleSingle(result)` — caminho do arquivo único, chama `_askToSave` com
+  fluxo inalterado (incluindo tratamento de conflito interativo).
+- `_handleBatch(results)` — itera os resultados em série (para respeitar
+  `canStore` de forma acumulativa). Classifica cada item em: `saved`,
+  `skipped` (idêntico), `conflicts` (mesmo nome, conteúdo diferente) ou
+  `failed`. Conflitos não são resolvidos automaticamente no batch — o usuário
+  deve importar o arquivo individualmente para substituir.
+- `_showBatchReport(report)` — usa `ModalManager.custom()` para exibir o
+  resumo. Se ao menos um foi salvo, o botão principal navega para a Biblioteca.
+
+### `modal-manager.js`
+- Adicionado método `custom({ title, body, confirmText, cancelText, onConfirm })`
+  que reutiliza o `#customModal` existente no HTML, configurando dinamicamente
+  o conteúdo e o callback do botão de confirmação.
+
+### `index.html`
+- `<input type="file">` recebeu o atributo `multiple`.
+- Texto da `upload-area` atualizado para "um ou mais arquivos".
+- Label do botão atualizado para "Selecionar Arquivo(s)".
+
+### `main.js`
+- `onchange` do `#fileInput` alterado para passar `e.target.files` (FileList)
+  para `FileHandler.handleMultiple`. Adicionado `e.target.value = ''` para
+  permitir re-seleção do mesmo arquivo.
+- Handler de `drop` na `uploadArea` atualizado para passar
+  `e.dataTransfer.files` para `handleMultiple`.
+
+### `tests/unit/file-handler.test.js` — novo
+  Cobre `_findDuplicate`, `_handleBatch` com cenários de: múltiplos novos,
+  duplicata idêntica, conflito de conteúdo e arquivo inválido.

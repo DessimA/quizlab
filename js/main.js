@@ -286,7 +286,25 @@
             }
         });
 
-        document.getElementById('fileInput').onchange = (e) => FileHandler.handle(e.target.files[0]);
+        document.getElementById('fileInput').onchange = (e) => {
+            if (e.target.files.length) FileHandler.handleMultiple(e.target.files);
+            e.target.value = '';
+        };
+
+        const uploadArea = document.getElementById('uploadArea');
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer?.files;
+                if (files?.length) FileHandler.handleMultiple(files);
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') ModalManager.closeAll();
