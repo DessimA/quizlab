@@ -89,6 +89,11 @@
             },
 
             'show-library': () => { ScreenManager.change('libraryScreen'); LibraryManager.render(); },
+            'go-to-library-review': () => {
+                ScreenManager.change('libraryScreen');
+                LibraryManager.render();
+                LibraryManager.switchTab('revisao');
+            },
             'show-creator': () => { CreatorManager.reset(); ScreenManager.change('creatorScreen'); },
 
             'confirm-meta': () => CreatorManager.confirmMeta(),
@@ -215,6 +220,31 @@
 
             'delete-quiz':    (e, target) => LibraryManager.delete(target.dataset.id),
             'search-library': () => LibraryManager.render(),
+
+            'lib-tab': (e, target) => {
+                LibraryManager.switchTab(target.dataset.tab);
+            },
+
+            'review-source-toggle': (e, target) => {
+                LibraryManager.toggleReviewSource(target.dataset.id, target.checked);
+            },
+
+            'review-qty-change': (e, target) => {
+                LibraryManager.updateReviewQty(parseInt(target.value, 10));
+            },
+
+            'start-review-quiz': () => {
+                const selected = LibraryManager.getSelectedForReview();
+                const qty = LibraryManager.getReviewQuantity();
+                const quiz = ReviewQuizBuilder.build(selected.length ? selected : null, qty);
+                if (!quiz) {
+                    ToastSystem.show('Nenhuma questão disponível para revisão.', 'error');
+                    return;
+                }
+                _pendingState.loadOptions = { data: quiz, libraryId: null };
+                ModalManager.open('quizOptionsModal');
+            },
+
             'toggle-theme':   () => ThemeManager.toggle(),
 
             'close-modal':    (e, target) => ModalManager.close(target.dataset.target),

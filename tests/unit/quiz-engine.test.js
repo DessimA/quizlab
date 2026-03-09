@@ -71,7 +71,7 @@ const QUIZ_MULTI_QUESTION = {
     ]
 };
 
-describe('QuizEngine — init()', () => {
+describe('QuizEngine init()', () => {
     it('inicializa o estado corretamente', () => {
         QuizEngine.init(QUIZ_SINGLE);
         const state = QuizEngine.getState();
@@ -106,7 +106,7 @@ describe('QuizEngine — init()', () => {
     });
 });
 
-describe('QuizEngine — select() com questão de única escolha', () => {
+describe('QuizEngine select() com questão de única escolha', () => {
     beforeEach(() => QuizEngine.init(QUIZ_SINGLE));
 
     it('registra a alternativa selecionada', () => {
@@ -121,7 +121,7 @@ describe('QuizEngine — select() com questão de única escolha', () => {
     });
 });
 
-describe('QuizEngine — select() com questão de múltipla escolha', () => {
+describe('QuizEngine select() com questão de múltipla escolha', () => {
     beforeEach(() => QuizEngine.init(QUIZ_MULTIPLE));
 
     it('acumula alternativas até o limite de respostas corretas', () => {
@@ -144,7 +144,7 @@ describe('QuizEngine — select() com questão de múltipla escolha', () => {
     });
 });
 
-describe('QuizEngine — canConfirmCurrent()', () => {
+describe('QuizEngine canConfirmCurrent()', () => {
     it('retorna false quando nenhuma alternativa foi selecionada', () => {
         QuizEngine.init(QUIZ_SINGLE);
         assert.equal(QuizEngine.canConfirmCurrent(), false);
@@ -170,7 +170,7 @@ describe('QuizEngine — canConfirmCurrent()', () => {
     });
 });
 
-describe('QuizEngine — confirm() e checkAnswer()', () => {
+describe('QuizEngine confirm() e checkAnswer()', () => {
     it('incrementa correctCount ao confirmar resposta correta', () => {
         QuizEngine.init(QUIZ_SINGLE);
         QuizEngine.select('b');
@@ -209,7 +209,7 @@ describe('QuizEngine — confirm() e checkAnswer()', () => {
     });
 });
 
-describe('QuizEngine — navegação', () => {
+describe('QuizEngine navegação', () => {
     beforeEach(() => QuizEngine.init(QUIZ_MULTI_QUESTION));
 
     it('next() avança para a próxima questão e marca como visitada', () => {
@@ -240,7 +240,7 @@ describe('QuizEngine — navegação', () => {
     });
 });
 
-describe('QuizEngine — getStats()', () => {
+describe('QuizEngine getStats()', () => {
     it('calcula percentual corretamente', () => {
         QuizEngine.init(QUIZ_MULTI_QUESTION);
 
@@ -279,7 +279,7 @@ describe('QuizEngine — getStats()', () => {
     });
 });
 
-describe('QuizEngine — reset()', () => {
+describe('QuizEngine reset()', () => {
     it('zera o progresso mantendo os dados do quiz', () => {
         QuizEngine.init(QUIZ_SINGLE);
         QuizEngine.select('b');
@@ -301,7 +301,7 @@ describe('QuizEngine — reset()', () => {
     });
 });
 
-describe('QuizEngine — getQuestionStatus()', () => {
+describe('QuizEngine getQuestionStatus()', () => {
     beforeEach(() => QuizEngine.init(QUIZ_MULTI_QUESTION));
 
     it('retorna "skipped" para questão visitada mas não respondida (Q0 visitada por padrão)', () => {
@@ -325,7 +325,7 @@ describe('QuizEngine — getQuestionStatus()', () => {
     });
 });
 
-describe('QuizEngine — flagQuestion() e isFlagged()', () => {
+describe('QuizEngine flagQuestion() e isFlagged()', () => {
     beforeEach(() => QuizEngine.init(QUIZ_MULTI_QUESTION));
 
     it('marca uma questão como flagged', () => {

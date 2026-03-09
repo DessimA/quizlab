@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central de Ajuda | QuizLab</title>
+    <title>Documentação | QuizLab</title>
+    <meta name="description" content="Central de ajuda do QuizLab. Aprenda a importar, criar e gerenciar simulados.">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
 </head>
 <body>
 
@@ -28,7 +28,7 @@
             <button class="btn btn-ghost theme-toggle-btn" data-action="toggle-theme" title="Tema Claro" aria-label="Ativar tema claro">
                 <span data-icon="sun" data-size="sm"></span>
             </button>
-            <a href="exemplo_basico.json" class="btn btn-primary" download style="padding:0 16px;font-size:0.75rem;border-radius:var(--radius-full);">
+            <a href="exemplo_basico.json" download class="btn btn-ghost" style="padding:0 16px;font-size:0.75rem;border-radius:var(--radius-full);">
                 <span data-icon="download" data-size="xs"></span>
                 <span class="hide-mobile">Baixar Exemplo</span>
             </a>
@@ -50,7 +50,7 @@
             <div id="searchEmptyState" class="hidden" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted);">
                 <span data-icon="search" data-size="lg" style="display:block;margin:0 auto var(--space-md);opacity:0.4;"></span>
                 <p>Nenhum resultado para sua busca.</p>
-                <p style="font-size:0.8rem;">Tente termos como: "importar", "criar questão", "JSON", "biblioteca".</p>
+                <p style="font-size:0.8rem;">Tente termos como: "importar", "criar questão", "JSON", "revisão", "erro".</p>
             </div>
 
             <div class="docs-layout">
@@ -62,6 +62,9 @@
                     <a href="#modos" class="docs-nav-link">
                         <span data-icon="school" data-size="xs"></span> Modos de Jogo
                     </a>
+                    <a href="#durante-quiz" class="docs-nav-link">
+                        <span data-icon="quiz" data-size="xs"></span> Durante o Quiz
+                    </a>
                     <a href="#criador" class="docs-nav-link">
                         <span data-icon="edit" data-size="xs"></span> Criador de Simulados
                     </a>
@@ -70,6 +73,9 @@
                     </a>
                     <a href="#biblioteca" class="docs-nav-link">
                         <span data-icon="book" data-size="xs"></span> Biblioteca
+                    </a>
+                    <a href="#revisao-erros" class="docs-nav-link">
+                        <span data-icon="flag" data-size="xs"></span> Revisão de Erros
                     </a>
                     <a href="#faq" class="docs-nav-link">
                         <span data-icon="info" data-size="xs"></span> Perguntas Frequentes
@@ -81,44 +87,92 @@
 
                 <div id="docsContent">
 
+                    <!-- INÍCIO RÁPIDO -->
                     <section id="inicio" class="docs-section">
                         <h2><span data-icon="play" data-size="md"></span> Início Rápido</h2>
-                        <p>Comece a usar o QuizLab em menos de 1 minuto. Não precisa de cadastro.</p>
+                        <p>Comece a usar o QuizLab em menos de 1 minuto. Não precisa de cadastro, instalação ou conexão permanente com a internet.</p>
+
                         <h3>Opção A Importar um simulado pronto</h3>
-                        <p>Baixe o <a href="exemplo_basico.json" download style="color:var(--primary-500)">arquivo de exemplo (.json)</a>, clique em "Começar Agora" e arraste o arquivo para a área de upload.</p>
+                        <p>Baixe o <a href="exemplo_basico.json" download style="color:var(--primary-500)">arquivo de exemplo (.json)</a>, clique em "Começar Agora" e arraste o arquivo para a área de upload. Você também pode selecionar um ou múltiplos arquivos pelo botão.</p>
+
                         <h3>Opção B Criar do zero</h3>
-                        <p>Na tela inicial, clique em "Criar Simulado". Preencha o título, adicione questões com suas alternativas e marque a resposta correta em cada uma.</p>
+                        <p>Na tela inicial, clique em "Criar Simulado". Preencha o título, adicione questões com suas alternativas e marque a resposta correta em cada uma. Ao terminar, exporte para a biblioteca ou para um arquivo .json.</p>
+
                         <div class="tip-box">
-                            <strong>Dica:</strong> Você não precisa de um arquivo para começar. O criador integrado faz tudo pelo navegador.
+                            <strong>Dica:</strong> Você não precisa de um arquivo para começar. O criador integrado faz tudo pelo navegador, e o rascunho é salvo automaticamente a cada 30 segundos.
                         </div>
                     </section>
 
+                    <!-- MODOS DE JOGO -->
                     <section id="modos" class="docs-section">
                         <h2><span data-icon="school" data-size="md"></span> Modos de Jogo</h2>
-                        <p>Ao iniciar um simulado, você escolhe entre dois modos:</p>
+                        <p>Ao iniciar um simulado salvo na biblioteca ou após importar um arquivo, você escolhe o modo e as opções de embaralhamento.</p>
+
                         <h3>Modo Estudo</h3>
-                        <p>Após confirmar cada resposta, o sistema mostra imediatamente se você acertou ou errou, destacando a alternativa correta. Ideal para aprender e revisar conteúdo.</p>
+                        <p>Após confirmar cada resposta, o sistema mostra imediatamente se você acertou ou errou, destacando a alternativa correta em verde e a errada em vermelho. O progresso é salvo automaticamente se sair da página, pode retomar de onde parou pela biblioteca. Ideal para aprender e revisar conteúdo.</p>
+
                         <h3>Modo Exame</h3>
-                        <p>Sem feedback durante o simulado igual a uma prova real. O resultado completo aparece apenas ao finalizar. Se o simulado tiver tempo limite definido, o cronômetro ativa automaticamente neste modo.</p>
+                        <p>Sem feedback durante o simulado, igual a uma prova real. O resultado completo aparece apenas ao finalizar. Se o simulado tiver um campo <code>tempoLimiteMinutos</code> definido no JSON, o cronômetro ativa automaticamente. Caso contrário, o tempo é calculado em 2 minutos por questão. Quando o timer chega a zero, o quiz é finalizado e o resultado é exibido com o que foi respondido até então.</p>
+
+                        <div class="warning-box">
+                            <strong>Atenção:</strong> No Modo Exame, o progresso <strong>não</strong> é salvo para retomada. Se sair da página com o timer ativo, o simulado é encerrado sem registrar resultado.
+                        </div>
+
+                        <h3>Embaralhamento</h3>
+                        <p>Nas opções de início você pode ativar, de forma independente, o embaralhamento da ordem das questões e o embaralhamento das alternativas de cada questão. Ambos são aplicados a cada nova tentativa.</p>
+                    </section>
+
+                    <!-- DURANTE O QUIZ -->
+                    <section id="durante-quiz" class="docs-section">
+                        <h2><span data-icon="quiz" data-size="md"></span> Durante o Quiz</h2>
+
+                        <h3>Navegar entre questões</h3>
+                        <p>Use os botões "Anterior" e "Próxima" ou clique diretamente em qualquer número na grade de progresso. Você pode revisitar qualquer questão já visitada antes de confirmar a resposta.</p>
+
+                        <h3>Confirmar resposta</h3>
+                        <p>Após selecionar uma alternativa (ou o número correto delas, em múltipla escolha), clique em "Confirmar". No Modo Estudo, o gabarito aparece imediatamente. Uma vez confirmada, a resposta não pode ser alterada.</p>
+
+                        <h3>Marcar questões (Flag)</h3>
+                        <p>Clique no ícone de bandeira em qualquer questão para marcá-la para revisão posterior. As questões marcadas aparecem em destaque na tela de resultado, facilitando a revisão do gabarito.</p>
+
+                        <h3>Tela de Revisão antes de finalizar</h3>
+                        <p>Ao clicar em "Finalizar" na última questão, o sistema exibe a lista de todas as questões que ainda não foram confirmadas. Você pode voltar e responder cada uma ou finalizar mesmo assim. Questões sem resposta confirmada aparecem como "NÃO VIU" no resultado.</p>
+
+                        <h3>Retomar uma sessão salva</h3>
+                        <p>Se você fechar o navegador durante o Modo Estudo, o progresso é preservado. Na próxima vez que abrir a biblioteca, o card do simulado exibirá um botão "Retomar". Clicar nele restaura exatamente o estado anterior, incluindo respostas confirmadas e posição atual.</p>
+
                         <div class="tip-box">
-                            <strong>Embaralhamento:</strong> Ative nas opções de início para randomizar a ordem das questões e das alternativas a cada tentativa.
+                            <strong>Dica:</strong> A retomada de sessão funciona apenas no Modo Estudo. O Modo Exame não salva progresso intermediário.
                         </div>
                     </section>
 
+                    <!-- CRIADOR -->
                     <section id="criador" class="docs-section">
                         <h2><span data-icon="edit" data-size="md"></span> Criador de Simulados</h2>
-                        <p>O criador funciona em dois passos:</p>
+                        <p>O criador funciona em dois passos sequenciais.</p>
+
                         <h3>Passo 1 Dados gerais</h3>
-                        <p>Informe o título (obrigatório), descrição, tags de busca e, opcionalmente, um limite de tempo em minutos. Clique em "Confirmar" para avançar.</p>
+                        <p>Informe o título (obrigatório), descrição, tags de busca separadas por vírgula e, opcionalmente, um limite de tempo em minutos. Clique em "Confirmar" para avançar. Você pode voltar e editar os dados gerais a qualquer momento clicando em "Editar".</p>
+
                         <h3>Passo 2 Questões</h3>
-                        <p>Cada questão precisa de um enunciado, tipo (única ou múltipla escolha), ao menos 2 alternativas e ao menos uma alternativa marcada como correta (checkbox). Use arrastar e soltar para reordenar.</p>
+                        <p>Cada questão precisa de um enunciado, tipo (única ou múltipla escolha), ao menos 2 alternativas e ao menos uma alternativa marcada como correta via checkbox. Use arrastar e soltar para reordenar as questões.</p>
+
                         <h3>Exportar e Salvar</h3>
-                        <p>Clique em "Exportar". Você pode salvar na biblioteca local (acesso rápido sem upload) ou baixar como arquivo .json para guardar no computador.</p>
+                        <p>Clique em "Exportar". O sistema oferece duas opções: salvar na biblioteca local (acesso rápido sem precisar de upload) ou baixar como arquivo .json para guardar no computador e compartilhar.</p>
+
+                        <h3>Editar um simulado existente</h3>
+                        <p>Na biblioteca, clique no ícone de lápis de qualquer card para abrir o simulado no criador com todos os dados já preenchidos. Ao exportar novamente, você escolhe entre atualizar a versão na biblioteca ou apenas baixar o arquivo.</p>
+
                         <div class="warning-box">
-                            <strong>Atenção:</strong> Múltipla escolha exige que o usuário marque exatamente o número de respostas corretas que você definir. Defina 2 corretas apenas se a questão realmente tiver 2 respostas certas.
+                            <strong>Múltipla escolha:</strong> Defina como corretas apenas as alternativas que realmente têm resposta certa. O usuário precisará marcar exatamente o mesmo número de alternativas para conseguir confirmar a resposta.
+                        </div>
+
+                        <div class="tip-box">
+                            <strong>Rascunho automático:</strong> O criador salva automaticamente o estado a cada 30 segundos. Se fechar o navegador acidentalmente, ao voltar ao criador o rascunho estará disponível.
                         </div>
                     </section>
 
+                    <!-- JSON -->
                     <section id="json" class="docs-section">
                         <h2><span data-icon="download" data-size="md"></span> Formato do Arquivo JSON</h2>
                         <p>Se preferir criar o arquivo manualmente ou integrar com outras ferramentas, use esta estrutura:</p>
@@ -138,44 +192,133 @@
         { "id": "c", "texto": "Rio de Janeiro" }
       ],
       "respostasCorretas": ["b"]
+    },
+    {
+      "id": 2,
+      "enunciado": "Quais são números primos? (marque 2)",
+      "tipo": "multipla",
+      "alternativas": [
+        { "id": "a", "texto": "2" },
+        { "id": "b", "texto": "4" },
+        { "id": "c", "texto": "7" },
+        { "id": "d", "texto": "9" }
+      ],
+      "respostasCorretas": ["a", "c"]
     }
   ]
 }</code></pre>
+
+                        <h3>Regras de validação</h3>
+                        <p>O sistema valida o arquivo antes de qualquer operação. Os requisitos são:</p>
+                        <ul style="color:var(--text-secondary);margin-left:var(--space-md);line-height:2;">
+                            <li><code>nomeSimulado</code> e <code>questoes</code> são obrigatórios.</li>
+                            <li>Cada questão deve ter <code>id</code>, <code>enunciado</code>, <code>tipo</code>, <code>alternativas</code> (mínimo 2) e <code>respostasCorretas</code> (mínimo 1).</li>
+                            <li>Para <code>tipo: "unica"</code>, <code>respostasCorretas</code> deve conter exatamente 1 elemento.</li>
+                            <li>Todos os IDs em <code>respostasCorretas</code> devem existir em <code>alternativas</code>.</li>
+                            <li><code>tempoLimiteMinutos</code> é opcional. Se ausente, o timer do Modo Exame é calculado como questões × 2 minutos.</li>
+                            <li><code>respostasCorretas</code> deve ser sempre um array, mesmo para questão de única escolha.</li>
+                        </ul>
+
+                        <h3>Importação em massa</h3>
+                        <p>Você pode selecionar ou arrastar múltiplos arquivos .json de uma só vez. O sistema processa cada arquivo individualmente e exibe um relatório final com: salvos com sucesso, ignorados (duplicatas idênticas já na biblioteca), conflitos (mesmo nome mas conteúdo diferente) e falhas de validação.</p>
+
                         <div class="warning-box">
-                            <strong>Atenção:</strong> <code>respostasCorretas</code> deve sempre ser um array, mesmo para questões de única escolha. Os IDs das respostas devem coincidir exatamente com os IDs das alternativas.
+                            <strong>Conflitos em lote:</strong> Quando há um conflito de conteúdo em uma importação em massa, o arquivo é listado no relatório mas <strong>não</strong> é substituído automaticamente. Para resolver um conflito, importe o arquivo individualmente o sistema irá perguntar se deseja substituir.
+                        </div>
+
+                        <div class="tip-box">
+                            <strong>Dica:</strong> Use o <a href="https://jsonlint.com" target="_blank" rel="noopener" style="color:var(--primary-500)">JSONLint</a> para verificar a sintaxe antes de importar.
                         </div>
                     </section>
 
+                    <!-- BIBLIOTECA -->
                     <section id="biblioteca" class="docs-section">
                         <h2><span data-icon="book" data-size="md"></span> Biblioteca Local</h2>
                         <p>A biblioteca salva simulados diretamente no armazenamento do seu navegador (localStorage). Nenhum dado é enviado para servidores.</p>
-                        <h3>Acessar</h3>
-                        <p>Clique em "Meus Simulados" na tela inicial ou no header. Os simulados aparecem em cards com título, número de questões e sua média de acertos.</p>
+
+                        <h3>Capacidade de armazenamento</h3>
+                        <p>Não há um limite fixo de simulados. A biblioteca pode armazenar até <strong>4 MB</strong> de dados (quota segura do localStorage). Um indicador circular no topo da tela mostra o percentual de uso em tempo real: neutro abaixo de 70%, amarelo entre 70% e 85%, e vermelho acima de 85%. Quando o uso projetado ultrapassa 85%, novas importações são bloqueadas e uma mensagem de aviso é exibida.</p>
+
+                        <h3>Busca e ordenação</h3>
+                        <p>Use o campo de busca para filtrar simulados por título, descrição ou tags. O menu de ordenação permite organizar por mais recentes, mais antigos, ordem alfabética ou número de questões.</p>
+
                         <h3>Editar</h3>
-                        <p>Cada card tem um botão de edição que abre o simulado no criador com todos os dados já preenchidos.</p>
+                        <p>Clique no ícone de lápis de qualquer card para abrir o simulado no criador com todos os dados preenchidos.</p>
+
+                        <h3>Exclusão em massa</h3>
+                        <p>Clique em "Selecionar" para ativar o modo de seleção em massa. Marque os cards desejados e clique em "Excluir Selecionados". A operação é confirmada antes de executar.</p>
+
+                        <h3>Histórico de desempenho</h3>
+                        <p>Cada card exibe sua média de acertos e o número de partidas jogadas. Na tela de resultado, o histórico das últimas 10 tentativas é exibido com data, pontuação e percentual de acerto.</p>
+
                         <div class="warning-box">
-                            <strong>Atenção:</strong> Limpar o cache do navegador ou usar aba anônima apaga os dados. Sempre exporte simulados importantes como arquivo .json.
+                            <strong>Atenção:</strong> Limpar o cache do navegador ou usar aba anônima apaga todos os dados. Sempre exporte simulados importantes como arquivo .json clicando no botão de download no card da biblioteca.
                         </div>
                     </section>
 
+                    <!-- REVISÃO DE ERROS -->
+                    <section id="revisao-erros" class="docs-section">
+                        <h2><span data-icon="flag" data-size="md"></span> Revisão de Erros</h2>
+                        <p>O QuizLab rastreia automaticamente as questões que você erra em cada simulado salvo na biblioteca e permite criar um simulado de revisão focado nas suas dificuldades.</p>
+
+                        <h3>Como o rastreamento funciona</h3>
+                        <p>Ao finalizar qualquer partida de um simulado salvo na biblioteca, o sistema registra as questões respondidas incorretamente. Questões acertadas são removidas do banco de erros. O histórico de erros acumula até 65 questões por simulado.</p>
+
+                        <div class="warning-box">
+                            <strong>Importante:</strong> O rastreamento de erros funciona <strong>apenas para simulados salvos na Biblioteca Local</strong>. Simulados abertos diretamente de arquivo sem salvar não registram erros.
+                        </div>
+
+                        <h3>Acessar a aba Revisão</h3>
+                        <p>Na biblioteca, clique na aba "Revisão" (ao lado de "Simulados"). Um badge numérico indica o total de questões com erro disponíveis em todos os seus simulados. A aba lista cada simulado com o respectivo número de erros registrados.</p>
+
+                        <h3>Configurar e iniciar a revisão</h3>
+                        <p>Marque os simulados cujos erros você quer revisar. Use o slider para definir quantas questões incluir (até o máximo disponível nas fontes selecionadas). Clique em "Iniciar Revisão". As questões são embaralhadas e apresentadas em um simulado temporário.</p>
+
+                        <h3>O que acontece ao finalizar</h3>
+                        <p>O simulado de revisão é temporário e não aparece na biblioteca. Ao finalizar, o sistema distribui os resultados de volta para cada simulado de origem: questões acertadas são removidas do banco de erros, e questões erradas têm seu contador incrementado. No resultado, um botão "Ver Revisão" leva você de volta à aba.</p>
+
+                        <div class="tip-box">
+                            <strong>Estratégia:</strong> Use o Modo Estudo para aprender e registrar erros. Use a aba Revisão periodicamente para concentrar o estudo nas questões onde você tem mais dificuldade.
+                        </div>
+                    </section>
+
+                    <!-- FAQ -->
                     <section id="faq" class="docs-section">
                         <h2><span data-icon="info" data-size="md"></span> Perguntas Frequentes</h2>
-                        <h3>O botão "Confirmar" não aparece</h3>
-                        <p>Em questões de múltipla escolha, você precisa selecionar exatamente o número de alternativas indicado no enunciado nem mais, nem menos.</p>
-                        <h3>Meu arquivo JSON dá erro</h3>
-                        <p>Verifique se o arquivo começa com <code>{</code> e termina com <code>}</code>, sem vírgulas sobrando. Use o <a href="https://jsonlint.com" target="_blank" rel="noopener" style="color:var(--primary-500)">JSONLint</a> para validar a sintaxe.</p>
+
+                        <h3>O botão "Confirmar" não aparece ou está desabilitado</h3>
+                        <p>Em questões de múltipla escolha, você precisa selecionar exatamente o número de alternativas indicado no enunciado nem mais, nem menos. O aviso "(SELECIONE EXATAMENTE X)" indica quantas você deve marcar.</p>
+
+                        <h3>Meu arquivo JSON dá erro de validação</h3>
+                        <p>Verifique se o arquivo começa com <code>{</code> e termina com <code>}</code>, sem vírgulas sobrando no final de listas. Confira se todos os campos obrigatórios estão presentes e se os IDs em <code>respostasCorretas</code> coincidem exatamente com os IDs das alternativas. Use o <a href="https://jsonlint.com" target="_blank" rel="noopener" style="color:var(--primary-500)">JSONLint</a> para validar a sintaxe.</p>
+
                         <h3>Posso usar offline?</h3>
-                        <p>Sim. Após carregar a página uma vez, toda a lógica roda localmente. A única exceção é o carregamento das fontes do Google Fonts.</p>
+                        <p>Sim. Após carregar a página uma vez com conexão, toda a lógica fica disponível offline. A única exceção é o carregamento das fontes do Google Fonts em modo offline, o sistema usa fontes de fallback e os ícones podem ter aparência diferente.</p>
+
                         <h3>Como compartilhar um simulado?</h3>
-                        <p>Use o botão de download na biblioteca para exportar o arquivo .json e envie para outra pessoa. Ela importa da mesma forma que você.</p>
+                        <p>Use o botão de download (ícone de seta para baixo) no card da biblioteca para exportar o arquivo .json e envie para outra pessoa. Ela importa da mesma forma que você, arrastando o arquivo ou selecionando pelo botão.</p>
+
+                        <h3>Posso importar vários arquivos de uma vez?</h3>
+                        <p>Sim. Selecione múltiplos arquivos no seletor de arquivo ou arraste vários ao mesmo tempo para a área de upload. O sistema processa cada um individualmente e exibe um relatório de resultado.</p>
+
+                        <h3>O timer do Modo Exame não apareceu</h3>
+                        <p>O timer só ativa no Modo Exame. Se o simulado não tiver o campo <code>tempoLimiteMinutos</code> no JSON, o tempo é calculado automaticamente como número de questões × 2 minutos. Certifique-se de ter selecionado "Modo Exame" nas opções de início.</p>
+
+                        <h3>A aba Revisão está vazia</h3>
+                        <p>O banco de erros só é preenchido ao finalizar partidas de simulados <em>salvos na biblioteca</em>. Se você acabou de importar um simulado sem salvá-lo, ou se ainda não completou nenhuma partida, a aba ficará vazia até que você finalize ao menos uma tentativa.</p>
+
+                        <h3>Meus dados estão seguros?</h3>
+                        <p>Todos os dados (simulados, histórico, erros) ficam exclusivamente no seu navegador via localStorage. Nenhuma informação é enviada para servidores externos. Por isso, limpar o cache ou trocar de navegador apaga os dados sempre exporte os simulados importantes.</p>
+
                         <div style="margin-top:var(--space-lg)">
                             <a href="troubleshooting.html" class="btn btn-outline" style="width:100%;justify-content:center;">
                                 <span data-icon="alert" data-size="sm"></span>
-                                Solução de Problemas
+                                Ver Solução de Problemas
                             </a>
                         </div>
                     </section>
 
+                    <!-- SPECS -->
                     <section id="specs" class="docs-section">
                         <h2><span data-icon="alert" data-size="md"></span> Limites e Especificações</h2>
                         <div style="overflow-x:auto">
@@ -190,23 +333,48 @@
                                 <tbody>
                                     <tr style="border-bottom:1px solid var(--border-glass)">
                                         <td style="padding:12px 8px">Simulados na Biblioteca</td>
-                                        <td style="padding:12px 8px;font-family:var(--font-mono)">10</td>
-                                        <td style="padding:12px 8px">Performance do LocalStorage</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">Dinâmico (até 85% de 4 MB)</td>
+                                        <td style="padding:12px 8px">Guard de cota do localStorage</td>
+                                    </tr>
+                                    <tr style="border-bottom:1px solid var(--border-glass)">
+                                        <td style="padding:12px 8px">Quota segura de armazenamento</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">4 MB</td>
+                                        <td style="padding:12px 8px">Margem de segurança abaixo do limite de 5 MB dos browsers</td>
                                     </tr>
                                     <tr style="border-bottom:1px solid var(--border-glass)">
                                         <td style="padding:12px 8px">Questões por Simulado</td>
-                                        <td style="padding:12px 8px;font-family:var(--font-mono)">∞ (rec. &lt;500)</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">∞ (rec. &lt; 500)</td>
                                         <td style="padding:12px 8px">Fluidez da interface</td>
+                                    </tr>
+                                    <tr style="border-bottom:1px solid var(--border-glass)">
+                                        <td style="padding:12px 8px">Alternativas por Questão</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">∞ (rec. 2–6)</td>
+                                        <td style="padding:12px 8px">Legibilidade do layout</td>
                                     </tr>
                                     <tr style="border-bottom:1px solid var(--border-glass)">
                                         <td style="padding:12px 8px">Histórico por Simulado</td>
                                         <td style="padding:12px 8px;font-family:var(--font-mono)">10 tentativas</td>
-                                        <td style="padding:12px 8px">Espaço no storage</td>
+                                        <td style="padding:12px 8px">Espaço no localStorage</td>
+                                    </tr>
+                                    <tr style="border-bottom:1px solid var(--border-glass)">
+                                        <td style="padding:12px 8px">Erros rastreados por Simulado</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">65 questões</td>
+                                        <td style="padding:12px 8px">Espaço no localStorage</td>
+                                    </tr>
+                                    <tr style="border-bottom:1px solid var(--border-glass)">
+                                        <td style="padding:12px 8px">Timer padrão (Modo Exame)</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">2 min / questão</td>
+                                        <td style="padding:12px 8px">Calculado automaticamente se não definido no JSON</td>
+                                    </tr>
+                                    <tr style="border-bottom:1px solid var(--border-glass)">
+                                        <td style="padding:12px 8px">Autosave do Criador</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">30 segundos</td>
+                                        <td style="padding:12px 8px">Intervalo de rascunho automático</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding:12px 8px">Tamanho máximo do JSON</td>
-                                        <td style="padding:12px 8px;font-family:var(--font-mono)">~5 MB</td>
-                                        <td style="padding:12px 8px">Limite do navegador</td>
+                                        <td style="padding:12px 8px">Tamanho máximo por arquivo JSON</td>
+                                        <td style="padding:12px 8px;font-family:var(--font-mono)">≤ quota disponível</td>
+                                        <td style="padding:12px 8px">Verificado dinamicamente antes de salvar</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -222,6 +390,7 @@
         </footer>
     </div>
 
+    <script src="js/core/version.js"></script>
     <script src="js/core/config.js"></script>
     <script src="js/components/icon-system.js"></script>
     <script src="js/components/theme-manager.js"></script>
@@ -249,7 +418,6 @@
                         section.style.display = '';
                         return;
                     }
-
                     const text = section.innerText.toLowerCase();
                     const matches = text.includes(term);
                     section.style.display = matches ? '' : 'none';
@@ -264,15 +432,14 @@
             const observer = new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        navLinks.forEach(l => l.classList.remove('active'));
-                        const id = entry.target.id;
-                        const activeLink = document.querySelector(`.docs-nav-link[href="#${id}"]`);
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        const activeLink = document.querySelector(`.docs-nav-link[href="#${entry.target.id}"]`);
                         if (activeLink) activeLink.classList.add('active');
                     }
                 });
-            }, { rootMargin: '-20% 0px -75% 0px' });
+            }, { rootMargin: '-20% 0px -70% 0px' });
 
-            sections.forEach(s => observer.observe(s));
+            sections.forEach(section => observer.observe(section));
         });
 
         if ('serviceWorker' in navigator) {

@@ -1,6 +1,3 @@
-/**
- * CreatorManager - Wizard logic for creating new quizzes
- */
 (function(window) {
     const CreatorManager = {
         questionCount: 0,

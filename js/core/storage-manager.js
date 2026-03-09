@@ -13,6 +13,7 @@
         set(key, value) {
             try {
                 localStorage.setItem(key, JSON.stringify(value));
+                this._statsCache = null;
                 return true;
             } catch (e) {
                 console.error(`Error saving ${key} to storage`, e);
@@ -22,6 +23,7 @@
 
         remove(key) {
             localStorage.removeItem(key);
+            this._statsCache = null;
         },
 
         getLibrary() {
@@ -132,10 +134,25 @@
             return total;
         },
 
+        _statsCache: null,
+
         getStorageStats() {
+            const now = Date.now();
+            const currentKeys = Object.keys(localStorage);
+            const keySum = currentKeys.reduce((acc, k) => acc + (localStorage.getItem(k) || '').length, 0);
+
+            if (this._statsCache && 
+                (now - this._statsCache.ts) < 2000 && 
+                this._statsCache.keySum === keySum) {
+                return this._statsCache.value;
+            }
+
             const quota = CONFIG.LIMITS.STORAGE_SAFE_QUOTA_BYTES;
             const usage = this._measureLocalStorageUsage();
-            return { usage, quota, percent: usage / quota };
+            const stats = { usage, quota, percent: usage / quota };
+            
+            this._statsCache = { value: stats, ts: now, keySum };
+            return stats;
         },
 
         canStore(data) {
@@ -178,6 +195,32 @@
 
         markFirstVisit() {
             localStorage.setItem(CONFIG.STORAGE.FIRST_VISIT_KEY, 'true');
+        },
+
+        saveWrongQuestions(libraryId, wrongQuestions) {
+            this.updateLibraryMeta(libraryId, { wrongQuestions });
+        },
+
+        getAggregatedWrong(quizIds) {
+            const library = this.getLibrary();
+            const items = quizIds
+                ? library.filter(i => quizIds.includes(i.id))
+                : library;
+
+            const seen = new Set();
+            const result = [];
+
+            items.forEach(item => {
+                (item.meta.wrongQuestions || []).forEach(wq => {
+                    const key = `${wq.sourceQuizId}__${wq.questao.id}`;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        result.push(wq);
+                    }
+                });
+            });
+
+            return result;
         }
     };
 

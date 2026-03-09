@@ -55,8 +55,8 @@
             if (isAnswered) {
                 cls += ' disabled';
                 if (!isExam) {
-                    if (isCorrect) { cls += ' correct'; ariaLabel += ' — resposta correta'; }
-                    else if (isSelected) { cls += ' incorrect'; ariaLabel += ' — resposta incorreta'; }
+                    if (isCorrect) { cls += ' correct'; ariaLabel += ' resposta correta'; }
+                    else if (isSelected) { cls += ' incorrect'; ariaLabel += ' resposta incorreta'; }
                 } else if (isSelected) {
                     cls += ' selected';
                 }
@@ -113,7 +113,7 @@
 
             div.innerHTML = `<div>${correct
                 ? 'RESPOSTA CORRETA'
-                : `RESPOSTA INCORRETA — CORRETO: <strong>${correctLetters.join(', ')}</strong>`
+                : `RESPOSTA INCORRETA CORRETO: <strong>${correctLetters.join(', ')}</strong>`
             }</div>`;
             return div;
         },
@@ -122,6 +122,8 @@
             const grid = document.getElementById('questionGrid');
             const state = QuizEngine.getState();
             if (!grid) return;
+
+            const isExam = state.mode === CONFIG.QUIZ_MODES.EXAM;
 
             grid.innerHTML = '';
             grid.setAttribute('role', 'list');
@@ -136,8 +138,6 @@
                 item.className = 'grid-item';
                 item.setAttribute('role', 'listitem');
                 item.type = 'button';
-
-                const isExam = QuizEngine.getState().mode === CONFIG.QUIZ_MODES.EXAM;
 
                 if (isCurrent) item.classList.add('current');
                 if (status === 'correct') item.classList.add(isExam ? 'visited' : 'answered-correct');

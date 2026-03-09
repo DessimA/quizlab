@@ -94,8 +94,8 @@
         _showBatchReport(report) {
             const lines = [];
             if (report.saved.length)     lines.push(`✔ ${report.saved.length} importado(s) com sucesso.`);
-            if (report.skipped.length)   lines.push(`↩ ${report.skipped.length} ignorado(s) — conteúdo idêntico já salvo.`);
-            if (report.conflicts.length) lines.push(`⚠ ${report.conflicts.length} com conflito de nome — importe individualmente para substituir.`);
+            if (report.skipped.length)   lines.push(`↩ ${report.skipped.length} ignorado(s) conteúdo idêntico já salvo.`);
+            if (report.conflicts.length) lines.push(`⚠ ${report.conflicts.length} com conflito de nome importe individualmente para substituir.`);
             if (report.failed.length)    lines.push(`✖ ${report.failed.length} com erro de formato ou armazenamento.`);
 
             const hasSaved = report.saved.length > 0;
@@ -113,7 +113,7 @@
         },
 
         _showErrors(errors, fileName = '') {
-            const title = fileName ? `ERRO — ${fileName}` : 'ERRO DE FORMATO DETECTADO';
+            const title = fileName ? `ERRO ${fileName}` : 'ERRO DE FORMATO DETECTADO';
             const html = `<div class="error-container"><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul></div>`;
             ModalManager.alert(html, title);
         },

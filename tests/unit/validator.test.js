@@ -30,7 +30,7 @@ function buildQuestion(overrides = {}) {
     return { ...VALID_QUIZ.questoes[0], ...overrides };
 }
 
-describe('Validator — validateQuiz() — casos válidos', () => {
+describe('Validator validateQuiz() casos válidos', () => {
     it('aprova um quiz completo e correto', () => {
         const result = Validator.validateQuiz(VALID_QUIZ);
         assert.equal(result.valid, true);
@@ -61,7 +61,7 @@ describe('Validator — validateQuiz() — casos válidos', () => {
     });
 });
 
-describe('Validator — validateQuiz() — campo nomeSimulado', () => {
+describe('Validator validateQuiz() campo nomeSimulado', () => {
     it('rejeita quiz sem nomeSimulado', () => {
         const { nomeSimulado, ...quiz } = VALID_QUIZ;
         const result = Validator.validateQuiz(quiz);
@@ -75,7 +75,7 @@ describe('Validator — validateQuiz() — campo nomeSimulado', () => {
     });
 });
 
-describe('Validator — validateQuiz() — campo questoes', () => {
+describe('Validator validateQuiz() campo questoes', () => {
     it('rejeita quiz sem campo questoes', () => {
         const { questoes, ...quiz } = VALID_QUIZ;
         const result = Validator.validateQuiz(quiz);
@@ -94,7 +94,7 @@ describe('Validator — validateQuiz() — campo questoes', () => {
     });
 });
 
-describe('Validator — validateQuiz() — validação por questão', () => {
+describe('Validator validateQuiz() validação por questão', () => {
     it('rejeita questão sem enunciado', () => {
         const result = Validator.validateQuiz(buildQuiz({
             questoes: [buildQuestion({ enunciado: '' })]

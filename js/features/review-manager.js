@@ -28,6 +28,7 @@
         },
 
         finalizeProcess() {
+            this._extractAndSaveWrongQuestions();
             const stats = QuizEngine.getStats();
             QuizEngine.saveStatsToLibrary();
             QuizEngine.stopTimer();
@@ -58,6 +59,98 @@
 
             this._renderHistory(rev);
             ScreenManager.change(CONFIG.ELEMENTS.RESULT_SCREEN);
+
+            if (QuizEngine.getState().quizData?._reviewSources) {
+                const backBtn = document.createElement('button');
+                backBtn.className = 'btn btn-outline';
+                backBtn.setAttribute('data-action', 'go-to-library-review');
+                backBtn.innerHTML = `<span data-icon="book" data-size="sm"></span> Ver Revisão`;
+                document.querySelector('#resultScreen [style*="justify-content: center"]')
+                    ?.appendChild(backBtn);
+                if (window.IconSystem) IconSystem.inject(backBtn.parentElement);
+            }
+        },
+
+        _extractAndSaveWrongQuestions() {
+            const state = QuizEngine.getState();
+            const quizData = state.quizData;
+
+            if (state.libraryId) {
+                this._updateWrongForQuiz(state.libraryId, quizData, state);
+                return;
+            }
+
+            if (quizData._reviewSources) {
+                this._updateWrongFromReview(quizData, state);
+            }
+        },
+
+        _updateWrongForQuiz(libraryId, quizData, state) {
+            const item = StorageManager.getById(libraryId);
+            if (!item) return;
+
+            const existingMap = new Map(
+                (item.meta.wrongQuestions || []).map(wq => [String(wq.questao.id), wq])
+            );
+
+            quizData.questoes.forEach((q, i) => {
+                if (!state.questionAnswered[i]) return;
+
+                const key = String(q.id);
+                if (QuizEngine.checkAnswer(i)) {
+                    existingMap.delete(key);
+                } else {
+                    const prev = existingMap.get(key);
+                    existingMap.set(key, {
+                        sourceQuizId: libraryId,
+                        sourceQuizName: quizData.nomeSimulado,
+                        questao: q,
+                        errorCount: prev ? prev.errorCount + 1 : 1
+                    });
+                }
+            });
+
+            StorageManager.saveWrongQuestions(libraryId, _capWrongList([...existingMap.values()]));
+        },
+
+        _updateWrongFromReview(quizData, state) {
+            const bySource = {};
+
+            quizData.questoes.forEach((q, i) => {
+                if (!state.questionAnswered[i]) return;
+
+                const sourceQuizId = quizData._reviewSources[String(q.id)];
+                if (!sourceQuizId) return;
+
+                if (!bySource[sourceQuizId]) bySource[sourceQuizId] = [];
+                bySource[sourceQuizId].push({ questao: q, isCorrect: QuizEngine.checkAnswer(i) });
+            });
+
+            Object.entries(bySource).forEach(([sourceQuizId, entries]) => {
+                const item = StorageManager.getById(sourceQuizId);
+                if (!item) return;
+
+                const existingMap = new Map(
+                    (item.meta.wrongQuestions || []).map(wq => [String(wq.questao.id), wq])
+                );
+
+                entries.forEach(({ questao, isCorrect }) => {
+                    const key = String(questao.id);
+                    if (isCorrect) {
+                        existingMap.delete(key);
+                    } else {
+                        const prev = existingMap.get(key);
+                        existingMap.set(key, {
+                            sourceQuizId,
+                            sourceQuizName: item.data.nomeSimulado,
+                            questao,
+                            errorCount: prev ? prev.errorCount + 1 : 1
+                        });
+                    }
+                });
+
+                StorageManager.saveWrongQuestions(sourceQuizId, _capWrongList([...existingMap.values()]));
+            });
         },
 
         _buildFlaggedSection(flaggedIndexes) {
@@ -75,9 +168,10 @@
         },
 
         _renderHistory(container) {
-            if (!QuizEngine.getState().libraryId) return;
-            const lib = StorageManager.getLibrary();
-            const item = lib.find(i => i.id === QuizEngine.getState().libraryId);
+            const { libraryId } = QuizEngine.getState();
+            if (!libraryId) return;
+
+            const item = StorageManager.getById(libraryId);
             if (!item || !item.meta.history || item.meta.history.length < 2) return;
 
             const section = document.createElement('div');
@@ -87,7 +181,7 @@
                 <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
                     ${item.meta.history.map((h, idx) => `
                         <div style="flex:1;min-width:80px;text-align:center;padding:var(--space-sm);background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);">
-                            <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:${h.score >= 70 ? 'var(--success)' : h.score >= 50 ? 'var(--primary-500)' : 'var(--error)'};">${h.score}%</div>
+                            <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:${Utils.scoreColor(h.score)};">${h.score}%</div>
                             <div style="font-size:0.65rem;color:var(--text-muted);">${new Date(h.playedAt).toLocaleDateString()}</div>
                             <div style="font-size:0.65rem;color:var(--text-muted);">${h.correct}/${h.total}</div>
                         </div>
@@ -171,6 +265,13 @@
                 </div>`;
         }
     };
+
+    function _capWrongList(list) {
+        if (list.length <= CONFIG.LIMITS.MAX_WRONG_PER_QUIZ) return list;
+        return list
+            .sort((a, b) => b.errorCount - a.errorCount)
+            .slice(0, CONFIG.LIMITS.MAX_WRONG_PER_QUIZ);
+    }
 
     window.ReviewManager = ReviewManager;
 })(window);

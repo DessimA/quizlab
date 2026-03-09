@@ -12,12 +12,12 @@ const QUIZ = {
     nomeSimulado: 'Simulado de Integração',
     questoes: [
         {
-            id: 1, enunciado: 'Q1 — Única', tipo: 'unica',
+            id: 1, enunciado: 'Q1 Única', tipo: 'unica',
             alternativas: [{ id: 'a', texto: 'A' }, { id: 'b', texto: 'B' }],
             respostasCorretas: ['a']
         },
         {
-            id: 2, enunciado: 'Q2 — Múltipla', tipo: 'multipla',
+            id: 2, enunciado: 'Q2 Múltipla', tipo: 'multipla',
             alternativas: [
                 { id: 'a', texto: 'A' }, { id: 'b', texto: 'B' },
                 { id: 'c', texto: 'C' }, { id: 'd', texto: 'D' }
@@ -25,7 +25,7 @@ const QUIZ = {
             respostasCorretas: ['b', 'c']
         },
         {
-            id: 3, enunciado: 'Q3 — Única', tipo: 'unica',
+            id: 3, enunciado: 'Q3 Única', tipo: 'unica',
             alternativas: [{ id: 'a', texto: 'A' }, { id: 'b', texto: 'B' }],
             respostasCorretas: ['b']
         }
@@ -37,7 +37,7 @@ beforeEach(() => {
     QuizEngine.init(QUIZ);
 });
 
-describe('Fluxo completo — quiz respondido integralmente', () => {
+describe('Fluxo completo quiz respondido integralmente', () => {
     it('um simulado com 100% de acertos gera stats corretas', () => {
         QuizEngine.select('a'); QuizEngine.confirm();
         QuizEngine.next();
@@ -66,7 +66,7 @@ describe('Fluxo completo — quiz respondido integralmente', () => {
     });
 });
 
-describe('Fluxo — navegação e estado de visita', () => {
+describe('Fluxo navegação e estado de visita', () => {
     it('navegar entre questões marca todas como visitadas', () => {
         QuizEngine.next();
         QuizEngine.next();
@@ -112,7 +112,7 @@ describe('Fluxo — navegação e estado de visita', () => {
     });
 });
 
-describe('Fluxo — persistência na biblioteca', () => {
+describe('Fluxo persistência na biblioteca', () => {
     it('saveStatsToLibrary() atualiza metadados após completar o quiz', () => {
         const { id } = StorageManager.addToLibrary(QUIZ);
         QuizEngine.init(QUIZ, id);
@@ -154,7 +154,7 @@ describe('Fluxo — persistência na biblioteca', () => {
     });
 });
 
-describe('Fluxo — validação do JSON antes de iniciar', () => {
+describe('Fluxo validação do JSON antes de iniciar', () => {
     it('rejeita um arquivo que seria carregado sem nomeSimulado', () => {
         const { nomeSimulado, ...invalid } = QUIZ;
         const result = Validator.validateQuiz(invalid);
