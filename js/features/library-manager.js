@@ -193,7 +193,7 @@
 
             document.getElementById('libSimuladosControls')?.classList.toggle('hidden', isRevisao);
             document.getElementById('libraryList')?.classList.toggle('hidden', isRevisao);
-            document.getElementById('emptyLibraryMsg')?.classList.toggle('hidden', true);
+            document.getElementById('emptyLibraryMsg')?.classList.add('hidden');
             document.getElementById('libReviewPanel')?.classList.toggle('hidden', !isRevisao);
 
             this._syncSelectionUI();
@@ -220,10 +220,7 @@
             const selectedTotal = this._getSelectedWrongCount(lib);
 
             if (!this._reviewQty || this._reviewQty > selectedTotal) {
-                this._reviewQty = selectedTotal;
-            }
-            if (this._reviewQty < 1 && selectedTotal > 0) {
-                this._reviewQty = 1;
+                this._reviewQty = Math.max(1, selectedTotal);
             }
 
             panel.innerHTML = total === 0
@@ -233,8 +230,7 @@
             if (window.IconSystem) IconSystem.inject(panel);
         },
 
-        _buildEmptyReviewHTML(library) {
-            const lib = library || StorageManager.getLibrary();
+        _buildEmptyReviewHTML(lib) {
             const hasSimulados = lib.length > 0;
             const message = hasSimulados
                 ? 'Complete um simulado salvo na biblioteca para começar a rastrear erros.'
@@ -275,7 +271,29 @@
                     </label>`;
             }).join('');
 
-            const sliderAndButtonHTML = selectedTotal > 0 ? `
+            return `
+                <div class="review-info-notice" style="margin-bottom: var(--space-lg);">
+                    <span data-icon="info" data-size="sm"></span>
+                    <span>O rastreamento de erros funciona apenas para simulados salvos na Biblioteca Local.</span>
+                </div>
+                <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
+                    SIMULADOS
+                </div>
+                <div class="review-quiz-list" style="margin-bottom:var(--space-lg);">${rowsHTML}</div>
+                <div id="reviewSliderWrapper">
+                    ${this._buildSliderAndButtonHTML(selectedTotal)}
+                </div>`;
+        },
+
+        _buildSliderAndButtonHTML(selectedTotal) {
+            if (selectedTotal === 0) {
+                return `
+                    <p style="text-align:center; color:var(--text-muted); padding:var(--space-md); font-size:0.85rem;">
+                        Selecione ao menos um simulado com erros para iniciar a revisão.
+                    </p>`;
+            }
+
+            return `
                 <div class="review-qty-section">
                     <div class="review-qty-header">
                         <span>Questões no simulado de revisão</span>
@@ -296,21 +314,7 @@
                 <button class="btn btn-primary" style="width:100%; margin-top:var(--space-sm);" data-action="start-review-quiz">
                     <span data-icon="play" data-size="sm"></span>
                     Iniciar Revisão
-                </button>` : `
-                <p style="text-align:center; color:var(--text-muted); padding:var(--space-md); font-size:0.85rem;">
-                    Selecione ao menos um simulado com erros para iniciar a revisão.
-                </p>`;
-
-            return `
-                <div class="review-info-notice" style="margin-bottom: var(--space-lg);">
-                    <span data-icon="info" data-size="sm"></span>
-                    <span>O rastreamento de erros funciona apenas para simulados salvos na Biblioteca Local.</span>
-                </div>
-                <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
-                    SIMULADOS
-                </div>
-                <div class="review-quiz-list" style="margin-bottom:var(--space-lg);">${rowsHTML}</div>
-                ${sliderAndButtonHTML}`;
+                </button>`;
         },
 
         toggleReviewSource(id, checked) {
@@ -319,7 +323,25 @@
             } else {
                 this._reviewSelection.delete(id);
             }
-            this.renderReviewPanel();
+            this._updateReviewSummary();
+        },
+
+        _updateReviewSummary() {
+            const lib = StorageManager.getLibrary();
+            const selectedTotal = this._getSelectedWrongCount(lib);
+
+            if (!this._reviewQty || this._reviewQty > selectedTotal) {
+                this._reviewQty = Math.max(1, selectedTotal);
+            }
+
+            const sliderWrapper = document.getElementById('reviewSliderWrapper');
+            if (sliderWrapper) {
+                sliderWrapper.innerHTML = this._buildSliderAndButtonHTML(selectedTotal);
+                if (window.IconSystem) IconSystem.inject(sliderWrapper);
+            }
+
+            const display = document.getElementById('reviewQtyDisplay');
+            if (display) display.textContent = this._reviewQty;
         },
 
         updateReviewQty(qty) {
@@ -328,8 +350,9 @@
             if (display) display.textContent = qty;
         },
 
-        getSelectedForReview() {
-            const validIds = new Set(StorageManager.getLibrary().map(i => i.id));
+        getSelectedForReview(library) {
+            const lib = library || StorageManager.getLibrary();
+            const validIds = new Set(lib.map(i => i.id));
             return [...this._reviewSelection].filter(id => validIds.has(id));
         },
 
