@@ -15,7 +15,7 @@ const SAMPLE_QUIZ = {
 
 beforeEach(() => { localStorage.clear(); });
 
-describe('StorageManager — getLibrary() e saveLibrary()', () => {
+describe('StorageManager getLibrary() e saveLibrary()', () => {
     it('retorna array vazio inicialmente', () => {
         assert.deepEqual(StorageManager.getLibrary(), []);
     });
@@ -27,7 +27,7 @@ describe('StorageManager — getLibrary() e saveLibrary()', () => {
     });
 });
 
-describe('StorageManager — addToLibrary()', () => {
+describe('StorageManager addToLibrary()', () => {
     it('adiciona item com metadados corretos', () => {
         const result = StorageManager.addToLibrary(SAMPLE_QUIZ);
         assert.ok(result.success);
@@ -42,7 +42,7 @@ describe('StorageManager — addToLibrary()', () => {
     });
 });
 
-describe('StorageManager — removeFromLibrary()', () => {
+describe('StorageManager removeFromLibrary()', () => {
     it('remove item pelo ID', () => {
         const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         StorageManager.removeFromLibrary(id);
@@ -64,7 +64,7 @@ describe('StorageManager — removeFromLibrary()', () => {
     });
 });
 
-describe('StorageManager — replaceInLibrary()', () => {
+describe('StorageManager replaceInLibrary()', () => {
     it('substitui o conteúdo mantendo o mesmo id', () => {
         const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         const updated = { ...SAMPLE_QUIZ, nomeSimulado: 'Quiz Atualizado' };
@@ -95,7 +95,7 @@ describe('StorageManager — replaceInLibrary()', () => {
     });
 });
 
-describe('StorageManager — updateLibraryMeta()', () => {
+describe('StorageManager updateLibraryMeta()', () => {
     it('atualiza apenas os campos fornecidos', () => {
         const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         StorageManager.updateLibraryMeta(id, { timesPlayed: 5, averageScore: 80 });
@@ -110,7 +110,7 @@ describe('StorageManager — updateLibraryMeta()', () => {
     });
 });
 
-describe('StorageManager — removeManyFromLibrary()', () => {
+describe('StorageManager removeManyFromLibrary()', () => {
     it('remove múltiplos itens de uma só vez', () => {
         const { id: id1 } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         const { id: id2 } = StorageManager.addToLibrary({ ...SAMPLE_QUIZ, nomeSimulado: 'Quiz 2' });
@@ -146,7 +146,7 @@ describe('StorageManager — removeManyFromLibrary()', () => {
     });
 });
 
-describe('StorageManager — updateQuizStats()', () => {
+describe('StorageManager updateQuizStats()', () => {
     it('registra a primeira tentativa corretamente', () => {
         const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         StorageManager.updateQuizStats(id, { percent: 80, correct: 4, total: 5 });
@@ -176,7 +176,7 @@ describe('StorageManager — updateQuizStats()', () => {
     });
 });
 
-describe('StorageManager — getStorageStats()', () => {
+describe('StorageManager getStorageStats()', () => {
     it('retorna estrutura válida com quota fixa de 4 MB', () => {
         const stats = StorageManager.getStorageStats();
         assert.ok(typeof stats.usage === 'number');
@@ -198,7 +198,7 @@ describe('StorageManager — getStorageStats()', () => {
     });
 });
 
-describe('StorageManager — canStore()', () => {
+describe('StorageManager canStore()', () => {
     it('permite armazenar quando uso está abaixo do threshold', () => {
         const result = StorageManager.canStore(SAMPLE_QUIZ);
         assert.equal(result.allowed, true);
@@ -226,7 +226,7 @@ describe('StorageManager — canStore()', () => {
     });
 });
 
-describe('StorageManager — saveWrongQuestions() e getAggregatedWrong()', () => {
+describe('StorageManager saveWrongQuestions() e getAggregatedWrong()', () => {
     it('persiste wrongQuestions via updateLibraryMeta', () => {
         const { id } = StorageManager.addToLibrary(SAMPLE_QUIZ);
         const list = [{ sourceQuizId: id, sourceQuizName: 'X', questao: { id: 1 }, errorCount: 1 }];
