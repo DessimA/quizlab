@@ -79,6 +79,37 @@
             };
 
             this.open('customModal');
+        },
+
+        custom({ title, body, confirmText = 'OK', cancelText = null, onConfirm = null }) {
+            const modal = document.getElementById('customModal');
+            if (!modal) return;
+
+            const titleEl  = modal.querySelector('.modal-title');
+            const bodyEl   = modal.querySelector('#modalMessage');
+            const btnOk    = modal.querySelector('#modalBtnConfirm');
+            const btnCancel = modal.querySelector('#modalBtnCancel');
+
+            if (titleEl)  titleEl.textContent  = title;
+            if (bodyEl)   bodyEl.innerHTML     = body;
+            if (btnOk)    btnOk.textContent    = confirmText;
+
+            if (cancelText && btnCancel) {
+                btnCancel.textContent = cancelText;
+                btnCancel.classList.remove('hidden');
+            } else if (btnCancel) {
+                btnCancel.classList.add('hidden');
+            }
+
+            this._customOnConfirm = onConfirm;
+
+            btnOk.onclick = () => {
+                this.close('customModal');
+                if (typeof this._customOnConfirm === 'function') this._customOnConfirm();
+                this._customOnConfirm = null;
+            };
+
+            this.open('customModal');
         }
     };
 

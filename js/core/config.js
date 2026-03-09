@@ -7,7 +7,9 @@
             SESSION_KEY: 'quizlab_session'
         },
         LIMITS: {
-            MAX_LIBRARY_SLOTS: 10,
+            STORAGE_SAFE_QUOTA_BYTES: 4 * 1024 * 1024,
+            STORAGE_WARN_THRESHOLD: 0.70,
+            STORAGE_BLOCK_THRESHOLD: 0.85,
             ENUNCIADO_MIN_LENGTH: 5,
             RECOMMENDED_MAX_QUESTIONS: 500,
             MAX_HISTORY_ENTRIES: 10,
@@ -48,6 +50,12 @@
 
         truncate(text, maxLength = CONFIG.LIMITS.ENUNCIADO_PREVIEW_LENGTH) {
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        },
+
+        formatBytes(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
         }
     };
 
