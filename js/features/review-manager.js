@@ -168,9 +168,10 @@
         },
 
         _renderHistory(container) {
-            if (!QuizEngine.getState().libraryId) return;
-            const lib = StorageManager.getLibrary();
-            const item = lib.find(i => i.id === QuizEngine.getState().libraryId);
+            const { libraryId } = QuizEngine.getState();
+            if (!libraryId) return;
+
+            const item = StorageManager.getById(libraryId);
             if (!item || !item.meta.history || item.meta.history.length < 2) return;
 
             const section = document.createElement('div');
@@ -180,7 +181,7 @@
                 <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
                     ${item.meta.history.map((h, idx) => `
                         <div style="flex:1;min-width:80px;text-align:center;padding:var(--space-sm);background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);">
-                            <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:${h.score >= 70 ? 'var(--success)' : h.score >= 50 ? 'var(--primary-500)' : 'var(--error)'};">${h.score}%</div>
+                            <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:${Utils.scoreColor(h.score)};">${h.score}%</div>
                             <div style="font-size:0.65rem;color:var(--text-muted);">${new Date(h.playedAt).toLocaleDateString()}</div>
                             <div style="font-size:0.65rem;color:var(--text-muted);">${h.correct}/${h.total}</div>
                         </div>
