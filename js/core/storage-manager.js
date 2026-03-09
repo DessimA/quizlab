@@ -38,9 +38,6 @@
 
         addToLibrary(quiz) {
             const library = this.getLibrary();
-            if (library.length >= CONFIG.LIMITS.MAX_LIBRARY_SLOTS) {
-                return { success: false, reason: 'LIMIT_REACHED' };
-            }
             const newId = `quiz_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             const newItem = {
                 id: newId,
@@ -55,7 +52,7 @@
                 }
             };
             library.push(newItem);
-            this.saveLibrary(library);
+            if (!this.saveLibrary(library)) return { success: false, reason: 'SAVE_FAILED' };
             return { success: true, id: newId };
         },
 
@@ -70,10 +67,21 @@
 
         removeFromLibrary(id) {
             const session = this.getSession();
-            if (session && session.libraryId === id) {
-                this.clearSession();
-            }
+            if (session && session.libraryId === id) this.clearSession();
             const library = this.getLibrary().filter(item => item.id !== id);
+            return this.saveLibrary(library);
+        },
+
+        removeManyFromLibrary(ids) {
+            const session = this.getSession();
+            const idsSet = new Set(ids);
+            const library = this.getLibrary().filter(item => {
+                if (idsSet.has(item.id)) {
+                    if (session?.libraryId === item.id) this.clearSession();
+                    return false;
+                }
+                return true;
+            });
             return this.saveLibrary(library);
         },
 
@@ -114,6 +122,31 @@
 
             library[index].meta = meta;
             return this.saveLibrary(library);
+        },
+
+        async getStorageStats() {
+            const FALLBACK_QUOTA = 5 * 1024 * 1024;
+            if (!navigator.storage?.estimate) {
+                const raw = localStorage.getItem(CONFIG.STORAGE.LIBRARY_KEY) || '';
+                const usage = new Blob([raw]).size;
+                return { usage, quota: FALLBACK_QUOTA, percent: usage / FALLBACK_QUOTA };
+            }
+            try {
+                const { usage, quota } = await navigator.storage.estimate();
+                return { usage, quota, percent: usage / quota };
+            } catch {
+                return { usage: 0, quota: FALLBACK_QUOTA, percent: 0 };
+            }
+        },
+
+        async canStore(data) {
+            const stats = await this.getStorageStats();
+            const dataSize = new Blob([JSON.stringify(data)]).size;
+            const projectedPercent = (stats.usage + dataSize) / stats.quota;
+            if (projectedPercent >= CONFIG.LIMITS.STORAGE_BLOCK_THRESHOLD) {
+                return { allowed: false, reason: 'QUOTA_EXCEEDED', stats };
+            }
+            return { allowed: true, stats };
         },
 
         getDraft() {

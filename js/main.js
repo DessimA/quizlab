@@ -30,22 +30,24 @@
             a.click();
         };
 
-        const _finalizeExport = () => {
+        const _finalizeExport = async () => {
             const quiz = CreatorManager.buildQuizObject();
             if (!quiz) return;
-            const shouldSave = document.getElementById('optSaveLibrary')?.checked;
-            
+
+            const shouldSave = document.getElementById('saveToLibCheckbox')?.checked;
             _pendingState.quiz = quiz;
             _pendingState.savedId = null;
 
             if (shouldSave) {
-                const result = StorageManager.addToLibrary(quiz);
-                if (!result.success && result.reason === 'LIMIT_REACHED') {
-                    const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
-                    document.getElementById('limitOldestTitle').textContent = oldest.data.nomeSimulado;
-                    document.getElementById('limitOldestDate').textContent = `Adicionado em: ${new Date(oldest.meta.addedAt).toLocaleDateString('pt-BR')}`;
+                const check = await StorageManager.canStore(quiz);
+                if (!check.allowed) {
                     ModalManager.close('exportOptionsModal');
-                    ModalManager.open('limitModal');
+                    ModalManager.alert('Armazenamento local cheio. Acesse a Biblioteca e exclua simulados para liberar espaço.');
+                    return;
+                }
+                const result = StorageManager.addToLibrary(quiz);
+                if (!result.success) {
+                    ModalManager.alert('Erro ao salvar na biblioteca. Tente novamente.');
                     return;
                 }
                 _pendingState.savedId = result.id;
@@ -251,30 +253,11 @@
                 }
             },
 
-            'limit-export': () => {
-                const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
-                _downloadJson(oldest.data, oldest.data.nomeSimulado);
-                StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(_pendingState.quiz);
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(_pendingState.quiz, result.id);
-                _pendingState.quiz = null;
-            },
-
-            'limit-replace': () => {
-                const oldest = [...StorageManager.getLibrary()].sort((a, b) => a.meta.addedAt - b.meta.addedAt)[0];
-                StorageManager.removeFromLibrary(oldest.id);
-                const result = StorageManager.addToLibrary(_pendingState.quiz);
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(_pendingState.quiz, result.id);
-                _pendingState.quiz = null;
-            },
-
-            'limit-cancel': () => {
-                ModalManager.close('limitModal');
-                ScreenManager.loadQuiz(_pendingState.quiz, null);
-                _pendingState.quiz = null;
-            }
+            'toggle-selection-mode': () => LibraryManager.toggleSelectionMode(),
+            'toggle-card-select':    (e, target) => LibraryManager.toggleCardSelection(target.dataset.id),
+            'select-all-library':    () => LibraryManager.selectAll(),
+            'deselect-all-library':  () => LibraryManager.deselectAll(),
+            'delete-selected':       () => LibraryManager.bulkDelete()
         });
 
         // Redirect ScreenManager global calls to use our local state
@@ -285,8 +268,6 @@
         };
 
         window.addEventListener('quizlab:timer-expired', () => {
-            const examBar = document.getElementById('examTimerBar');
-            if (examBar) examBar.classList.add('hidden');
             const inlineTimer = document.getElementById('timerDisplay');
             if (inlineTimer) inlineTimer.style.display = 'none';
             ToastSystem.show('Tempo esgotado! Finalizando simulado...', 'error');
@@ -302,13 +283,6 @@
                 inlineTimer.textContent = timeStr;
                 inlineTimer.style.display = 'inline';
                 inlineTimer.classList.toggle('timer-warning', isWarning);
-            }
-
-            const examBar = document.getElementById('examTimerBar');
-            if (examBar) {
-                const valEl = examBar.querySelector('.exam-timer-value');
-                if (valEl) valEl.textContent = timeStr;
-                examBar.classList.toggle('timer-warning', isWarning);
             }
         });
 

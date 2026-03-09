@@ -270,21 +270,47 @@
 
             <!-- Library Screen (Meus Simulados) -->
             <div id="libraryScreen" class="hidden fade-in">
-                <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start;">
-                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar" style="margin-top: -4px;">
+                <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-ghost" data-action="enter-app" title="Voltar">
                         <span data-icon="arrowLeft"></span>
                     </button>
-                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width: 140px;">
-                        <span id="libraryCounter" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); letter-spacing:0.08em; white-space:nowrap;">
-                            CAPACIDADE &nbsp; <strong style="color:var(--text-main);">0/10</strong>
-                        </span>
-                        <div class="lib-capacity-track">
-                            <div class="lib-capacity-fill" id="libCapacityFill" style="width:0%"></div>
-                        </div>
-                    </div>
+                    <button class="btn btn-ghost" id="btnToggleSelection" data-action="toggle-selection-mode">
+                        <span data-icon="check" data-size="sm"></span>
+                        <span class="btn-label" style="margin-left:4px; font-size:0.8rem;">Selecionar</span>
+                    </button>
                 </div>
                 
-                <h2 class="neon-text" style="text-align: center; margin-bottom: 24px;">Biblioteca Local</h2>
+                <h2 class="neon-text" style="text-align: center; margin-bottom: 16px;">Biblioteca Local</h2>
+
+                <!-- Barra de status de armazenamento -->
+                <div class="lib-storage-status" style="margin-bottom: 20px;">
+                    <div id="libStorageInfo" class="lib-storage-info">
+                        <span>0 simulados</span>
+                        <span>—</span>
+                    </div>
+                    <div class="lib-capacity-track" style="height: 5px; margin-top: 6px;">
+                        <div class="lib-capacity-fill" id="libCapacityFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Toolbar de seleção em massa (oculta por padrão) -->
+                <div id="libBulkToolbar" class="lib-bulk-toolbar hidden" style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="btn btn-ghost" data-action="select-all-library"
+                                style="font-size: 0.75rem; padding: 4px 10px;">TODOS</button>
+                        <button class="btn btn-ghost" data-action="deselect-all-library"
+                                style="font-size: 0.75rem; padding: 4px 10px;">NENHUM</button>
+                        <span id="libSelectionCount"
+                              style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);">
+                            0 selecionados
+                        </span>
+                    </div>
+                    <button class="btn btn-ghost btn-delete" id="libDeleteSelectedBtn"
+                            data-action="delete-selected" disabled>
+                        <span data-icon="trash" data-size="sm"></span>
+                        <span id="libDeleteSelectedLabel" style="margin-left: 4px;">Excluir</span>
+                    </button>
+                </div>
 
                 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
                     <div style="flex: 1; position: relative; min-width: 200px;">

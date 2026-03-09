@@ -90,3 +90,66 @@ em `ScreenManager.resumeSession()`.
 `confirm-answer`, `next-question`, `prev-question` e `select-alternative`
 seguem o padrão `engine.action() + renderQuestion()`. A closure `_navigateQuiz`
 elimina a repetição sem introduzir acoplamento extra.
+
+---
+
+# Guard Dinâmico de Cota, Barra de Status e Seleção em Massa
+
+## Motivação
+
+O limite fixo de 10 slots era arbitrário e não refletia a capacidade real do
+`localStorage`. A substituição por verificação dinâmica via `navigator.storage.estimate()`
+permite que o usuário armazene quantos simulados o navegador suportar, com feedback visual
+preciso sobre o espaço disponível.
+
+---
+
+## Mudanças por Arquivo
+
+### `config.js`
+Substituídos `MAX_LIBRARY_SLOTS: 10` por `STORAGE_WARN_THRESHOLD: 0.70` e
+`STORAGE_BLOCK_THRESHOLD: 0.85`. Adicionado `Utils.formatBytes()`.
+
+### `storage-manager.js`
+- `addToLibrary()` não verifica mais slots. Retorna `SAVE_FAILED` apenas em erro real de escrita.
+- `getStorageStats()` — async. Usa `navigator.storage.estimate()` quando disponível; cai no
+  fallback de 5 MB baseado em `Blob.size` do localStorage quando não.
+- `canStore(data)` — async. Projeta o uso pós-adição e bloqueia se >= 85%.
+- `removeManyFromLibrary(ids)` — deleta um array de IDs em uma única escrita, limpando a
+  sessão se necessário.
+
+### `file-handler.js`
+`_askToSave` tornou-se `async`. A verificação `LIMIT_REACHED` foi substituída por
+`await StorageManager.canStore(data)` antes de chamar `addToLibrary`.
+
+### `library-manager.js`
+- `_selection` — estado de seleção em massa (`active`, `ids: Set`).
+- `render()` chama `_updateCapacityUI()` (que é async internamente via `.then()`).
+- `_updateCapacityUI()` consulta `getStorageStats()` e atualiza a barra com cores
+  progressivas: verde / amarelo (70%) / vermelho (85%).
+- `renderCard()` em modo seleção: adiciona `data-action="toggle-card-select"` no card,
+  exibe checkbox, oculta botões de ação.
+- Novos métodos públicos: `toggleSelectionMode`, `toggleCardSelection`, `selectAll`,
+  `deselectAll`, `bulkDelete`.
+
+### `main.js`
+- `_finalizeExport` tornou-se `async`; usa `canStore` antes de `addToLibrary`.
+- Removidos handlers `limit-export` e `limit-replace` (modal obsoleto).
+- Adicionados handlers: `toggle-selection-mode`, `toggle-card-select`,
+  `select-all-library`, `deselect-all-library`, `delete-selected`.
+
+### `index.html`
+- Bloco `#limitModal` removido (fluxo substituído pelo alerta de `canStore`).
+- Header da biblioteca: botão "Selecionar" + barra de status `#libStorageInfo` /
+  `#libCapacityFill`.
+- Toolbar `#libBulkToolbar`: oculta por padrão, visível em modo seleção.
+
+### `styles.css`
+Adicionados: `.lib-storage-status`, `.lib-storage-info`, `.lib-capacity-fill.warn`,
+`.lib-capacity-fill.danger`, `.lib-bulk-toolbar`, `.library-card.is-selected`,
+`.lib-card-checkbox-wrap`, `.lib-card-checkbox`.
+
+### `tests/unit/storage-manager.test.js`
+- Removida suite `addToLibrary() com limite` (baseada em slots fixos).
+- Adicionadas suites para `removeManyFromLibrary()` e smoke tests para
+  `getStorageStats()` e `canStore()`.

@@ -22,7 +22,7 @@
                             this._askToSave(data);
                         }
                     }, CONFIG.TIMINGS.LOADING_MIN_DELAY);
-                } catch (err) {
+                } catch {
                     ScreenManager.hideLoading();
                     ModalManager.alert('Erro crítico ao ler o arquivo. Verifique a sintaxe JSON.');
                 }
@@ -43,19 +43,22 @@
             const lib = StorageManager.getLibrary();
             const byName = lib.find(item => item.data.nomeSimulado === data.nomeSimulado);
             if (!byName) return null;
-
             const sameContent = this._generateHash(byName.data) === this._generateHash(data);
-
             return { item: byName, sameContent };
         },
 
-        _askToSave(data) {
+        async _askToSave(data) {
             const duplicate = this._findDuplicate(data);
 
             if (!duplicate) {
+                const check = await StorageManager.canStore(data);
+                if (!check.allowed) {
+                    ModalManager.alert('Armazenamento local cheio. Acesse a Biblioteca e exclua simulados para liberar espaço.');
+                    return;
+                }
                 const result = StorageManager.addToLibrary(data);
                 if (!result.success) {
-                    ModalManager.alert('Biblioteca cheia. Exclua um simulado para adicionar novos.');
+                    ModalManager.alert('Erro ao salvar. Tente novamente.');
                     return;
                 }
                 ScreenManager.loadQuizOptions(data, result.id);
